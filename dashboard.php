@@ -446,13 +446,7 @@ function get_flag_icon($country) {
 
         <nav class="sidebar-nav">
             <div class="nav-label">Navigation</div>
-            <button class="nav-item active" id="menu-buy" onclick="switchSection('buy')">
-                <i class="bx bx-phone-call"></i> Buy Numbers
-            </button>
-            <button class="nav-item" id="menu-canva" onclick="switchSection('canva')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 6px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" fill="#00C4CC"/></svg> Canva Premium
-            </button>
-            <button class="nav-item" id="menu-history" onclick="switchSection('history')">
+            <button class="nav-item active" id="menu-history" onclick="switchSection('history')">
                 <i class="bx bx-history"></i> Order History
             </button>
             <button class="nav-item" id="menu-support" onclick="switchSection('support')">
@@ -490,119 +484,8 @@ function get_flag_icon($country) {
                 <div class="alert-bar alert-error"><i class="bx bx-error-circle" style="font-size:18px;"></i> <?= $error_msg ?></div>
             <?php endif; ?>
 
-            <!-- 1. BUY SECTION -->
-            <div id="section-buy" class="dashboard-section active">
-                <h1 class="section-title">Buy Numbers</h1>
-                <p class="section-sub">Browse our catalog of virtual SMS verification numbers.</p>
-
-                <div class="filter-tabs">
-                    <button class="filter-tab tg-tab active" id="tab-tg" onclick="filterService('Telegram', this)">
-                        <i class="bx bxl-telegram" style="font-size:17px;"></i> Telegram
-                    </button>
-                    <button class="filter-tab" id="tab-wa" onclick="filterService('WhatsApp', this)">
-                        <i class="bx bxl-whatsapp" style="font-size:17px;color:#22c55e;"></i> WhatsApp
-                    </button>
-                </div>
-
-                <div class="search-wrap">
-                    <i class="bx bx-search search-icon"></i>
-                    <input type="text" id="search-input" placeholder="Search country... (India, China, USA)" oninput="searchCatalog()">
-                    <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
-                </div>
-
-                <?php if (empty($catalog_items)): ?>
-                    <div class="empty-state">No active numbers in catalog yet.</div>
-                <?php else: ?>
-                <div class="catalog-grid">
-                    <?php foreach ($catalog_items as $item): ?>
-                        <div class="catalog-card" data-service="<?= htmlspecialchars($item['service_type']) ?>">
-                            <div>
-                                <div class="c-flag"><?= get_flag_icon($item['country']) ?></div>
-                                <div class="c-country"><?= htmlspecialchars($item['country']) ?></div>
-                                <div class="c-platform <?= $item['service_type'] === 'Telegram' ? 'tg' : 'wa' ?>">
-                                    <?= htmlspecialchars($item['service_type']) ?> · <?= htmlspecialchars($item['name']) ?>
-                                </div>
-                                <?php if ($item['stock'] > 3): ?>
-                                    <span class="stock-badge stock-in">Stock: <?= $item['stock'] ?></span>
-                                <?php elseif ($item['stock'] > 0): ?>
-                                    <span class="stock-badge stock-low">⚡ Only <?= $item['stock'] ?> Left!</span>
-                                <?php else: ?>
-                                    <span class="stock-badge stock-out">Out of Stock</span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="card-footer">
-                                <div>
-                                    <div class="price-inr">₹<?= number_format($item['price_inr'], 0) ?></div>
-                                    <div class="price-usd">$<?= number_format($item['price_usd'], 2) ?></div>
-                                </div>
-                                <a href="payment.php?id=<?= $item['id'] ?>" class="btn-buy <?= $item['stock'] > 0 ? '' : 'disabled' ?>">
-                                    <?= $item['stock'] > 0 ? 'Buy' : 'Sold Out' ?>
-                                </a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- CANVA PREMIUM SECTION -->
-            <div id="section-canva" class="dashboard-section">
-                <h1 class="section-title" style="display:flex; align-items:center; gap:10px;">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" fill="#00C4CC"/></svg>
-                    Canva Premium Lifetime
-                </h1>
-                <p class="section-sub">Get instant lifetime access to Canva Pro Premium features for only ₹150.</p>
-
-                <div style="max-width: 650px; background: linear-gradient(145deg, #161622 0%, #0d0d14 100%); border: 1.5px solid rgba(0, 196, 204, 0.35); border-radius: 20px; padding: 28px; box-shadow: 0 10px 30px rgba(0, 196, 204, 0.12); position: relative; overflow: hidden;">
-                    <!-- Glowing Radial Background -->
-                    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,196,204,0.25) 0%, transparent 70%); pointer-events: none;"></div>
-
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <!-- Canva Icon Badge -->
-                            <div style="width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0, 196, 204, 0.4); flex-shrink:0;">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
-                            </div>
-                            <div>
-                                <h3 style="font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 4px 0;">Canva Premium Lifetime</h3>
-                                <span style="background: rgba(0, 196, 204, 0.15); color: #00C4CC; border: 1px solid rgba(0, 196, 204, 0.3); padding: 3px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 700;">✨ Lifetime Unlimited Access</span>
-                            </div>
-                        </div>
-
-                        <!-- Price Tag -->
-                        <div style="text-align: right;">
-                            <div style="font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 900; color: #00C4CC; line-height: 1;">₹150</div>
-                            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;"><del style="color:#f87171;">₹4,999</del> (Save 97%)</div>
-                        </div>
-                    </div>
-
-                    <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px;">
-                        Get Canva Premium Lifetime subscription for 150 Rupees. Enjoy 100M+ premium assets, AI tools, background remover, and unlimited templates on your email forever.
-                    </p>
-
-                    <!-- Features list -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 26px;">
-                        <div style="font-size: 13px; color: #e2e8f0; display: flex; align-items: center; gap: 8px;"><span style="color:#00C4CC;">🎨</span> 100M+ Stock Photos & Fonts</div>
-                        <div style="font-size: 13px; color: #e2e8f0; display: flex; align-items: center; gap: 8px;"><span style="color:#00C4CC;">🪄</span> Background Remover & Magic Eraser</div>
-                        <div style="font-size: 13px; color: #e2e8f0; display: flex; align-items: center; gap: 8px;"><span style="color:#00C4CC;">⚡</span> 100GB Cloud Storage</div>
-                        <div style="font-size: 13px; color: #e2e8f0; display: flex; align-items: center; gap: 8px;"><span style="color:#00C4CC;">♾️</span> Lifetime Validity & Support</div>
-                    </div>
-
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-                        <div style="font-size: 12.5px; color: var(--muted);">⚡ Canva Premium Lifetime for 150 Rupees</div>
-                        <?php if (!empty($canva_item['id'])): ?>
-                            <a href="payment.php?id=<?= $canva_item['id'] ?>" class="btn-buy" style="background: linear-gradient(135deg, #00C4CC 0%, #7D2AE8 100%); padding: 12px 28px; font-size: 15px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 196, 204, 0.4);">
-                                Buy Canva Premium (₹150)
-                            </a>
-                        <?php else: ?>
-                            <button class="btn-buy disabled">Out of Stock</button>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-
             <!-- 2. HISTORY SECTION -->
-            <div id="section-history" class="dashboard-section">
+            <div id="section-history" class="dashboard-section active">
                 <h1 class="section-title">Order History</h1>
                 <p class="section-sub">Track your purchases and verification status.</p>
 
@@ -877,8 +760,8 @@ function get_flag_icon($country) {
         // Restore section from URL
         document.addEventListener('DOMContentLoaded', () => {
             const p = new URLSearchParams(window.location.search).get('section');
-            if (p && ['buy','canva','history','support'].includes(p)) switchSection(p);
-            else filterService('Telegram', document.getElementById('tab-tg'));
+            if (p && ['history','support'].includes(p)) switchSection(p);
+            else switchSection('history');
         });
 
         // Copy text helper
