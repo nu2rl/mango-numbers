@@ -503,7 +503,7 @@ function get_flag_icon($country) {
 
             <!-- DYNAMIC CATALOG SECTIONS -->
             <?php foreach ($active_sections as $sec): 
-                $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? AND status = 'active' ORDER BY display_order ASC, id DESC");
+                $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? ORDER BY display_order ASC, id DESC");
                 $prod_stmt->execute([$sec['id']]);
                 $sec_products = $prod_stmt->fetchAll();
             ?>
@@ -546,7 +546,12 @@ function get_flag_icon($country) {
                                             <?php endif; ?>
                                         </div>
 
-                                        <?php if ($item['stock_quantity'] > 0): ?>
+                                        <?php 
+                                            $is_item_disabled = ($item['status'] === 'inactive' || $item['availability_status'] === 'disabled');
+                                        ?>
+                                        <?php if ($is_item_disabled): ?>
+                                            <button class="btn-buy disabled" disabled style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 700; cursor: not-allowed;">Not available right now</button>
+                                        <?php elseif ($item['stock_quantity'] > 0): ?>
                                             <a href="checkout.php?product_id=<?= $item['id'] ?>" class="btn-buy">Buy Now</a>
                                         <?php else: ?>
                                             <button class="btn-buy disabled" disabled>Out of Stock</button>

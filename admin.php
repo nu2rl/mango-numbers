@@ -554,19 +554,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_toggle_house_s
     $prod_id = (int)$_POST['product_id'];
     $sec_id = (int)$_POST['section_id'];
 
-    $stmt_curr = $db->prepare("SELECT status, availability_status, stock_quantity FROM products WHERE id = ?");
-    $stmt_curr->execute([$prod_id]);
-    $curr = $stmt_curr->fetch();
+    if (isset($_POST['status'])) {
+        $status_val = trim($_POST['status']);
+        $new_status = ($status_val === 'disabled' || $status_val === 'inactive') ? 'inactive' : 'active';
+    } else {
+        $stmt_curr = $db->prepare("SELECT status, availability_status FROM products WHERE id = ?");
+        $stmt_curr->execute([$prod_id]);
+        $curr = $stmt_curr->fetch();
+        $is_currently_disabled = ($curr && ($curr['status'] === 'inactive' || $curr['availability_status'] === 'disabled'));
+        $new_status = $is_currently_disabled ? 'active' : 'inactive';
+    }
 
-    $is_currently_disabled = ($curr && ($curr['status'] === 'inactive' || $curr['availability_status'] === 'disabled'));
-
-    if ($is_currently_disabled) {
-        $new_status = 'active';
-        $stock = (int)($curr['stock_quantity'] ?? 0);
+    if ($new_status === 'active') {
+        $stmt_st = $db->prepare("SELECT stock_quantity FROM products WHERE id = ?");
+        $stmt_st->execute([$prod_id]);
+        $st = $stmt_st->fetch();
+        $stock = (int)($st['stock_quantity'] ?? 0);
         $new_availability = ($stock > 0) ? 'available' : 'out_of_stock';
         $label = 'Enabled';
     } else {
-        $new_status = 'inactive';
         $new_availability = 'disabled';
         $label = 'Disabled';
     }
@@ -1784,9 +1790,19 @@ if ($view_section_id > 0) {
                                                                                             <input type="number" name="stock_quantity" class="form-control" value="<?= (int)$h['stock_quantity'] ?>" required style="border-radius: 10px;">
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="mb-3">
-                                                                                        <label class="form-label fw-bold small text-uppercase">Badge Tag (e.g. HOT, POPULAR)</label>
-                                                                                        <input type="text" name="badge" class="form-control" value="<?= htmlspecialchars($h['badge'] ?? '') ?>" placeholder="e.g. INSTANT" style="border-radius: 10px;">
+                                                                                    <div class="row g-3 mb-3">
+                                                                                        <div class="col-6">
+                                                                                            <label class="form-label fw-bold small text-uppercase">Badge Tag (e.g. HOT, POPULAR)</label>
+                                                                                            <input type="text" name="badge" class="form-control" value="<?= htmlspecialchars($h['badge'] ?? '') ?>" placeholder="e.g. INSTANT" style="border-radius: 10px;">
+                                                                                        </div>
+                                                                                        <div class="col-6">
+                                                                                            <label class="form-label fw-bold small text-uppercase">Service Status</label>
+                                                                                            <?php $modal_disabled = ($h['status'] === 'inactive' || $h['availability_status'] === 'disabled'); ?>
+                                                                                            <select name="status" class="form-select fw-bold" style="border-radius: 10px;">
+                                                                                                <option value="active" <?= !$modal_disabled ? 'selected' : '' ?>>🟢 Enabled</option>
+                                                                                                <option value="disabled" <?= $modal_disabled ? 'selected' : '' ?>>🔴 Disabled</option>
+                                                                                            </select>
+                                                                                        </div>
                                                                                     </div>
                                                                                     <div class="mb-3">
                                                                                         <label class="form-label fw-bold small text-uppercase">Upload New House Icon / Photo</label>
@@ -1819,29 +1835,18 @@ if ($view_section_id > 0) {
                                                             <td style="padding: 16px 20px;">
                                                                 <?php 
                                                                     $is_disabled = ($h['status'] === 'inactive' || $h['availability_status'] === 'disabled');
-                                                                    $is_out_of_stock = ($h['stock_quantity'] <= 0);
                                                                 ?>
                                                                 <form action="admin.php" method="POST" style="margin: 0; display: inline-block;">
                                                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                     <input type="hidden" name="active_tab" value="catalog">
                                                                     <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
                                                                     <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
-                                                                    <input type="hidden" name="current_status" value="<?= $h['status'] ?>">
                                                                     <input type="hidden" name="action_toggle_house_status" value="1">
                                                                     
-                                                                    <?php if ($is_disabled): ?>
-                                                                        <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.12); color: #b91c1c; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1.5px solid rgba(239, 68, 68, 0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to Enable this service">
-                                                                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> 🔴 Disabled
-                                                                        </button>
-                                                                    <?php elseif ($is_out_of_stock): ?>
-                                                                        <button type="submit" class="btn btn-sm" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1.5px solid rgba(245, 158, 11, 0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to Disable this service">
-                                                                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span> 🟡 Out of Stock
-                                                                        </button>
-                                                                    <?php else: ?>
-                                                                        <button type="submit" class="btn btn-sm" style="background: rgba(16, 185, 129, 0.12); color: #047857; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1.5px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to Disable this service">
-                                                                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span> 🟢 Enabled
-                                                                        </button>
-                                                                    <?php endif; ?>
+                                                                    <select name="status" onchange="this.form.submit()" class="form-select form-select-sm fw-bold" style="max-width: 140px; border-radius: 10px; border: 1.5px solid <?= $is_disabled ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)' ?>; background-color: <?= $is_disabled ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)' ?>; color: <?= $is_disabled ? '#b91c1c' : '#047857' ?>; font-size: 13px; padding: 6px 10px; cursor: pointer;">
+                                                                        <option value="active" <?= !$is_disabled ? 'selected' : '' ?>>🟢 Enabled</option>
+                                                                        <option value="disabled" <?= $is_disabled ? 'selected' : '' ?>>🔴 Disabled</option>
+                                                                    </select>
                                                                 </form>
                                                             </td>
                                                             <td style="padding: 16px 20px; text-align: right;">
