@@ -732,11 +732,13 @@ function get_flag_icon($country) {
             .topbar { padding: 12px 16px; }
             .tg-btn span { display: none; }
             .tg-btn { padding: 9px; }
-            input[type="text"], input[type="password"], select, textarea { font-size: 16px !important; }
+            .support-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+            input[type="text"], input[type="password"], input[type="email"], input[type="tel"], select, textarea { font-size: 16px !important; }
         }
         @media (max-width: 480px) {
-            .catalog-grid { grid-template-columns: 1fr 1fr; }
+            .catalog-grid { grid-template-columns: 1fr; }
             .price-inr { font-size: 17px; }
+            .content { padding: 12px; padding-bottom: 84px; }
         }
         /* ─── PAGE PRELOADER ANIMATION ─── */
         #mn-page-preloader {

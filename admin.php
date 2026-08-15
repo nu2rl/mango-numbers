@@ -1532,15 +1532,22 @@ if ($view_section_id > 0) {
         @media (max-width: 767px) {
             /* Table formatting and container optimizations for mobile */
             .container-xxl {
-                padding-left: 14px !important;
-                padding-right: 14px !important;
+                padding-left: 12px !important;
+                padding-right: 12px !important;
             }
             .stat-card {
                 margin-bottom: 14px;
             }
             .table th, .table td {
-                padding: 12px 14px !important;
-                font-size: 13px !important;
+                padding: 10px 12px !important;
+                font-size: 12.5px !important;
+            }
+            .table-responsive {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            input[type="text"], input[type="password"], input[type="email"], input[type="tel"], select, textarea {
+                font-size: 16px !important;
             }
             /* Modals safety padding */
             .lightbox-overlay {
