@@ -304,12 +304,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_approve'])) {
     $otp_code = trim($_POST['otp_code'] ?? '');
     $active_tab = $_POST['active_tab'] ?? 'approvals';
     
-    if (empty($virtual_number) || empty($otp_code)) {
-        $_SESSION['error_msg'] = 'Virtual number and SMS OTP code are required for approval.';
+    if (empty($virtual_number)) {
+        $_SESSION['error_msg'] = 'Virtual number is required for approval.';
     } elseif (!preg_match('/^\+?[0-9]+$/', $virtual_number) || strlen($virtual_number) > 12) {
         $_SESSION['error_msg'] = 'Virtual number must only contain digits and an optional leading plus sign (+), up to 12 characters in total.';
-    } elseif (!preg_match('/^[a-zA-Z0-9]+$/', $otp_code) || strlen($otp_code) > 8) {
-        $_SESSION['error_msg'] = 'SMS OTP code must be alphanumeric and 8 characters or less.';
     } else {
         // Fetch purchase details
         $stmt = $db->prepare("SELECT * FROM purchases WHERE id = ? AND status = 'pending'");
@@ -1828,8 +1826,7 @@ if ($view_section_id > 0) {
                                                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                 <input type="hidden" name="active_tab" value="approvals">
                                                                 <input type="hidden" name="purchase_id" value="<?= $p['id'] ?>">
-                                                                <input class="form-control form-control-sm" type="text" name="virtual_number" placeholder="Enter Virtual Number" style="width: 140px;" required maxlength="12" pattern="^\+?[0-9]+$" oninput="this.value = this.value.replace(/[^0-9+]/g, '')">
-                                                                <input class="form-control form-control-sm" type="text" name="otp_code" placeholder="Enter SMS OTP" style="width: 100px;" required maxlength="8" pattern="^[a-zA-Z0-9]+$" oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')">
+                                                                <input class="form-control form-control-sm" type="text" name="virtual_number" placeholder="Enter Virtual Number" style="width: 170px;" required maxlength="12" pattern="^\+?[0-9]+$" oninput="this.value = this.value.replace(/[^0-9+]/g, '')">
                                                                 
                                                                 <button type="submit" name="action_approve" class="btn btn-sm btn-success">Approve</button>
                                                                 <button type="button" class="btn btn-sm btn-danger" onclick="confirmOrderRejection(this.form)">Reject</button>
