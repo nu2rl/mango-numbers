@@ -2046,14 +2046,14 @@ if ($view_section_id > 0) {
                                                                         <i class="bx bx-check fs-5"></i> Save
                                                                     </button>
 
-                                                                    <form action="admin.php" method="POST" onsubmit="return confirm('Are you sure you want to delete <?= htmlspecialchars(addslashes($h['name'])) ?>?');" style="margin: 0;">
+                                                                    <form action="admin.php" method="POST" onsubmit="return mnConfirmAction(event, 'Are you sure you want to delete <?= htmlspecialchars(addslashes($h['name'])) ?>?');" style="margin: 0;">
                                                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                         <input type="hidden" name="active_tab" value="catalog">
                                                                         <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
                                                                         <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
                                                                         <input type="hidden" name="action_delete_house" value="1">
-                                                                        <button type="submit" class="btn btn-sm px-3 py-2" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s ease;" title="Delete this house item">
-                                                                            <i class="bx bx-trash fs-6"></i> Delete
+                                                                        <button type="submit" class="btn btn-sm px-3 py-2" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;" title="Delete this house item">
+                                                                            <img src="assets/img/delete_icon.png" style="width: 16px; height: 16px; object-fit: contain;"> Delete
                                                                         </button>
                                                                     </form>
                                                                 </div>
@@ -2097,8 +2097,8 @@ if ($view_section_id > 0) {
                                     <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,94,54,0.12) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="z-index: 1;">
                                         <div class="d-flex align-items-center gap-3">
-                                            <div style="width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, #ff5e36, #fca834); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 94, 54, 0.3); flex-shrink: 0;">
-                                                <i class="bx bxs-grid-alt text-white fs-3"></i>
+                                            <div style="width: 58px; height: 58px; border-radius: 18px; background: #ffffff; border: 1.5px solid rgba(255, 94, 54, 0.25); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(255, 94, 54, 0.15); flex-shrink: 0; overflow: hidden; padding: 4px;">
+                                                <img src="assets/img/offers_icon.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                                             </div>
                                             <div>
                                                 <div class="d-flex align-items-center gap-2 mb-1">
@@ -2258,13 +2258,13 @@ if ($view_section_id > 0) {
                                                             <i class="bx bx-chevron-right fs-5 ms-auto opacity-75"></i>
                                                         </a>
 
-                                                        <form action="admin.php" method="POST" onsubmit="return confirm('Deleting this Section will delete all houses inside it! Continue?');" style="margin: 0;">
+                                                        <form action="admin.php" method="POST" onsubmit="return mnConfirmAction(event, 'Deleting this Section will delete all houses inside it! Continue?');" style="margin: 0;">
                                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                             <input type="hidden" name="active_tab" value="catalog">
                                                             <input type="hidden" name="section_id" value="<?= $sec['id'] ?>">
                                                             <input type="hidden" name="action_delete_section" value="1">
                                                             <button type="submit" class="btn mn-btn-delete-section" title="Delete Section">
-                                                                <i class="bx bx-trash"></i>
+                                                                <img src="assets/img/delete_icon.png" style="width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.2));">
                                                             </button>
                                                         </form>
                                                     </div>
@@ -3489,6 +3489,76 @@ if ($view_section_id > 0) {
         document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('section-revenue')?.classList.contains('active')) {
                 initCharts();
+            }
+        });
+    </script>
+    <!-- In-Website Dialog Confirmation Modal (No Browser Native Popups) -->
+    <div id="mnCustomConfirmModal" class="modal fade" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.5);">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content" style="border-radius: 24px; border: 1.5px solid rgba(255, 94, 54, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; background: #ffffff;">
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-3 d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px; border-radius: 22px; background: #fef2f2; border: 1.5px solid #fecaca; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.15);">
+                        <img id="mnConfirmIcon" src="assets/img/delete_icon.png" style="width: 42px; height: 42px; object-fit: contain;">
+                    </div>
+                    <h5 id="mnConfirmTitle" class="fw-bold mb-2" style="font-family: 'Outfit', sans-serif; color: #0f172a; font-size: 20px;">Confirm Action</h5>
+                    <p id="mnConfirmMessage" class="text-muted mb-4" style="font-size: 14px; line-height: 1.5; color: #64748b;">Are you sure you want to proceed with this action?</p>
+                    
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <button type="button" class="btn py-2.5 px-4 fw-semibold flex-grow-1" data-bs-dismiss="modal" style="border-radius: 14px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 14px;">
+                            Cancel
+                        </button>
+                        <button type="button" id="mnConfirmProceedBtn" class="btn py-2.5 px-4 fw-bold flex-grow-1" style="border-radius: 14px; background: linear-gradient(135deg, #dc2626, #b91c1c); color: #ffffff; border: none; box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35); font-size: 14px;">
+                            Yes, Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In-Website Dialog Confirmation Handler (Replaces native browser popups)
+        let mnPendingSubmitForm = null;
+
+        function mnConfirmAction(event, message, iconUrl = 'assets/img/delete_icon.png', buttonText = 'Yes, Delete') {
+            if (event) {
+                event.preventDefault();
+                mnPendingSubmitForm = event.target.closest('form');
+            }
+            
+            const msgEl = document.getElementById('mnConfirmMessage');
+            const iconEl = document.getElementById('mnConfirmIcon');
+            const proceedBtn = document.getElementById('mnConfirmProceedBtn');
+            
+            if (msgEl) msgEl.textContent = message || 'Are you sure you want to continue?';
+            if (iconEl && iconUrl) iconEl.src = iconUrl;
+            if (proceedBtn && buttonText) proceedBtn.textContent = buttonText;
+            
+            const confirmModalEl = document.getElementById('mnCustomConfirmModal');
+            if (confirmModalEl && typeof bootstrap !== 'undefined') {
+                const bsModal = new bootstrap.Modal(confirmModalEl);
+                bsModal.show();
+            } else {
+                if (mnPendingSubmitForm) mnPendingSubmitForm.submit();
+            }
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const proceedBtn = document.getElementById('mnConfirmProceedBtn');
+            if (proceedBtn) {
+                proceedBtn.addEventListener('click', function() {
+                    if (mnPendingSubmitForm) {
+                        const formToSubmit = mnPendingSubmitForm;
+                        mnPendingSubmitForm = null;
+                        const confirmModalEl = document.getElementById('mnCustomConfirmModal');
+                        if (confirmModalEl && typeof bootstrap !== 'undefined') {
+                            const bsModal = bootstrap.Modal.getInstance(confirmModalEl);
+                            if (bsModal) bsModal.hide();
+                        }
+                        formToSubmit.submit();
+                    }
+                });
             }
         });
     </script>
