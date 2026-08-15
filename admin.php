@@ -1625,44 +1625,45 @@ if ($view_section_id > 0) {
                                                         ?>
                                                         <tr class="house-row" style="border-bottom: 1px solid #f1f5f9;">
                                                             <td style="padding: 16px 20px;">
-                                                                <form id="form-update-house-<?= $h['id'] ?>" action="admin.php" method="POST">
+                                                                <form id="form-update-house-<?= $h['id'] ?>" action="admin.php" method="POST" style="display:none;">
                                                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                     <input type="hidden" name="active_tab" value="catalog">
                                                                     <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
                                                                     <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
                                                                     <input type="hidden" name="action_update_house" value="1">
-                                                                    
-                                                                    <div class="d-flex align-items-center gap-3">
-                                                                        <div style="width: 44px; height: 44px; border-radius: 12px; background: <?= $icon_bg ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.04);">
-                                                                            <?php if (!empty($h['icon']) && str_contains($h['icon'], 'http')): ?>
-                                                                                <img src="<?= htmlspecialchars($h['icon']) ?>" style="width:24px; height:24px; object-fit:contain;">
-                                                                            <?php else: ?>
-                                                                                <i class="bx <?= htmlspecialchars($icon_val) ?> fs-3" style="color: <?= $icon_color ?>;"></i>
-                                                                            <?php endif; ?>
-                                                                        </div>
-                                                                        <div>
-                                                                            <strong class="d-block house-title" style="font-size:15px; color: #0f172a; font-family: 'Outfit', sans-serif; font-weight: 700;"><?= htmlspecialchars($h['name']) ?></strong>
-                                                                            <?php if (!empty($h['badge'])): ?>
-                                                                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size:10.5px; font-weight: 800; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars($h['badge']) ?></span>
-                                                                            <?php endif; ?>
-                                                                        </div>
+                                                                </form>
+                                                                
+                                                                <div class="d-flex align-items-center gap-3">
+                                                                    <div style="width: 44px; height: 44px; border-radius: 12px; background: <?= $icon_bg ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.04);">
+                                                                        <?php if (!empty($h['icon']) && str_contains($h['icon'], 'http')): ?>
+                                                                            <img src="<?= htmlspecialchars($h['icon']) ?>" style="width:24px; height:24px; object-fit:contain;">
+                                                                        <?php else: ?>
+                                                                            <i class="bx <?= htmlspecialchars($icon_val) ?> fs-3" style="color: <?= $icon_color ?>;"></i>
+                                                                        <?php endif; ?>
                                                                     </div>
+                                                                    <div>
+                                                                        <strong class="d-block house-title" style="font-size:15px; color: #0f172a; font-family: 'Outfit', sans-serif; font-weight: 700;"><?= htmlspecialchars($h['name']) ?></strong>
+                                                                        <?php if (!empty($h['badge'])): ?>
+                                                                            <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size:10.5px; font-weight: 800; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars($h['badge']) ?></span>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                </div>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
                                                                 <div class="input-group input-group-sm" style="max-width:140px; border-radius: 10px; overflow: hidden; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                                                                     <span class="input-group-text fw-bold" style="background: #f8fafc; border: none; color: #0f172a; font-size: 14px; padding-right: 6px;">₹</span>
-                                                                    <input type="number" step="0.01" name="price_inr" class="form-control form-control-sm fw-bold" value="<?= htmlspecialchars($h['price_inr']) ?>" style="border: none; color: #0f172a; font-size: 14px; padding: 7px 10px;" required>
+                                                                    <input type="number" step="0.01" name="price_inr" form="form-update-house-<?= $h['id'] ?>" class="form-control form-control-sm fw-bold" value="<?= htmlspecialchars($h['price_inr']) ?>" style="border: none; color: #0f172a; font-size: 14px; padding: 7px 10px;" required>
                                                                 </div>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
-                                                                <input type="number" name="stock_quantity" class="form-control form-control-sm text-center fw-bold" style="max-width:90px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 14.5px; color: #0f172a; padding: 7px 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" value="<?= (int)$h['stock_quantity'] ?>" required>
+                                                                <input type="number" name="stock_quantity" form="form-update-house-<?= $h['id'] ?>" class="form-control form-control-sm text-center fw-bold" style="max-width:90px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 14.5px; color: #0f172a; padding: 7px 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" value="<?= (int)$h['stock_quantity'] ?>" required>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
                                                                 <?php 
                                                                     $is_disabled = ($h['status'] === 'inactive' || $h['availability_status'] === 'disabled');
                                                                     $is_out_of_stock = ($h['stock_quantity'] <= 0);
                                                                 ?>
-                                                                <select name="status" class="form-select form-select-sm fw-bold" style="border-radius: 10px; font-size: 12.5px; max-width: 145px; border: 1.5px solid <?= $is_disabled ? '#fca5a5' : ($is_out_of_stock ? '#fde68a' : '#a7f3d0') ?>; background: <?= $is_disabled ? '#fef2f2' : ($is_out_of_stock ? '#fffbeb' : '#ecfdf5') ?>; color: <?= $is_disabled ? '#991b1b' : ($is_out_of_stock ? '#92400e' : '#065f46') ?>; padding: 6px 10px; cursor: pointer;">
+                                                                <select name="status" form="form-update-house-<?= $h['id'] ?>" class="form-select form-select-sm fw-bold" style="border-radius: 10px; font-size: 12.5px; max-width: 145px; border: 1.5px solid <?= $is_disabled ? '#fca5a5' : ($is_out_of_stock ? '#fde68a' : '#a7f3d0') ?>; background: <?= $is_disabled ? '#fef2f2' : ($is_out_of_stock ? '#fffbeb' : '#ecfdf5') ?>; color: <?= $is_disabled ? '#991b1b' : ($is_out_of_stock ? '#92400e' : '#065f46') ?>; padding: 6px 10px; cursor: pointer;">
                                                                     <option value="active" <?= !$is_disabled ? 'selected' : '' ?>>
                                                                         <?= $is_out_of_stock ? '🟡 Out of Stock' : '🟢 Enabled' ?>
                                                                     </option>
@@ -1673,21 +1674,20 @@ if ($view_section_id > 0) {
                                                             </td>
                                                             <td style="padding: 16px 20px; text-align: right;">
                                                                 <div class="d-flex align-items-center justify-content-end gap-2">
-                                                                    <button type="submit" class="btn btn-sm px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(16,185,129,0.25); transition: all 0.2s ease;" title="Save price and stock changes">
+                                                                    <button type="submit" form="form-update-house-<?= $h['id'] ?>" class="btn btn-sm px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(16,185,129,0.25); transition: all 0.2s ease;" title="Save price and stock changes">
                                                                         <i class="bx bx-check fs-5"></i> Save
                                                                     </button>
-                                                                </form>
 
-                                                                <form action="admin.php" method="POST" onsubmit="return confirm('Are you sure you want to delete <?= htmlspecialchars(addslashes($h['name'])) ?>?');" style="margin: 0;">
-                                                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                                                                    <input type="hidden" name="active_tab" value="catalog">
-                                                                    <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
-                                                                    <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
-                                                                    <input type="hidden" name="action_delete_house" value="1">
-                                                                    <button type="submit" class="btn btn-sm px-3 py-2" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s ease;" title="Delete this house item">
-                                                                        <i class="bx bx-trash fs-6"></i> Delete
-                                                                    </button>
-                                                                </form>
+                                                                    <form action="admin.php" method="POST" onsubmit="return confirm('Are you sure you want to delete <?= htmlspecialchars(addslashes($h['name'])) ?>?');" style="margin: 0;">
+                                                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                                        <input type="hidden" name="active_tab" value="catalog">
+                                                                        <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
+                                                                        <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
+                                                                        <input type="hidden" name="action_delete_house" value="1">
+                                                                        <button type="submit" class="btn btn-sm px-3 py-2" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s ease;" title="Delete this house item">
+                                                                            <i class="bx bx-trash fs-6"></i> Delete
+                                                                        </button>
+                                                                    </form>
                                                                 </div>
                                                             </td>
                                                         </tr>
