@@ -11,23 +11,30 @@ if (!$db) die("Database connection failed.");
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 
-$catalog_id = (int)($_GET['id'] ?? 0);
+$catalog_id = (int)($_GET['product_id'] ?? $_GET['id'] ?? 0);
 if ($catalog_id <= 0) {
     $_SESSION['error_msg'] = 'Invalid product selection.';
-    header("Location: dashboard.php?section=buy"); exit;
+    header("Location: dashboard.php"); exit;
 }
 
-$stmt = $db->prepare("SELECT * FROM catalog WHERE id = ? AND status = 'active'");
+$stmt = $db->prepare("SELECT p.*, s.name as service_type FROM products p JOIN sections s ON p.section_id = s.id WHERE p.id = ? AND p.status = 'active'");
 $stmt->execute([$catalog_id]);
 $product = $stmt->fetch();
 
 if (!$product) {
-    $_SESSION['error_msg'] = 'The selected verification number category is not available.';
-    header("Location: dashboard.php?section=buy"); exit;
+    $stmt = $db->prepare("SELECT * FROM catalog WHERE id = ? AND status = 'active'");
+    $stmt->execute([$catalog_id]);
+    $product = $stmt->fetch();
 }
-if ($product['stock'] <= 0) {
-    $_SESSION['error_msg'] = 'This country number is currently out of stock.';
-    header("Location: dashboard.php?section=buy"); exit;
+
+if (!$product) {
+    $_SESSION['error_msg'] = 'The selected service is not available.';
+    header("Location: dashboard.php"); exit;
+}
+$stock = isset($product['stock_quantity']) ? (int)$product['stock_quantity'] : (int)($product['stock'] ?? 0);
+if ($stock <= 0) {
+    $_SESSION['error_msg'] = 'This item is currently out of stock.';
+    header("Location: dashboard.php"); exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {

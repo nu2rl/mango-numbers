@@ -100,7 +100,11 @@ $order_count = $db->prepare("SELECT COUNT(*) FROM purchases WHERE user_id = ? AN
 $stmt = $db->prepare("SELECT * FROM catalog WHERE status = 'active' ORDER BY service_type DESC, price_inr ASC"); $stmt->execute(); $catalog_items = $stmt->fetchAll();
 $canva_stmt = $db->query("SELECT * FROM catalog WHERE name LIKE '%Canva Premium Lifetime%' AND status = 'active' LIMIT 1"); $canva_item = $canva_stmt ? $canva_stmt->fetch() : null;
 $stmt = $db->prepare("SELECT * FROM purchases WHERE user_id = ? ORDER BY id DESC"); $stmt->execute([$user_id]); $purchases = $stmt->fetchAll();
-$stmt = $db->prepare("SELECT * FROM complaints WHERE user_id = ? ORDER BY id DESC"); $stmt->execute([$user_id]); $complaints = $stmt->fetchAll();
+$active_sections = [];
+try {
+    $sections_stmt = $db->query("SELECT * FROM sections WHERE status = 'active' ORDER BY display_order ASC, id ASC");
+    $active_sections = $sections_stmt->fetchAll();
+} catch (Exception $e) {}
 
 function get_flag_icon($country) {
     $country = strtolower($country);
@@ -446,6 +450,19 @@ function get_flag_icon($country) {
 
         <nav class="sidebar-nav">
             <div class="nav-label">Navigation</div>
+            <?php if (!empty($active_sections)): ?>
+                <?php foreach ($active_sections as $sec): ?>
+                    <button class="nav-item" id="menu-section-<?= $sec['id'] ?>" onclick="switchSection('section-<?= $sec['id'] ?>')">
+                        <?php if (!empty($sec['icon']) && str_contains($sec['icon'], 'http')): ?>
+                            <img src="<?= htmlspecialchars($sec['icon']) ?>" style="width:18px; height:18px; object-fit:contain; border-radius:3px;">
+                        <?php else: ?>
+                            <i class="bx <?= htmlspecialchars(!empty($sec['icon']) ? $sec['icon'] : 'bx-layer') ?>"></i>
+                        <?php endif; ?>
+                        <?= htmlspecialchars($sec['name']) ?>
+                    </button>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
             <button class="nav-item active" id="menu-history" onclick="switchSection('history')">
                 <i class="bx bx-history"></i> Order History
             </button>
@@ -483,6 +500,65 @@ function get_flag_icon($country) {
             <?php if (!empty($error_msg)): ?>
                 <div class="alert-bar alert-error"><i class="bx bx-error-circle" style="font-size:18px;"></i> <?= $error_msg ?></div>
             <?php endif; ?>
+
+            <!-- DYNAMIC CATALOG SECTIONS -->
+            <?php foreach ($active_sections as $sec): 
+                $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? AND status = 'active' ORDER BY display_order ASC, id DESC");
+                $prod_stmt->execute([$sec['id']]);
+                $sec_products = $prod_stmt->fetchAll();
+            ?>
+                <div id="section-section-<?= $sec['id'] ?>" class="dashboard-section">
+                    <h1 class="section-title"><?= htmlspecialchars($sec['name']) ?></h1>
+                    <p class="section-sub"><?= htmlspecialchars(!empty($sec['description']) ? $sec['description'] : 'Browse available offers and services below.') ?></p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                        <?php if (!empty($sec_products)): ?>
+                            <?php foreach ($sec_products as $item): ?>
+                                <div class="card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <?php if (!empty($item['icon']) && str_contains($item['icon'], 'http')): ?>
+                                                    <img src="<?= htmlspecialchars($item['icon']) ?>" style="width:28px; height:28px; object-fit:contain;">
+                                                <?php else: ?>
+                                                    <i class="bx <?= htmlspecialchars(!empty($item['icon']) ? $item['icon'] : 'bx-package') ?>" style="font-size:24px; color: var(--accent);"></i>
+                                                <?php endif; ?>
+                                                <span style="font-family:'Sora', sans-serif; font-weight:700; font-size:15px; color: var(--text);"><?= htmlspecialchars($item['name']) ?></span>
+                                            </div>
+                                            <?php if (!empty($item['badge'])): ?>
+                                                <span style="background: rgba(249,115,22,0.15); color: #f97316; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700;"><?= htmlspecialchars($item['badge']) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <div style="font-size: 13px; color: var(--muted); margin-bottom: 15px;">
+                                            Region / Country: <strong style="color: var(--text);"><?= htmlspecialchars($item['country']) ?></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-footer" style="display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+                                        <div>
+                                            <div class="price-inr">₹<?= number_format($item['price_inr'], 0) ?></div>
+                                            <?php if ($item['price_usd'] > 0): ?>
+                                                <div class="price-usd">$<?= number_format($item['price_usd'], 2) ?></div>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <?php if ($item['stock_quantity'] > 0): ?>
+                                            <a href="checkout.php?product_id=<?= $item['id'] ?>" class="btn-buy">Buy Now</a>
+                                        <?php else: ?>
+                                            <button class="btn-buy disabled" disabled>Out of Stock</button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="card p-4 text-center text-muted" style="grid-column: 1 / -1; background: var(--surface); border: 1px dashed var(--border); border-radius: 16px;">
+                                No items currently available in this category. Check back soon!
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
 
             <!-- 2. HISTORY SECTION -->
             <div id="section-history" class="dashboard-section active">

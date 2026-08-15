@@ -1,12 +1,13 @@
 <?php
 /**
- * Mango Number - Database Initialization & Seeding Script
+ * Mango Number - Database Initialization & PRD Schema Migration Script
+ * Supports 2-Level Dynamic Catalog (Sections -> Houses/Products)
  */
 
 require_once __DIR__ . '/config.php';
 
 try {
-    // 1. Connect to MySQL server (without selecting database to create it)
+    // 1. Connect to MySQL server
     $dsn = "mysql:host=" . DB_HOST . ";charset=utf8mb4";
     $options = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -14,7 +15,7 @@ try {
     ];
     $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
     
-    echo "<h3>Mango Number Database Initialization</h3>";
+    echo "<h3>Mango Number Database Initialization & PRD Migration</h3>";
     echo "Connecting to MySQL server... Connected.<br>";
 
     // 2. Create database if not exists
@@ -25,19 +26,9 @@ try {
     $pdo->exec("USE `" . DB_NAME . "`;");
     echo "Switched to database `" . DB_NAME . "`.<br>";
 
-    // 4. Create Tables
-    echo "Creating schemas...<br>";
     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-    $pdo->exec("DROP TABLE IF EXISTS complaint_messages;");
-    $pdo->exec("DROP TABLE IF EXISTS complaints;");
-    $pdo->exec("DROP TABLE IF EXISTS purchases;");
-    $pdo->exec("DROP TABLE IF EXISTS users;");
-    $pdo->exec("DROP TABLE IF EXISTS catalog;");
-    $pdo->exec("DROP TABLE IF EXISTS email_otps;");
-    $pdo->exec("DROP TABLE IF EXISTS smtp_settings;");
-    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
-    // Users Table
+    // Core Users Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) DEFAULT NULL,
@@ -46,9 +37,11 @@ try {
         mobile VARCHAR(20) DEFAULT NULL,
         password VARCHAR(255) NOT NULL,
         role ENUM('user', 'admin') DEFAULT 'user',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        status ENUM('active', 'disabled') DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;");
-    echo "- Users table created.<br>";
+    echo "- Users table verified.<br>";
 
     // Email OTPs Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS email_otps (
@@ -62,12 +55,51 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;");
-    echo "- Email OTPs table created.<br>";
+    echo "- Email OTPs table verified.<br>";
 
-    // Numbers Catalog Table (Includes Cost price/Rate Bought columns)
+    // LEVEL 1: SECTIONS Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS sections (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(150) NOT NULL,
+        slug VARCHAR(150) NOT NULL UNIQUE,
+        description TEXT DEFAULT NULL,
+        icon VARCHAR(255) DEFAULT 'bx-layer',
+        display_order INT DEFAULT 0,
+        status ENUM('active', 'inactive') DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;");
+    echo "- Sections table verified.<br>";
+
+    // LEVEL 2: HOUSES / PRODUCTS Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS products (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        section_id INT NOT NULL,
+        name VARCHAR(150) NOT NULL,
+        slug VARCHAR(150) DEFAULT NULL,
+        description TEXT DEFAULT NULL,
+        country VARCHAR(100) DEFAULT 'Global',
+        price_cost_usd DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        price_cost_inr DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        price_usd DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        price_inr DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        stock_type ENUM('finite', 'unlimited') DEFAULT 'finite',
+        stock_quantity INT NOT NULL DEFAULT 0,
+        availability_status ENUM('available', 'out_of_stock') DEFAULT 'available',
+        status ENUM('active', 'inactive') DEFAULT 'active',
+        display_order INT DEFAULT 0,
+        badge VARCHAR(50) DEFAULT NULL,
+        icon VARCHAR(255) DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB;");
+    echo "- Products / Houses table verified.<br>";
+
+    // Legacy catalog table for backwards safety
     $pdo->exec("CREATE TABLE IF NOT EXISTS catalog (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        service_type ENUM('Telegram', 'WhatsApp') NOT NULL,
+        service_type VARCHAR(100) NOT NULL,
         name VARCHAR(100) NOT NULL,
         country VARCHAR(100) NOT NULL,
         price_cost_usd DECIMAL(10,2) NOT NULL DEFAULT 0.00,
@@ -77,29 +109,28 @@ try {
         stock INT NOT NULL DEFAULT 0,
         status ENUM('active', 'inactive') DEFAULT 'active'
     ) ENGINE=InnoDB;");
-    echo "- Catalog table created.<br>";
 
-    // Purchases/Orders Table (Stores specific cost price at moment of purchase)
+    // Purchases Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS purchases (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
-        catalog_id INT NOT NULL,
-        service_type ENUM('Telegram', 'WhatsApp') NOT NULL,
+        catalog_id INT DEFAULT NULL,
+        product_id INT DEFAULT NULL,
+        service_type VARCHAR(100) NOT NULL,
         item_name VARCHAR(100) NOT NULL,
         price_cost_inr DECIMAL(10,2) NOT NULL DEFAULT 0.00,
         price_paid_inr DECIMAL(10,2) NOT NULL,
-        payment_method VARCHAR(20) DEFAULT 'UPI',
-        utr_number VARCHAR(50) NOT NULL,
+        payment_method VARCHAR(50) DEFAULT 'UPI',
+        utr_number VARCHAR(100) NOT NULL,
         screenshot_path VARCHAR(255) DEFAULT NULL,
         status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-        virtual_number_provided VARCHAR(50) DEFAULT NULL,
-        otp_provided VARCHAR(50) DEFAULT NULL,
+        virtual_number_provided VARCHAR(100) DEFAULT NULL,
+        otp_provided VARCHAR(100) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (catalog_id) REFERENCES catalog(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;");
-    echo "- Purchases table created.<br>";
+    echo "- Purchases table verified.<br>";
 
     // Complaints Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS complaints (
@@ -113,7 +144,6 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;");
-    echo "- Complaints table created.<br>";
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS complaint_messages (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -123,7 +153,14 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (complaint_id) REFERENCES complaints(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;");
-    echo "- Complaint messages table created.<br>";
+
+    // System Settings Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS settings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        setting_key VARCHAR(100) NOT NULL UNIQUE,
+        setting_value TEXT DEFAULT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;");
 
     // SMTP Settings Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS smtp_settings (
@@ -137,88 +174,50 @@ try {
         from_name VARCHAR(255) DEFAULT NULL,
         active TINYINT DEFAULT 1
     ) ENGINE=InnoDB;");
-    echo "- SMTP settings table created.<br>";
 
-    // Seed default SMTP settings
-    $env_host = $_ENV['MAIL_HOST'] ?? getenv('MAIL_HOST') ?: 'smtp-relay.brevo.com';
-    $env_port = $_ENV['MAIL_PORT'] ?? getenv('MAIL_PORT') ?: 587;
-    $env_user = $_ENV['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME') ?: '';
-    $env_pass = $_ENV['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD') ?: '';
-    $env_enc = $_ENV['MAIL_ENCRYPTION'] ?? getenv('MAIL_ENCRYPTION') ?: 'tls';
-    $env_from = $_ENV['MAIL_FROM_ADDRESS'] ?? getenv('MAIL_FROM_ADDRESS') ?: 'no-reply@mangonumbers.com';
-    $env_name = $_ENV['MAIL_FROM_NAME'] ?? getenv('MAIL_FROM_NAME') ?: 'Mango Numbers';
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
-    $inst = $pdo->prepare("INSERT INTO smtp_settings (host, port, username, password, encryption, from_email, from_name, active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
-    $inst->execute([$env_host, (int)$env_port, $env_user, $env_pass, $env_enc, $env_from, $env_name]);
-    echo "- Seeded default SMTP settings from environment configuration.<br>";
-
-    // 5. Seed Users (Default Admin and Default Test User)
+    // Seed default users if empty
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users");
     $stmt->execute();
     if ($stmt->fetchColumn() == 0) {
-        echo "Seeding default users...<br>";
-        
         $adminPassword = password_hash('muslimhu108', PASSWORD_DEFAULT);
         $userPassword = password_hash('user123', PASSWORD_DEFAULT);
         
         $insertUser = $pdo->prepare("INSERT INTO users (name, email, username, password, role) VALUES (?, ?, ?, ?, ?)");
         $insertUser->execute(['Administrator', 'admin@mangonumbers.com', 'nutrl786', $adminPassword, 'admin']);
         $insertUser->execute(['Standard User', 'user@mangonumbers.com', 'user', $userPassword, 'user']);
-        
-        echo "- Default admin created (username: <strong>nutrl786</strong>, password: <strong>muslimhu108</strong>)<br>";
-        echo "- Default user created (username: <strong>user</strong>, password: <strong>user123</strong>)<br>";
     }
 
-    // 6. Seed Catalog Data (Your custom countries and stock list!)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM catalog");
-    $stmt->execute();
-    if ($stmt->fetchColumn() == 0) {
-        echo "Seeding number catalogs...<br>";
-        
-        $items = [
-            // Service, Name, Country, Cost USD, Cost INR, Sale USD, Sale INR, Stock
-            ['Telegram', 'India', 'India', 0.28, 25, 0.51, 45, 112],
-            ['Telegram', 'india-best-quality', 'India', 0.34, 30, 0.56, 50, 48],
-            ['Telegram', 'india-free-as-bird', 'India', 0.17, 15, 0.28, 25, 122],
-            ['Telegram', 'india-spam-acc', 'India', 0.11, 10, 0.18, 16, 98],
-            ['Telegram', 'indian-new-acc', 'India', 0.14, 12, 0.25, 22, 339],
-            ['Telegram', 'indian-old-2020', 'India', 0.67, 60, 1.12, 100, 34],
-            ['Telegram', 'indian-old-2021', 'India', 0.45, 40, 0.79, 70, 51],
-            ['Telegram', 'indian-old-2022', 'India', 0.43, 38, 0.73, 65, 123],
-            ['Telegram', 'indian-old-2023', 'India', 0.39, 35, 0.67, 60, 135],
-            ['Telegram', 'indian-old-2024', 'India', 0.34, 30, 0.56, 50, 78],
-            ['Telegram', 'myanmar', 'Myanmar', 0.20, 18, 0.34, 30, 13],
-            ['Telegram', 'usa', 'USA', 0.22, 20, 0.39, 35, 17],
-            ['Telegram', 'Vietnam', 'Vietnam', 0.43, 38, 0.70, 62, 42],
-            ['Telegram', 'Canada', 'Canada', 0.39, 35, 0.65, 58, 30],
-            ['Telegram', 'Chile', 'Chile', 0.51, 45, 0.81, 72, 33],
-            ['Telegram', 'Afghanistan', 'Afghanistan', 0.51, 45, 0.81, 72, 33],
-            ['Telegram', 'Greenland', 'Greenland', 0.90, 80, 1.51, 134, 42],
-            ['Telegram', 'United Arab Emirates', 'United Arab Emirates', 1.35, 120, 2.15, 191, 32],
-            ['Telegram', 'Fiji', 'Fiji', 0.79, 70, 1.29, 115, 40],
-            ['Telegram', 'Russia', 'Russia', 1.35, 120, 2.25, 200, 39],
-            ['Telegram', 'France', 'France', 1.01, 90, 1.72, 153, 38],
-            ['Telegram', 'China', 'China', 1.07, 95, 1.72, 153, 42],
-            ['Telegram', 'Turkey', 'Turkey', 0.84, 75, 1.39, 124, 48],
-            ['Telegram', 'Germany', 'Germany', 0.90, 80, 1.55, 138, 36],
-            
-            // WhatsApp Services (Premium)
-            ['WhatsApp', 'USA WhatsApp', 'USA', 1.69, 150, 2.81, 250, 10],
-            ['WhatsApp', 'Philippines WhatsApp', 'Philippines', 0.67, 60, 1.12, 100, 8]
-        ];
-        
-        $insertItem = $pdo->prepare("INSERT INTO catalog (service_type, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        foreach ($items as $item) {
-            $insertItem->execute($item);
+    // Seed Sections if empty
+    $secCount = $pdo->query("SELECT COUNT(*) FROM sections")->fetchColumn();
+    if ($secCount == 0) {
+        $secStmt = $pdo->prepare("INSERT INTO sections (name, slug, description, icon, display_order) VALUES (?, ?, ?, ?, ?)");
+        $secStmt->execute(['Telegram Numbers', 'telegram-numbers', 'Instant Telegram OTP virtual numbers', 'bxl-telegram', 1]);
+        $tgSecId = $pdo->lastInsertId();
+
+        $secStmt->execute(['WhatsApp Numbers', 'whatsapp-numbers', 'High quality WhatsApp verification numbers', 'bxl-whatsapp', 2]);
+        $waSecId = $pdo->lastInsertId();
+
+        // Migrate items from legacy catalog or seed default products
+        $catItems = $pdo->query("SELECT * FROM catalog")->fetchAll();
+        $prodStmt = $pdo->prepare("INSERT INTO products (section_id, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock_quantity, availability_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        if (!empty($catItems)) {
+            foreach ($catItems as $ci) {
+                $targetSecId = ($ci['service_type'] === 'WhatsApp') ? $waSecId : $tgSecId;
+                $status = ($ci['stock'] > 0) ? 'available' : 'out_of_stock';
+                $prodStmt->execute([$targetSecId, $ci['name'], $ci['country'], $ci['price_cost_usd'], $ci['price_cost_inr'], $ci['price_usd'], $ci['price_inr'], $ci['stock'], $status]);
+            }
+        } else {
+            // Default seed
+            $prodStmt->execute([$tgSecId, 'India Telegram', 'India', 0.28, 25.00, 0.51, 45.00, 112, 'available']);
+            $prodStmt->execute([$waSecId, 'USA WhatsApp', 'USA', 1.69, 150.00, 2.81, 250.00, 10, 'available']);
         }
-        echo "- Seeded " . count($items) . " virtual number catalog items successfully!<br>";
     }
-    
-    echo "<br><strong style='color:green;'>Success! Database successfully initialized.</strong><br>";
-    echo "<a href='index.php'>Go to Landing Page</a>";
+
+    echo "<br><strong style='color:green;'>Success! Database & PRD schema initialized.</strong><br>";
 
 } catch (PDOException $e) {
     echo "<br><strong style='color:red;'>Initialization Failed:</strong> " . $e->getMessage() . "<br>";
-    echo "Check if your local MySQL service (XAMPP/MAMP) is active and running.";
 }
