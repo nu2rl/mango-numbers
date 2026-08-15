@@ -147,7 +147,7 @@ function get_flag($country) {
     
     .gm-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
     .mobile-menu {
-      display: none; position: fixed; inset: 0; z-index: 99;
+      display: none; position: fixed; inset: 0; z-index: 1001;
       background: rgba(255,255,255,0.97); backdrop-filter: blur(20px);
       flex-direction: column; align-items: center; justify-content: center; gap: 32px;
     }

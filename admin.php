@@ -1822,7 +1822,7 @@ if ($view_section_id > 0) {
                                                         </td>
                                                         <td>
                                                             <!-- Quick Action Inline Form for Approving Number -->
-                                                            <form action="admin.php" method="POST" class="d-flex align-items-center gap-2" style="max-width:400px;">
+                                                            <form action="admin.php" method="POST" class="d-flex align-items-center flex-wrap gap-2" style="max-width:400px;">
                                                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                 <input type="hidden" name="active_tab" value="approvals">
                                                                 <input type="hidden" name="purchase_id" value="<?= $p['id'] ?>">
