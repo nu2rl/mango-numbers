@@ -120,9 +120,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_complaint_repl
     } catch (PDOException $e) { $_SESSION['error_msg'] = 'Failed: '.$e->getMessage(); header("Location: dashboard.php?section=support"); exit; }
 }
 
+// Handle Profile Info Update (Name & Mobile)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile_info'])) {
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (empty($_SESSION['csrf_token']) || $csrf_token !== $_SESSION['csrf_token']) {
+        $_SESSION['error_msg'] = 'Invalid request state. CSRF mismatch.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+    $new_name = trim($_POST['name'] ?? '');
+    $new_mobile = trim($_POST['mobile'] ?? '');
+
+    if (empty($new_name)) {
+        $_SESSION['error_msg'] = 'Full Name cannot be empty.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+
+    try {
+        $up = $db->prepare("UPDATE users SET name = ?, mobile = ? WHERE id = ?");
+        $up->execute([$new_name, $new_mobile, $user_id]);
+        $_SESSION['username'] = $new_name;
+        $_SESSION['success_msg'] = 'Profile details updated successfully!';
+
+        // Send instant Telegram notification
+        $user_email_txt = $_SESSION['email'] ?? 'User #'.$user_id;
+        $notify_msg = "👤 <b>USER PROFILE UPDATED!</b>\n\n"
+                    . "📧 <b>Email:</b> <code>" . htmlspecialchars($user_email_txt) . "</code>\n"
+                    . "📛 <b>New Name:</b> " . htmlspecialchars($new_name) . "\n"
+                    . "📱 <b>Mobile:</b> " . htmlspecialchars($new_mobile) . "\n"
+                    . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+        send_telegram_notification($notify_msg);
+
+        header("Location: dashboard.php?section=profile"); exit;
+    } catch (PDOException $e) {
+        $_SESSION['error_msg'] = 'Failed to update profile: ' . $e->getMessage();
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+}
+
+// Handle Change Password
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_user_password'])) {
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (empty($_SESSION['csrf_token']) || $csrf_token !== $_SESSION['csrf_token']) {
+        $_SESSION['error_msg'] = 'Invalid request state. CSRF mismatch.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+    $curr_pass = $_POST['current_password'] ?? '';
+    $new_pass = $_POST['new_password'] ?? '';
+    $confirm_pass = $_POST['confirm_password'] ?? '';
+
+    if (empty($curr_pass) || empty($new_pass) || empty($confirm_pass)) {
+        $_SESSION['error_msg'] = 'All password fields are required.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+
+    if ($new_pass !== $confirm_pass) {
+        $_SESSION['error_msg'] = 'New password and confirmation password do not match.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+
+    if (strlen($new_pass) < 6) {
+        $_SESSION['error_msg'] = 'New password must be at least 6 characters long.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+
+    // Verify current password against database
+    $user_pwd_stmt = $db->prepare("SELECT password, email FROM users WHERE id = ?");
+    $user_pwd_stmt->execute([$user_id]);
+    $user_data = $user_pwd_stmt->fetch();
+    $pwd_hash = $user_data['password'] ?? '';
+    $user_email_txt = $user_data['email'] ?? 'User #'.$user_id;
+
+    if (!$pwd_hash || !password_verify($curr_pass, $pwd_hash)) {
+        $_SESSION['error_msg'] = 'Current password entered is incorrect.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+
+    // Hash and update new password
+    $new_pwd_hash = password_hash($new_pass, PASSWORD_DEFAULT);
+    $up_pwd = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
+    if ($up_pwd->execute([$new_pwd_hash, $user_id])) {
+        session_regenerate_id(true);
+        $_SESSION['success_msg'] = 'Password updated successfully!';
+
+        // Send instant Telegram notification
+        $notify_msg = "🔐 <b>USER CHANGED PASSWORD!</b>\n\n"
+                    . "📧 <b>Email:</b> <code>" . htmlspecialchars($user_email_txt) . "</code>\n"
+                    . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+        send_telegram_notification($notify_msg);
+
+        header("Location: dashboard.php?section=profile"); exit;
+    } else {
+        $_SESSION['error_msg'] = 'Failed to update password.';
+        header("Location: dashboard.php?section=profile"); exit;
+    }
+}
+
 // Data fetch
-$user_stmt = $db->prepare("SELECT name, email FROM users WHERE id = ?"); $user_stmt->execute([$user_id]); $user_profile = $user_stmt->fetch();
-$user_name = $user_profile['name'] ?? 'User'; $user_email = $user_profile['email'] ?? $username;
+$user_stmt = $db->prepare("SELECT name, email, mobile FROM users WHERE id = ?"); $user_stmt->execute([$user_id]); $user_profile = $user_stmt->fetch();
+$user_name = $user_profile['name'] ?? 'User'; $user_email = $user_profile['email'] ?? $username; $user_mobile = $user_profile['mobile'] ?? '';
 $spend_stmt = $db->prepare("SELECT SUM(price_paid_inr) FROM purchases WHERE user_id = ? AND status = 'approved'"); $spend_stmt->execute([$user_id]); $total_spending = $spend_stmt->fetchColumn() ?: 0;
 $order_count = $db->prepare("SELECT COUNT(*) FROM purchases WHERE user_id = ? AND status = 'approved'"); $order_count->execute([$user_id]); $approved_count = $order_count->fetchColumn() ?: 0;
 $stmt = $db->prepare("SELECT * FROM catalog WHERE status = 'active' ORDER BY service_type DESC, price_inr ASC"); $stmt->execute(); $catalog_items = $stmt->fetchAll();
@@ -695,7 +790,7 @@ function get_flag_icon($country) {
             <button class="sidebar-close" onclick="closeSidebar()"><i class="bx bx-x"></i></button>
         </div>
 
-        <div class="sidebar-profile">
+        <div class="sidebar-profile" onclick="switchSection('profile')" style="cursor: pointer; transition: background 0.2s; position: relative;" title="Click to manage account profile & password">
             <div class="profile-row">
                 <div class="avatar"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
                 <div class="profile-info">
@@ -742,6 +837,9 @@ function get_flag_icon($country) {
             </button>
             <button class="nav-item" id="menu-support" onclick="switchSection('support')">
                 <i class="bx bx-support"></i> Support Center
+            </button>
+            <button class="nav-item" id="menu-profile" onclick="switchSection('profile')">
+                <i class="bx bx-user-circle"></i> Account Settings
             </button>
         </nav>
 
@@ -1019,6 +1117,64 @@ function get_flag_icon($country) {
                         <?php else: ?>
                             <div class="empty-state">No support tickets yet. We're here if you need us! 🙂</div>
                         <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Account Settings & Profile -->
+            <div class="dashboard-section" id="section-profile">
+                <div class="section-title">Account Settings</div>
+                <div class="section-sub">Manage your personal profile details and account security password.</div>
+
+                <div class="support-grid" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Card 1: Personal Details -->
+                    <div class="support-form-card">
+                        <div class="card-title">
+                            <span>👤 Personal Profile</span>
+                        </div>
+                        <form action="dashboard.php" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                            
+                            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 14px; border: 1px solid rgba(255,255,255,0.06);">
+                                <div class="avatar" style="width: 48px; height: 48px; font-size: 20px; flex-shrink: 0; box-shadow: 0 0 16px rgba(249,115,22,0.4);"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
+                                <div style="min-width: 0;">
+                                    <div style="font-size: 14px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($user_name) ?></div>
+                                    <div style="font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($user_email) ?></div>
+                                </div>
+                            </div>
+
+                            <label for="prof_name">Full Name</label>
+                            <input type="text" name="name" id="prof_name" value="<?= htmlspecialchars($user_name) ?>" required placeholder="Your Full Name">
+
+                            <label>Registered Email Address</label>
+                            <input type="text" value="<?= htmlspecialchars($user_email) ?>" disabled style="opacity: 0.6; cursor: not-allowed;" title="Email cannot be modified for security reasons">
+
+                            <label for="prof_mobile">Mobile Number (Optional)</label>
+                            <input type="text" name="mobile" id="prof_mobile" value="<?= htmlspecialchars($user_mobile) ?>" placeholder="e.g. +91 9876543210">
+
+                            <button type="submit" name="update_profile_info" class="form-submit">Save Profile Changes 💾</button>
+                        </form>
+                    </div>
+
+                    <!-- Card 2: Change Password -->
+                    <div class="support-log-card">
+                        <div class="card-title">
+                            <span>🔐 Security & Password</span>
+                        </div>
+                        <form action="dashboard.php" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+
+                            <label for="curr_pass">Current Password</label>
+                            <input type="password" name="current_password" id="curr_pass" required placeholder="Enter current password">
+
+                            <label for="new_pass">New Password</label>
+                            <input type="password" name="new_password" id="new_pass" required placeholder="Minimum 6 characters">
+
+                            <label for="conf_pass">Confirm New Password</label>
+                            <input type="password" name="confirm_password" id="conf_pass" required placeholder="Re-enter new password">
+
+                            <button type="submit" name="change_user_password" class="form-submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 24px rgba(16,185,129,0.35);">Update Password 🔒</button>
+                        </form>
                     </div>
                 </div>
             </div>
