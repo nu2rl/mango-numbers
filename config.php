@@ -381,6 +381,9 @@ function send_telegram_notification($message) {
     
     if (empty($token) || empty($chat_id)) return false;
 
+    // Convert literal '\n' sequences into actual newlines for perfect Telegram formatting
+    $message = str_replace('\n', "\n", $message);
+
     $url = "https://api.telegram.org/bot{$token}/sendMessage";
     $params = [
         'chat_id' => $chat_id,
