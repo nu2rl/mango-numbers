@@ -458,6 +458,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_delete_section
     exit;
 }
 
+// 3c-2. Handle Manage Offers: Reorder Sections (AJAX Drag & Drop)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reorder_sections'])) {
+    $raw_order = $_POST['order'] ?? '';
+    $order = json_decode($raw_order, true);
+    if (is_array($order)) {
+        $stmt = $db->prepare("UPDATE sections SET display_order = ? WHERE id = ?");
+        foreach ($order as $index => $id) {
+            $stmt->execute([$index + 1, (int)$id]);
+        }
+    }
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'success']);
+    exit;
+}
+
 // 3d. Handle Manage Offers: Create House (Product)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_create_house'])) {
     $sec_id = (int)$_POST['section_id'];
@@ -1147,19 +1162,75 @@ if ($view_section_id > 0) {
         }
 
         .mn-btn-delete-section {
-            background: rgba(239, 68, 68, 0.08);
-            color: #ef4444;
-            border: 1.5px solid rgba(239, 68, 68, 0.2);
-            border-radius: 12px;
-            padding: 10px 14px;
-            transition: all 0.2s ease;
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+            border: 1.5px solid #fca5a5 !important;
+            border-radius: 12px !important;
+            padding: 10px 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15) !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            cursor: pointer !important;
         }
 
         .mn-btn-delete-section:hover {
-            background: #ef4444;
-            color: #ffffff;
-            border-color: #ef4444;
-            transform: scale(1.05);
+            background: #dc2626 !important;
+            color: #ffffff !important;
+            border-color: #dc2626 !important;
+            transform: scale(1.08) !important;
+            box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4) !important;
+        }
+
+        .mn-btn-delete-section i {
+            color: #dc2626 !important;
+            font-size: 18px !important;
+            transition: color 0.2s ease !important;
+        }
+
+        .mn-btn-delete-section:hover i {
+            color: #ffffff !important;
+        }
+
+        /* Drag & Drop Reordering Styles */
+        .mn-section-col {
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .mn-section-col.is-dragging {
+            opacity: 0.45;
+            transform: scale(0.96);
+        }
+
+        .mn-section-col.drag-over-target .mn-section-card {
+            border: 2px dashed #ff5e36 !important;
+            box-shadow: 0 0 20px rgba(255, 94, 54, 0.35) !important;
+            background: #fff8f5 !important;
+        }
+
+        .mn-drag-handle {
+            cursor: grab;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.06);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #475569;
+            transition: all 0.2s ease;
+        }
+
+        .mn-drag-handle:hover {
+            background: rgba(255, 94, 54, 0.14);
+            color: #ff5e36;
+        }
+
+        .mn-drag-handle:active {
+            cursor: grabbing;
         }
 
         /* Screenshot light-box modal */
@@ -2082,8 +2153,8 @@ if ($view_section_id > 0) {
                                     </div>
                                 </div>
 
-                                <!-- Sections Cards Grid -->
-                                <div class="row g-4">
+                                <!-- Sections Cards Grid with Drag & Drop -->
+                                <div class="row g-4" id="sectionsGrid">
                                     <?php if (!empty($sections_list)): ?>
                                         <?php foreach ($sections_list as $sec): ?>
                                             <?php
@@ -2095,6 +2166,7 @@ if ($view_section_id > 0) {
                                                 $brand_icon = 'bx-layer';
                                                 $brand_badge_bg = 'rgba(255, 94, 54, 0.08)';
                                                 $brand_badge_color = '#e04f26';
+                                                $brand_png = null;
                                                 
                                                 if (str_contains($sec_name_lower, 'telegram')) {
                                                     $brand_icon_bg = 'linear-gradient(135deg, #0088cc, #00a8ff)';
@@ -2102,18 +2174,27 @@ if ($view_section_id > 0) {
                                                     $brand_icon = 'bxl-telegram';
                                                     $brand_badge_bg = 'rgba(0, 136, 204, 0.09)';
                                                     $brand_badge_color = '#0088cc';
+                                                    if (file_exists(__DIR__ . '/assets/img/telegram_icon.png')) {
+                                                        $brand_png = 'assets/img/telegram_icon.png';
+                                                    }
                                                 } elseif (str_contains($sec_name_lower, 'whatsapp')) {
                                                     $brand_icon_bg = 'linear-gradient(135deg, #25D366, #128C7E)';
                                                     $brand_shadow = 'rgba(37, 211, 102, 0.3)';
                                                     $brand_icon = 'bxl-whatsapp';
                                                     $brand_badge_bg = 'rgba(37, 211, 102, 0.09)';
                                                     $brand_badge_color = '#059669';
+                                                    if (file_exists(__DIR__ . '/assets/img/whatsapp_icon.png')) {
+                                                        $brand_png = 'assets/img/whatsapp_icon.png';
+                                                    }
                                                 } elseif (str_contains($sec_name_lower, 'canva')) {
                                                     $brand_icon_bg = 'linear-gradient(135deg, #7d2ae8, #00c4cc)';
                                                     $brand_shadow = 'rgba(125, 42, 232, 0.3)';
                                                     $brand_icon = 'bx-paint';
                                                     $brand_badge_bg = 'rgba(125, 42, 232, 0.09)';
                                                     $brand_badge_color = '#7d2ae8';
+                                                    if (file_exists(__DIR__ . '/assets/img/canva_icon.png')) {
+                                                        $brand_png = 'assets/img/canva_icon.png';
+                                                    }
                                                 } elseif (str_contains($sec_name_lower, 'otp') || str_contains($sec_name_lower, 'number')) {
                                                     $brand_icon_bg = 'linear-gradient(135deg, #ff5e36, #ff8a1f)';
                                                     $brand_shadow = 'rgba(255, 94, 54, 0.3)';
@@ -2122,7 +2203,7 @@ if ($view_section_id > 0) {
 
                                                 $icon_val = !empty($sec['icon']) ? $sec['icon'] : $brand_icon;
                                             ?>
-                                            <div class="col-md-6 col-lg-4">
+                                            <div class="col-md-6 col-lg-4 mn-section-col" draggable="true" data-section-id="<?= $sec['id'] ?>">
                                                 <div class="mn-section-card h-100 p-4">
                                                     <div class="mn-card-header-bar"></div>
                                                     <div class="d-flex align-items-start justify-content-between mb-3 pt-1">
@@ -2130,6 +2211,8 @@ if ($view_section_id > 0) {
                                                             <div class="mn-icon-box" style="background: <?= $brand_icon_bg ?>; box-shadow: 0 8px 20px <?= $brand_shadow ?>;">
                                                                 <?php if ($sec_has_image): ?>
                                                                     <img src="<?= htmlspecialchars($sec['icon']) ?>" style="width:100%; height:100%; object-fit:cover; border-radius: 16px;">
+                                                                <?php elseif (!empty($brand_png)): ?>
+                                                                    <img src="<?= $brand_png ?>" style="width:100%; height:100%; object-fit:contain; padding: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));">
                                                                 <?php else: ?>
                                                                     <i class="bx <?= htmlspecialchars($icon_val) ?> text-white fs-2"></i>
                                                                 <?php endif; ?>
@@ -2140,6 +2223,9 @@ if ($view_section_id > 0) {
                                                                     <i class="bx bx-package"></i> <?= (int)$sec['house_count'] ?> Houses / Services
                                                                 </span>
                                                             </div>
+                                                        </div>
+                                                        <div class="mn-drag-handle" title="Click and drag to reorder section">
+                                                            <i class="bx bx-move fs-6"></i> Drag
                                                         </div>
                                                     </div>
                                                     
@@ -2181,6 +2267,107 @@ if ($view_section_id > 0) {
                                         </div>
                                     <?php endif; ?>
                                 </div>
+
+                                <!-- Reorder Toast Notification -->
+                                <div id="reorderToast" class="toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-4" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 9999; border-radius: 14px; box-shadow: 0 10px 30px rgba(16,185,129,0.3);">
+                                    <div class="d-flex">
+                                        <div class="toast-body d-flex align-items-center gap-2 font-weight-bold" style="font-size: 14px;">
+                                            <i class="bx bx-check-circle fs-4"></i> Section order saved successfully!
+                                        </div>
+                                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                </div>
+
+                                <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const grid = document.getElementById('sectionsGrid');
+                                    if (!grid) return;
+
+                                    let draggedItem = null;
+
+                                    grid.addEventListener('dragstart', function(e) {
+                                        const target = e.target.closest('.mn-section-col');
+                                        if (!target) return;
+                                        draggedItem = target;
+                                        target.classList.add('is-dragging');
+                                        e.dataTransfer.effectAllowed = 'move';
+                                        e.dataTransfer.setData('text/plain', target.getAttribute('data-section-id'));
+                                    });
+
+                                    grid.addEventListener('dragover', function(e) {
+                                        e.preventDefault();
+                                        e.dataTransfer.dropEffect = 'move';
+                                        const target = e.target.closest('.mn-section-col');
+                                        if (target && target !== draggedItem) {
+                                            document.querySelectorAll('.mn-section-col').forEach(col => col.classList.remove('drag-over-target'));
+                                            target.classList.add('drag-over-target');
+                                        }
+                                    });
+
+                                    grid.addEventListener('dragleave', function(e) {
+                                        const target = e.target.closest('.mn-section-col');
+                                        if (target) {
+                                            target.classList.remove('drag-over-target');
+                                        }
+                                    });
+
+                                    grid.addEventListener('drop', function(e) {
+                                        e.preventDefault();
+                                        document.querySelectorAll('.mn-section-col').forEach(col => col.classList.remove('drag-over-target'));
+                                        const target = e.target.closest('.mn-section-col');
+                                        if (target && draggedItem && target !== draggedItem) {
+                                            const cols = Array.from(grid.querySelectorAll('.mn-section-col'));
+                                            const draggedIdx = cols.indexOf(draggedItem);
+                                            const targetIdx = cols.indexOf(target);
+
+                                            if (draggedIdx < targetIdx) {
+                                                target.after(draggedItem);
+                                            } else {
+                                                target.before(draggedItem);
+                                            }
+
+                                            saveSectionOrder();
+                                        }
+                                    });
+
+                                    grid.addEventListener('dragend', function(e) {
+                                        if (draggedItem) {
+                                            draggedItem.classList.remove('is-dragging');
+                                            draggedItem = null;
+                                        }
+                                        document.querySelectorAll('.mn-section-col').forEach(col => col.classList.remove('drag-over-target'));
+                                    });
+
+                                    function saveSectionOrder() {
+                                        const cols = grid.querySelectorAll('.mn-section-col');
+                                        const order = Array.from(cols).map(c => c.getAttribute('data-section-id'));
+                                        const csrfToken = "<?= $_SESSION['csrf_token'] ?>";
+
+                                        fetch('admin.php', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/x-www-form-urlencoded',
+                                            },
+                                            body: new URLSearchParams({
+                                                action_reorder_sections: 1,
+                                                csrf_token: csrfToken,
+                                                order: JSON.stringify(order)
+                                            })
+                                        })
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            if (data.status === 'success') {
+                                                const toastEl = document.getElementById('reorderToast');
+                                                if (toastEl) {
+                                                    toastEl.classList.add('show');
+                                                    setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
+                                                }
+                                            }
+                                        })
+                                        .catch(err => console.error('Error saving section order:', err));
+                                    }
+                                });
+                                </script>
                             <?php endif; ?>
                         </div>
 
