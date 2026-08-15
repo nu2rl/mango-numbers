@@ -4,6 +4,8 @@
  */
 
 require_once __DIR__ . '/config.php';
+require_login();
+require_admin();
 require_once __DIR__ . '/Mailer.php';
 
 $error = '';
