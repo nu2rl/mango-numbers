@@ -401,9 +401,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_catalog_item']
     exit;
 }
 
-// Helper for file uploads
+// Helper for file uploads (Supports direct file upload & Clipboard Ctrl+V pasted image base64)
 if (!function_exists('upload_catalog_icon')) {
     function upload_catalog_icon($file_input_name, $subfolder = 'houses') {
+        // 1. Check if base64 image was pasted from clipboard (Ctrl+V)
+        $base64_param = 'pasted_base64_' . $file_input_name;
+        if (!empty($_POST[$base64_param])) {
+            $base64_data = $_POST[$base64_param];
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64_data, $type)) {
+                $data = substr($base64_data, strpos($base64_data, ',') + 1);
+                $ext = strtolower($type[1]);
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                    $decoded = base64_decode($data);
+                    if ($decoded !== false) {
+                        $upload_dir = __DIR__ . '/uploads/' . $subfolder . '/';
+                        if (!is_dir($upload_dir)) {
+                            mkdir($upload_dir, 0777, true);
+                        }
+                        $filename = uniqid('pasted_', true) . '.' . $ext;
+                        $destination = $upload_dir . $filename;
+                        if (file_put_contents($destination, $decoded) !== false) {
+                            return 'uploads/' . $subfolder . '/' . $filename;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Standard File Upload (also works with DataTransfer pasted file objects)
         if (isset($_FILES[$file_input_name]) && $_FILES[$file_input_name]['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES[$file_input_name];
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -1852,8 +1877,33 @@ if ($view_section_id > 0) {
                                                     <input type="text" name="badge" class="form-control" placeholder="e.g. HOT, INSTANT, POPULAR" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Upload Custom Image/Icon</label>
-                                                    <input type="file" name="house_image_file" accept="image/*" class="form-control" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 7px 11px;">
+                                                    <label class="form-label font-weight-bold" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Upload Custom House Image/Icon (Choose, Drag & Drop or Ctrl+V)</label>
+                                                    <div class="mn-image-dropzone-wrap">
+                                                        <div class="mn-image-dropzone p-3 text-center" style="border: 2px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; cursor: pointer; transition: all 0.2s ease; position: relative;" onclick="this.querySelector('input[type=file]').click()">
+                                                            <input type="file" name="house_image_file" accept="image/*" class="d-none" onchange="mnHandleFileSelect(this)">
+                                                            <input type="hidden" name="pasted_base64_house_image_file" value="">
+                                                            
+                                                            <div class="mn-dropzone-prompt">
+                                                                <div class="d-inline-flex align-items-center justify-content-center mb-1" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,94,54,0.1); color: #ff5e36;">
+                                                                    <i class="bx bx-cloud-upload fs-5"></i>
+                                                                </div>
+                                                                <div style="font-size: 12px; color: #334155; font-weight: 600;">
+                                                                    Choose file, Drag & Drop, or press <span class="badge bg-warning text-dark border fw-bold" style="font-size: 10px;">Ctrl + V / Cmd + V to Paste</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mn-dropzone-preview d-none align-items-center justify-content-center gap-2">
+                                                                <img class="mn-preview-img" src="" style="width: 42px; height: 42px; object-fit: contain; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; padding: 2px;">
+                                                                <div class="text-start">
+                                                                    <div class="fw-bold text-truncate mn-preview-filename" style="max-width: 180px; font-size: 12px; color: #0f172a;">Image Selected</div>
+                                                                    <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold mn-preview-source" style="font-size: 10px;">Ready</span>
+                                                                </div>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger ms-auto p-0 px-1.5" style="border-radius: 6px;" onclick="event.stopPropagation(); mnClearDropzone(this.closest('.mn-image-dropzone-wrap'))">
+                                                                    <i class="bx bx-x fs-5"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-12 mt-3 text-end">
                                                     <button type="submit" class="btn btn-primary px-4 py-2" style="background: var(--gradient-accent); border:none; border-radius:10px; font-weight: 700;">Save New House</button>
@@ -1988,9 +2038,33 @@ if ($view_section_id > 0) {
                                                                                         </div>
                                                                                     </div>
                                                                                     <div class="mb-3">
-                                                                                        <label class="form-label fw-bold small text-uppercase">Upload New House Icon / Photo</label>
-                                                                                        <input type="file" name="house_image_file" accept="image/*" class="form-control" style="border-radius: 10px;">
-                                                                                        <small class="text-muted">Select image file (PNG, JPG, WEBP) to update photo icon.</small>
+                                                                                        <label class="form-label fw-bold small text-uppercase">Upload New House Icon / Photo (Choose, Drag & Drop or Ctrl+V)</label>
+                                                                                        <div class="mn-image-dropzone-wrap">
+                                                                                            <div class="mn-image-dropzone p-3 text-center" style="border: 2px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; cursor: pointer; transition: all 0.2s ease; position: relative;" onclick="this.querySelector('input[type=file]').click()">
+                                                                                                <input type="file" name="house_image_file" accept="image/*" class="d-none" onchange="mnHandleFileSelect(this)">
+                                                                                                <input type="hidden" name="pasted_base64_house_image_file" value="">
+                                                                                                
+                                                                                                <div class="mn-dropzone-prompt">
+                                                                                                    <div class="d-inline-flex align-items-center justify-content-center mb-1" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,94,54,0.1); color: #ff5e36;">
+                                                                                                        <i class="bx bx-cloud-upload fs-5"></i>
+                                                                                                    </div>
+                                                                                                    <div style="font-size: 12px; color: #334155; font-weight: 600;">
+                                                                                                        Choose file, Drag & Drop, or press <span class="badge bg-warning text-dark border fw-bold" style="font-size: 10px;">Ctrl + V / Cmd + V to Paste</span>
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                                <div class="mn-dropzone-preview d-none align-items-center justify-content-center gap-2">
+                                                                                                    <img class="mn-preview-img" src="" style="width: 42px; height: 42px; object-fit: contain; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; padding: 2px;">
+                                                                                                    <div class="text-start">
+                                                                                                        <div class="fw-bold text-truncate mn-preview-filename" style="max-width: 180px; font-size: 12px; color: #0f172a;">Image Selected</div>
+                                                                                                        <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold mn-preview-source" style="font-size: 10px;">Ready</span>
+                                                                                                    </div>
+                                                                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-auto p-0 px-1.5" style="border-radius: 6px;" onclick="event.stopPropagation(); mnClearDropzone(this.closest('.mn-image-dropzone-wrap'))">
+                                                                                                        <i class="bx bx-x fs-5"></i>
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="modal-footer border-top py-3 px-4">
@@ -2132,8 +2206,33 @@ if ($view_section_id > 0) {
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label" style="font-size: 11.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Icon Photo Upload</label>
-                                                    <input type="file" name="section_image_file" accept="image/*" class="form-control" style="border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 8px 12px;">
+                                                    <label class="form-label font-weight-bold" style="font-size: 11.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Icon Photo Upload (Choose, Drag & Drop or Ctrl+V)</label>
+                                                    <div class="mn-image-dropzone-wrap">
+                                                        <div class="mn-image-dropzone p-3 text-center" style="border: 2px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; cursor: pointer; transition: all 0.2s ease; position: relative;" onclick="this.querySelector('input[type=file]').click()">
+                                                            <input type="file" id="section_image_file" name="section_image_file" accept="image/*" class="d-none" onchange="mnHandleFileSelect(this)">
+                                                            <input type="hidden" name="pasted_base64_section_image_file" value="">
+                                                            
+                                                            <div class="mn-dropzone-prompt">
+                                                                <div class="d-inline-flex align-items-center justify-content-center mb-1" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,94,54,0.1); color: #ff5e36;">
+                                                                    <i class="bx bx-cloud-upload fs-5"></i>
+                                                                </div>
+                                                                <div style="font-size: 12px; color: #334155; font-weight: 600;">
+                                                                    Choose file, Drag & Drop, or press <span class="badge bg-warning text-dark border fw-bold" style="font-size: 10px;">Ctrl + V / Cmd + V to Paste</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mn-dropzone-preview d-none align-items-center justify-content-center gap-2">
+                                                                <img class="mn-preview-img" src="" style="width: 42px; height: 42px; object-fit: contain; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; padding: 2px;">
+                                                                <div class="text-start">
+                                                                    <div class="fw-bold text-truncate mn-preview-filename" style="max-width: 180px; font-size: 12px; color: #0f172a;">Image Selected</div>
+                                                                    <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold mn-preview-source" style="font-size: 10px;">Ready</span>
+                                                                </div>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger ms-auto p-0 px-1.5" style="border-radius: 6px;" onclick="event.stopPropagation(); mnClearDropzone(this.closest('.mn-image-dropzone-wrap'))">
+                                                                    <i class="bx bx-x fs-5"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-8">
                                                     <label class="form-label" style="font-size: 11.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Description (Optional)</label>
@@ -3545,6 +3644,153 @@ if ($view_section_id > 0) {
                     }
                 });
             }
+        });
+    </script>
+
+    <!-- Global Image Clipboard Paste (Ctrl+V / Cmd+V) & Drag-Drop Engine -->
+    <style>
+        .mn-image-dropzone:hover,
+        .mn-image-dropzone.drag-over {
+            border-color: #ff5e36 !important;
+            background: #fff7ed !important;
+            box-shadow: 0 0 0 4px rgba(255, 94, 54, 0.12);
+        }
+        .mn-image-dropzone.has-file {
+            border-color: #10b981 !important;
+            background: #f0fdf4 !important;
+        }
+    </style>
+    <script>
+        function mnAttachImageToDropzone(wrap, file, sourceLabel = 'File Selected') {
+            if (!wrap || !file) return;
+            const fileInput = wrap.querySelector('input[type="file"]');
+            const base64Input = wrap.querySelector('input[type="hidden"]');
+            const promptEl = wrap.querySelector('.mn-dropzone-prompt');
+            const previewEl = wrap.querySelector('.mn-dropzone-preview');
+            const previewImg = wrap.querySelector('.mn-preview-img');
+            const filenameEl = wrap.querySelector('.mn-preview-filename');
+            const sourceEl = wrap.querySelector('.mn-preview-source');
+            const dropzone = wrap.querySelector('.mn-image-dropzone');
+
+            if (fileInput && window.DataTransfer) {
+                try {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    fileInput.files = dt.files;
+                } catch (err) {
+                    console.warn('DataTransfer error:', err);
+                }
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                if (base64Input) base64Input.value = base64Data;
+                if (previewImg) previewImg.src = base64Data;
+
+                if (promptEl) promptEl.classList.add('d-none');
+                if (previewEl) {
+                    previewEl.classList.remove('d-none');
+                    previewEl.classList.add('d-flex');
+                }
+                if (filenameEl) filenameEl.textContent = file.name || 'clipboard_image.png';
+                if (sourceEl) sourceEl.textContent = sourceLabel;
+
+                if (dropzone) {
+                    dropzone.classList.add('has-file');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function mnHandleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const wrap = input.closest('.mn-image-dropzone-wrap');
+                if (wrap) {
+                    mnAttachImageToDropzone(wrap, input.files[0], 'File Selected');
+                }
+            }
+        }
+
+        function mnClearDropzone(wrap) {
+            if (!wrap) return;
+            const fileInput = wrap.querySelector('input[type="file"]');
+            const base64Input = wrap.querySelector('input[type="hidden"]');
+            const promptEl = wrap.querySelector('.mn-dropzone-prompt');
+            const previewEl = wrap.querySelector('.mn-dropzone-preview');
+            const dropzone = wrap.querySelector('.mn-image-dropzone');
+
+            if (fileInput) fileInput.value = '';
+            if (base64Input) base64Input.value = '';
+            if (promptEl) promptEl.classList.remove('d-none');
+            if (previewEl) {
+                previewEl.classList.add('d-none');
+                previewEl.classList.remove('d-flex');
+            }
+            if (dropzone) {
+                dropzone.classList.remove('has-file');
+            }
+        }
+
+        // Listen for Ctrl+V / Cmd+V image paste events
+        document.addEventListener('paste', function(e) {
+            const clipboardData = e.clipboardData || window.clipboardData;
+            if (!clipboardData || !clipboardData.items) return;
+
+            let imageItem = null;
+            for (let i = 0; i < clipboardData.items.length; i++) {
+                if (clipboardData.items[i].type.indexOf('image') !== -1) {
+                    imageItem = clipboardData.items[i];
+                    break;
+                }
+            }
+
+            if (!imageItem) return;
+
+            const file = imageItem.getAsFile();
+            if (!file) return;
+
+            const activeHover = document.querySelector('.mn-image-dropzone-wrap:hover');
+            const activeModal = document.querySelector('.modal.show .mn-image-dropzone-wrap');
+            const activeCollapse = document.querySelector('.collapse.show .mn-image-dropzone-wrap');
+            const firstDropzone = document.querySelector('.mn-image-dropzone-wrap');
+
+            const targetWrap = activeHover || activeModal || activeCollapse || firstDropzone;
+
+            if (targetWrap) {
+                e.preventDefault();
+                mnAttachImageToDropzone(targetWrap, file, '📋 Pasted from Clipboard!');
+            }
+        });
+
+        // Setup Drag & Drop listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.mn-image-dropzone').forEach(dropzone => {
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropzone.classList.add('drag-over');
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropzone.classList.remove('drag-over');
+                    }, false);
+                });
+
+                dropzone.addEventListener('drop', (e) => {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files && files[0] && files[0].type.startsWith('image/')) {
+                        const wrap = dropzone.closest('.mn-image-dropzone-wrap');
+                        mnAttachImageToDropzone(wrap, files[0], '📁 Dropped Image');
+                    }
+                }, false);
+            });
         });
     </script>
     <script src="assets/js/anti-devtools.js"></script>
