@@ -819,7 +819,6 @@ function get_flag_icon($country) {
                                     <th>UTR</th>
                                     <th>Status</th>
                                     <th>Virtual Number</th>
-                                    <th>OTP</th>
                                     <th>Support</th>
                                     <th>Re-order</th>
                                 </tr>
@@ -870,16 +869,6 @@ function get_flag_icon($country) {
                                                     <span class="waiting-pulse">⏳ Processing...</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="col-otp">
-                                                <?php if ($p['status'] === 'approved' && !empty($p['otp_provided'])): ?>
-                                                    <div class="otp-box">
-                                                        <span class="otp-val"><?= htmlspecialchars($p['otp_provided']) ?></span>
-                                                        <button class="btn-copy-sm" onclick="copyText('<?= htmlspecialchars($p['otp_provided']) ?>', this)" title="Copy OTP">📋 Copy</button>
-                                                    </div>
-                                                <?php else: ?>
-                                                    <span class="waiting-pulse">⌛ Awaiting SMS...</span>
-                                                <?php endif; ?>
-                                            </td>
                                             <td>
                                                 <a href="https://t.me/nu9rl" target="_blank" class="btn-tg-sm">✈️ Telegram</a>
                                             </td>
@@ -893,7 +882,7 @@ function get_flag_icon($country) {
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <tr><td colspan="9" class="empty-row">No orders yet. Go buy a number! 🚀</td></tr>
+                                    <tr><td colspan="8" class="empty-row">No orders yet. Go buy a number! 🚀</td></tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
