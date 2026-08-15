@@ -328,45 +328,95 @@ function get_flag_icon($country) {
         .btn-sm { padding: 6px 12px; border: none; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: transform 0.15s; }
         .btn-sm:hover { transform: translateY(-1px); }
         .btn-tg-sm { background: linear-gradient(135deg,#0088cc,#29b6f6); color: #fff; }
-        .btn-again { background: linear-gradient(135deg,#f97316,#fb923c); color: #fff; }
-        .empty-row { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
-
-        /* ── Support ── */
-        .support-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
-        .support-form-card, .support-log-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-        .card-title { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 18px; }
-        label { display: block; font-size: 12.5px; font-weight: 600; color: #94a3b8; margin-bottom: 7px; }
-        input[type="text"], select, textarea {
-            width: 100%; background: var(--elevated); border: 1px solid var(--border); border-radius: 9px;
-            padding: 11px 14px; font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--text);
-            outline: none; transition: border-color 0.2s; margin-bottom: 14px;
+        .btn-ag        /* ── Support Center Redesign ── */
+        .support-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
+        .support-form-card, .support-log-card {
+            background: rgba(18, 18, 26, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 3px solid var(--accent);
+            border-radius: 20px; padding: 28px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-        input::placeholder, textarea::placeholder { color: #334155; }
-        select option { background: var(--elevated); }
-        textarea { resize: vertical; min-height: 100px; }
-        .form-submit { width: 100%; padding: 13px; background: linear-gradient(135deg,#f97316,#fb923c); border: none; border-radius: 9px; font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; transition: transform 0.2s; }
-        .form-submit:hover { transform: translateY(-1px); }
-        .form-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; font-style: italic; }
+        .card-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 20px; letter-spacing: -0.3px; display: flex; align-items: center; justify-content: space-between; }
+        label { display: block; font-size: 12.5px; font-weight: 700; color: #cbd5e1; margin-bottom: 8px; letter-spacing: 0.2px; }
+        input[type="text"], select, textarea {
+            width: 100%; background: #141420;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 13px 16px; font-family: 'Inter', sans-serif; font-size: 14px; color: #f8fafc;
+            outline: none; transition: border-color 0.25s, box-shadow 0.25s, background 0.25s; margin-bottom: 18px;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #f97316;
+            background: #181826;
+            box-shadow: 0 0 0 3.5px rgba(249, 115, 22, 0.2);
+        }
+        input::placeholder, textarea::placeholder { color: #64748b; }
+        select option { background: #181826; color: #f8fafc; }
+        textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+        .form-submit {
+            width: 100%; padding: 14px 20px;
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            border: none; border-radius: 12px;
+            font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 800; color: #fff;
+            cursor: pointer; transition: transform 0.25s, box-shadow 0.25s;
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.35);
+        }
+        .form-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(249, 115, 22, 0.5); }
+        .form-note { font-size: 12px; color: #64748b; text-align: center; margin-top: 12px; font-weight: 500; }
 
-        .complaint-item { border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
-        .complaint-header { padding: 14px 16px; background: var(--elevated); display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 10px; }
-        .complaint-subject { font-size: 13.5px; font-weight: 700; color: var(--text); flex: 1; }
-        .complaint-body { display: none; padding: 16px; background: var(--bg); }
+        .complaint-item {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; margin-bottom: 16px; overflow: hidden;
+            background: #12121c; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .complaint-item:hover { border-color: rgba(249, 115, 22, 0.3); }
+        .complaint-header {
+            padding: 16px 20px; background: rgba(255, 255, 255, 0.02);
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 12px;
+            transition: background 0.2s;
+        }
+        .complaint-header:hover { background: rgba(255, 255, 255, 0.04); }
+        .complaint-subject { font-size: 15px; font-weight: 700; color: #f1f5f9; flex: 1; letter-spacing: -0.2px; }
+        .complaint-body { display: none; padding: 20px; background: #0c0c14; border-top: 1px solid rgba(255, 255, 255, 0.06); }
         .complaint-item.open-item .complaint-body { display: block; }
-        .complaint-date { font-size: 11.5px; color: var(--muted); margin-bottom: 14px; }
-        .chat-thread { display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; background: var(--elevated); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
-        .bubble { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.55; }
-        .bubble-user { align-self: flex-start; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2); border-radius: 14px 14px 14px 2px; }
-        .bubble-admin { align-self: flex-end; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 14px 14px 2px 14px; }
-        .bubble-sender { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
-        .bubble-user .bubble-sender { color: var(--accent); }
-        .bubble-admin .bubble-sender { color: #22c55e; }
-        .bubble-time { font-size: 10px; color: var(--muted); text-align: right; margin-top: 5px; }
-        .reply-form textarea { margin-bottom: 10px; }
-        .reply-submit { padding: 10px 20px; background: linear-gradient(135deg,#f97316,#fb923c); border: none; border-radius: 8px; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: transform 0.15s; }
-        .reply-submit:hover { transform: translateY(-1px); }
-        .closed-notice { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #fca5a5; display: flex; align-items: center; gap: 8px; }
+        .complaint-date { font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+        .chat-thread {
+            display: flex; flex-direction: column; gap: 14px;
+            max-height: 380px; overflow-y: auto;
+            background: #12121e; border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px; padding: 18px; margin-bottom: 18px;
+        }
+        .bubble { max-width: 82%; padding: 14px 18px; border-radius: 16px; font-size: 13.5px; line-height: 1.6; color: #f8fafc; position: relative; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+        .bubble-user {
+            align-self: flex-start;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.18) 0%, rgba(251, 146, 60, 0.12) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.35);
+            border-radius: 16px 16px 16px 3px;
+        }
+        .bubble-admin {
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.18) 0%, rgba(74, 222, 128, 0.12) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            border-radius: 16px 16px 3px 16px;
+        }
+        .bubble-sender { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+        .bubble-user .bubble-sender { color: #fb923c; }
+        .bubble-admin .bubble-sender { color: #4ade80; }
+        .bubble-time { font-size: 10.5px; color: rgba(241, 245, 249, 0.5); text-align: right; margin-top: 6px; font-weight: 500; }
+        .reply-form textarea { margin-bottom: 12px; background: #141420; }
+        .reply-submit {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            border: none; border-radius: 10px;
+            font-family: 'Sora', sans-serif; font-size: 13.5px; font-weight: 800; color: #fff;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+        }
+        .reply-submit:hover { transform: translateY(-1.5px); box-shadow: 0 8px 22px rgba(249, 115, 22, 0.45); }
+        .closed-notice { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 12px; padding: 14px 18px; font-size: 13.5px; font-weight: 600; color: #fca5a5; display: flex; align-items: center; gap: 10px; }
+        .empty-state { text-align: center; color: #64748b; padding: 50px 20px; font-size: 14.5px; font-weight: 500; }nt-size: 13px; color: #fca5a5; display: flex; align-items: center; gap: 8px; }
         .empty-state { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 14px; }
 
         /* ── Mobile sidebar overlay ── */
@@ -786,7 +836,7 @@ function get_flag_icon($country) {
                                         <div class="chat-thread">
                                             <div style="align-self:flex-start;">
                                                 <div class="bubble bubble-user">
-                                                    <div class="bubble-sender">You (Original)</div>
+                                                    <div class="bubble-sender">👤 YOU (Original)</div>
                                                     <?= nl2br(htmlspecialchars($c['message'])) ?>
                                                     <div class="bubble-time"><?= date('d M, h:i A', strtotime($c['created_at'])) ?></div>
                                                 </div>
@@ -798,7 +848,7 @@ function get_flag_icon($country) {
                                             ?>
                                                 <div style="align-self:<?= $m['sender']==='admin'?'flex-end':'flex-start' ?>;">
                                                     <div class="bubble <?= $m['sender']==='admin'?'bubble-admin':'bubble-user' ?>">
-                                                        <div class="bubble-sender"><?= $m['sender']==='admin'?'Support Team':'You' ?></div>
+                                                        <div class="bubble-sender"><?= $m['sender']==='admin'?'🛡️ Mango Support':'👤 YOU' ?></div>
                                                         <?= nl2br(htmlspecialchars($m['message'])) ?>
                                                         <div class="bubble-time"><?= date('d M, h:i A', strtotime($m['created_at'])) ?></div>
                                                     </div>
