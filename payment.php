@@ -175,7 +175,7 @@ function get_country_flag($country) {
         .intl-card p{font-size:13px;color:var(--muted);line-height:1.6;}
         .btn-tg{width:100%;padding:14px;background:linear-gradient(135deg,#0088cc,#29b6f6);border:none;border-radius:12px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform 0.2s;box-shadow:0 4px 18px rgba(0,136,204,0.3);}
         .btn-tg:hover{transform:translateY(-1px);}
-        @media(max-width:540px){body{padding:20px 14px;}.card{padding:24px 18px;}}
+        @media(max-width:540px){body{padding:20px 14px;}.card{padding:24px 18px;} input[type="text"], input[type="file"], select, textarea { font-size: 16px !important; }}
     </style>
 </head>
 <body>

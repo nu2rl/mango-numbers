@@ -69,7 +69,7 @@ if (is_logged_in()) {
         .footer-note a{ color:var(--accent); text-decoration:none; font-weight:600; }
         @keyframes spin{ to{ transform:rotate(360deg); } }
         .spinner{ width:15px; height:15px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:inline-block; }
-        @media(max-width:480px){ .card{ padding:28px 20px; } .input-row{ flex-direction:column; } .btn-green{ width:100%; } }
+        @media(max-width:480px){ .card{ padding:28px 20px; } .input-row{ flex-direction:column; } .btn-green{ width:100%; } input[type="text"], input[type="password"], input[type="email"] { font-size: 16px !important; } }
     </style>
 </head>
 <body>

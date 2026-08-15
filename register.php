@@ -130,7 +130,7 @@ if (is_logged_in()) {
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner { width: 15px; height: 15px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
 
-        @media (max-width: 900px) { body { flex-direction: column; overflow: auto; } .left-panel { display: none; } .right-panel { width: 100%; border-left: none; min-height: 100vh; padding: 44px 24px; } }
+        @media (max-width: 900px) { body { flex-direction: column; overflow: auto; } .left-panel { display: none; } .right-panel { width: 100%; border-left: none; min-height: 100vh; padding: 44px 24px; } input[type="text"], input[type="password"], input[type="email"], input[type="tel"] { font-size: 16px !important; } }
         @media (max-width: 480px) { .right-panel { padding: 32px 18px; } .input-row { flex-direction: column; } .btn-green { width: 100%; } }
     </style>
 </head>

@@ -302,6 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             body { flex-direction: column; overflow: auto; }
             .left-panel { display: none; }
             .right-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); min-height: 100vh; padding: 48px 28px; }
+            input[type="text"], input[type="password"], input[type="email"] { font-size: 16px !important; }
         }
         @media (max-width: 480px) {
             .right-panel { padding: 36px 20px; }
