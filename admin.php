@@ -1542,21 +1542,16 @@ if ($view_section_id > 0) {
                                             <input type="hidden" name="active_tab" value="catalog">
                                             <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
                                             <input type="hidden" name="action_create_house" value="1">
-                                            
-                                            <div class="row g-3">
-                                                <div class="col-md-4">
+                                                   <div class="row g-3">
+                                                <div class="col-md-5">
                                                     <label class="form-label font-weight-bold" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">House / Service Name *</label>
-                                                    <input type="text" name="house_name" class="form-control" placeholder="e.g. WhatsApp USA Virtual Number" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                                                    <input type="text" name="country" class="form-control" placeholder="e.g. USA, India, Global" value="Global" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
+                                                    <input type="text" name="house_name" class="form-control" placeholder="e.g. WhatsApp Virtual Number" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Selling Price (INR ₹) *</label>
                                                     <input type="number" step="0.01" name="price_inr" class="form-control" placeholder="150.00" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-4">
                                                     <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Selling Price (USD $)</label>
                                                     <input type="number" step="0.01" name="price_usd" class="form-control" placeholder="2.00" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
@@ -1592,7 +1587,7 @@ if ($view_section_id > 0) {
                                         <div style="max-width: 250px; width: 100%;">
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text bg-white border-end-0"><i class="bx bx-search text-muted"></i></span>
-                                                <input type="text" id="houseSearchInput" onkeyup="filterHousesTable()" class="form-control border-start-0" placeholder="Search house by name/country..." style="border-radius: 0 8px 8px 0;">
+                                                <input type="text" id="houseSearchInput" onkeyup="filterHousesTable()" class="form-control border-start-0" placeholder="Search house by name..." style="border-radius: 0 8px 8px 0;">
                                             </div>
                                         </div>
                                     </div>
@@ -1602,7 +1597,6 @@ if ($view_section_id > 0) {
                                             <thead>
                                                 <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
                                                     <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">House / Service Name</th>
-                                                    <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Country</th>
                                                     <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Selling Price (₹)</th>
                                                     <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Available Stock</th>
                                                     <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Status</th>
@@ -1652,11 +1646,6 @@ if ($view_section_id > 0) {
                                                                     </div>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
-                                                                <span class="badge house-country" style="background: #f1f5f9; color: #1e293b; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 9px; border: 1px solid #cbd5e1; font-family: 'Outfit', sans-serif;">
-                                                                    🌐 <?= htmlspecialchars(strtoupper($h['country'])) ?>
-                                                                </span>
-                                                            </td>
-                                                            <td style="padding: 16px 20px;">
                                                                 <div class="input-group input-group-sm" style="max-width:140px; border-radius: 10px; overflow: hidden; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                                                                     <span class="input-group-text fw-bold" style="background: #f8fafc; border: none; color: #0f172a; font-size: 14px; padding-right: 6px;">₹</span>
                                                                     <input type="number" step="0.01" name="price_inr" class="form-control form-control-sm fw-bold" value="<?= htmlspecialchars($h['price_inr']) ?>" style="border: none; color: #0f172a; font-size: 14px; padding: 7px 10px;" required>
@@ -1699,7 +1688,7 @@ if ($view_section_id > 0) {
                                                     <?php endforeach; ?>
                                                 <?php else: ?>
                                                     <tr>
-                                                        <td colspan="6" class="text-center text-muted py-5">
+                                                        <td colspan="5" class="text-center text-muted py-5">
                                                             <i class="bx bx-folder-open display-4 mb-2 text-muted opacity-50"></i>
                                                             <p class="mb-0 fw-bold">No Houses / Services found in this Section.</p>
                                                             <small>Click <strong>+ New House</strong> above to create your first service!</small>
@@ -1718,14 +1707,14 @@ if ($view_section_id > 0) {
                                     const rows = document.querySelectorAll('.house-row');
                                     rows.forEach(row => {
                                         const title = row.querySelector('.house-title')?.textContent.toLowerCase() || '';
-                                        const country = row.querySelector('.house-country')?.textContent.toLowerCase() || '';
-                                        if (title.includes(filter) || country.includes(filter)) {
+                                        if (title.includes(filter)) {
                                             row.style.display = '';
                                         } else {
                                             row.style.display = 'none';
                                         }
                                     });
                                 }
+                                </script>    }
                                 </script>
 
                             <?php else: ?>
