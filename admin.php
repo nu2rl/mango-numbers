@@ -1581,23 +1581,52 @@ if ($view_section_id > 0) {
                                 </div>
 
                                 <!-- Houses List Table -->
-                                <div class="card" style="border: 1px solid rgba(0, 0, 0, 0.07); border-radius: 16px; background: #ffffff; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); overflow: hidden;">
+                                <div class="card" style="border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 18px; background: #ffffff; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04); overflow: hidden;">
+                                    <!-- Table Top Bar with Quick Search -->
+                                    <div class="px-4 py-3 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bx bx-list-ul fs-4 text-primary"></i>
+                                            <span class="fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">Manage Service Houses</span>
+                                            <span class="badge rounded-pill bg-label-primary ms-1"><?= count($houses_list) ?> Total</span>
+                                        </div>
+                                        <div style="max-width: 250px; width: 100%;">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white border-end-0"><i class="bx bx-search text-muted"></i></span>
+                                                <input type="text" id="houseSearchInput" onkeyup="filterHousesTable()" class="form-control border-start-0" placeholder="Search house by name/country..." style="border-radius: 0 8px 8px 0;">
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="table-responsive text-nowrap">
-                                        <table class="table table-hover align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
+                                        <table class="table table-hover align-middle mb-0" id="housesTable" style="border-collapse: separate; border-spacing: 0;">
                                             <thead>
-                                                <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">House Name</th>
-                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Country</th>
-                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Selling Price</th>
-                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Available Stock</th>
-                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Status</th>
-                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px; text-align: right;">Actions</th>
+                                                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                                    <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">House / Service Name</th>
+                                                    <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Country</th>
+                                                    <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Selling Price (₹)</th>
+                                                    <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Available Stock</th>
+                                                    <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Status</th>
+                                                    <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px; text-align: right;">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php if (!empty($houses_list)): ?>
                                                     <?php foreach ($houses_list as $h): ?>
-                                                        <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
+                                                        <?php
+                                                            $sec_name_lower = strtolower($active_section_data['name'] ?? '');
+                                                            $icon_bg = 'rgba(255, 94, 54, 0.1)';
+                                                            $icon_color = '#ff5e36';
+                                                            $default_icon = 'bx-package';
+                                                            if (str_contains($sec_name_lower, 'telegram')) {
+                                                                $icon_bg = 'rgba(0, 136, 204, 0.12)'; $icon_color = '#0088cc'; $default_icon = 'bxl-telegram';
+                                                            } elseif (str_contains($sec_name_lower, 'whatsapp')) {
+                                                                $icon_bg = 'rgba(37, 211, 102, 0.12)'; $icon_color = '#25D366'; $default_icon = 'bxl-whatsapp';
+                                                            } elseif (str_contains($sec_name_lower, 'canva')) {
+                                                                $icon_bg = 'rgba(125, 42, 232, 0.12)'; $icon_color = '#7d2ae8'; $default_icon = 'bx-paint';
+                                                            }
+                                                            $icon_val = !empty($h['icon']) ? $h['icon'] : $default_icon;
+                                                        ?>
+                                                        <tr class="house-row" style="border-bottom: 1px solid #f1f5f9;">
                                                             <td style="padding: 16px 20px;">
                                                                 <form id="form-update-house-<?= $h['id'] ?>" action="admin.php" method="POST">
                                                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -1607,61 +1636,61 @@ if ($view_section_id > 0) {
                                                                     <input type="hidden" name="action_update_house" value="1">
                                                                     
                                                                     <div class="d-flex align-items-center gap-3">
-                                                                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 94, 54, 0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                                        <div style="width: 44px; height: 44px; border-radius: 12px; background: <?= $icon_bg ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.04);">
                                                                             <?php if (!empty($h['icon']) && str_contains($h['icon'], 'http')): ?>
-                                                                                <img src="<?= htmlspecialchars($h['icon']) ?>" style="width:22px; height:22px; object-fit:contain;">
+                                                                                <img src="<?= htmlspecialchars($h['icon']) ?>" style="width:24px; height:24px; object-fit:contain;">
                                                                             <?php else: ?>
-                                                                                <i class="bx <?= htmlspecialchars(!empty($h['icon']) ? $h['icon'] : 'bx-package') ?> fs-4" style="color: var(--accent-orange);"></i>
+                                                                                <i class="bx <?= htmlspecialchars($icon_val) ?> fs-3" style="color: <?= $icon_color ?>;"></i>
                                                                             <?php endif; ?>
                                                                         </div>
                                                                         <div>
-                                                                            <strong class="d-block" style="font-size:14.5px; color: #0f172a; font-family: 'Inter', sans-serif;"><?= htmlspecialchars($h['name']) ?></strong>
+                                                                            <strong class="d-block house-title" style="font-size:15px; color: #0f172a; font-family: 'Outfit', sans-serif; font-weight: 700;"><?= htmlspecialchars($h['name']) ?></strong>
                                                                             <?php if (!empty($h['badge'])): ?>
-                                                                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size:10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;"><?= htmlspecialchars($h['badge']) ?></span>
+                                                                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size:10.5px; font-weight: 800; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars($h['badge']) ?></span>
                                                                             <?php endif; ?>
                                                                         </div>
                                                                     </div>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
-                                                                <span class="badge" style="background: #f1f5f9; color: #334155; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-family: monospace;">
-                                                                    <?= htmlspecialchars(strtoupper($h['country'])) ?>
+                                                                <span class="badge house-country" style="background: #f1f5f9; color: #1e293b; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 9px; border: 1px solid #cbd5e1; font-family: 'Outfit', sans-serif;">
+                                                                    🌐 <?= htmlspecialchars(strtoupper($h['country'])) ?>
                                                                 </span>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
-                                                                <div class="input-group input-group-sm" style="max-width:130px; border-radius: 10px; overflow: hidden; border: 1.5px solid #cbd5e1;">
-                                                                    <span class="input-group-text" style="background: #f8fafc; border: none; font-weight: 700; color: #64748b; padding-right: 4px;">₹</span>
-                                                                    <input type="number" step="0.01" name="price_inr" class="form-control form-control-sm" value="<?= htmlspecialchars($h['price_inr']) ?>" style="border: none; font-weight: 700; color: #0f172a; font-size: 14px;" required>
+                                                                <div class="input-group input-group-sm" style="max-width:140px; border-radius: 10px; overflow: hidden; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                                                                    <span class="input-group-text fw-bold" style="background: #f8fafc; border: none; color: #0f172a; font-size: 14px; padding-right: 6px;">₹</span>
+                                                                    <input type="number" step="0.01" name="price_inr" class="form-control form-control-sm fw-bold" value="<?= htmlspecialchars($h['price_inr']) ?>" style="border: none; color: #0f172a; font-size: 14px; padding: 7px 10px;" required>
                                                                 </div>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
-                                                                <input type="number" name="stock_quantity" class="form-control form-control-sm text-center" style="max-width:85px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-weight: 700; font-size: 14px; color: #0f172a;" value="<?= (int)$h['stock_quantity'] ?>" required>
+                                                                <input type="number" name="stock_quantity" class="form-control form-control-sm text-center fw-bold" style="max-width:90px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 14.5px; color: #0f172a; padding: 7px 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" value="<?= (int)$h['stock_quantity'] ?>" required>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
                                                                 <?php if ($h['stock_quantity'] > 0): ?>
-                                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 700; border-radius: 99px; padding: 5px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-                                                                        <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span> Available
+                                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #047857; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1px solid rgba(16, 185, 129, 0.2); display: inline-flex; align-items: center; gap: 6px;">
+                                                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span> AVAILABLE
                                                                     </span>
                                                                 <?php else: ?>
-                                                                    <span class="badge" style="background: rgba(239, 68, 68, 0.12); color: #dc2626; font-weight: 700; border-radius: 99px; padding: 5px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-                                                                        <span style="width: 7px; height: 7px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> Out of Stock
+                                                                    <span class="badge" style="background: rgba(239, 68, 68, 0.12); color: #b91c1c; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1px solid rgba(239, 68, 68, 0.2); display: inline-flex; align-items: center; gap: 6px;">
+                                                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> OUT OF STOCK
                                                                     </span>
                                                                 <?php endif; ?>
                                                             </td>
                                                             <td style="padding: 16px 20px; text-align: right;">
                                                                 <div class="d-flex align-items-center justify-content-end gap-2">
-                                                                    <button type="submit" class="btn btn-sm" style="background: #10b981; color: #ffffff; border: none; border-radius: 9px; padding: 6px 14px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(16,185,129,0.3);" title="Save price and stock changes">
+                                                                    <button type="submit" class="btn btn-sm px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(16,185,129,0.25); transition: all 0.2s ease;" title="Save price and stock changes">
                                                                         <i class="bx bx-check fs-5"></i> Save
                                                                     </button>
                                                                 </form>
 
-                                                                <form action="admin.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this House?');" style="margin: 0;">
+                                                                <form action="admin.php" method="POST" onsubmit="return confirm('Are you sure you want to delete <?= htmlspecialchars(addslashes($h['name'])) ?>?');" style="margin: 0;">
                                                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                     <input type="hidden" name="active_tab" value="catalog">
                                                                     <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
                                                                     <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
                                                                     <input type="hidden" name="action_delete_house" value="1">
-                                                                    <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 9px; padding: 6px 10px; font-size: 14px;" title="Delete House">
-                                                                        <i class="bx bx-trash"></i>
+                                                                    <button type="submit" class="btn btn-sm px-3 py-2" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s ease;" title="Delete this house item">
+                                                                        <i class="bx bx-trash fs-6"></i> Delete
                                                                     </button>
                                                                 </form>
                                                                 </div>
@@ -1681,6 +1710,23 @@ if ($view_section_id > 0) {
                                         </table>
                                     </div>
                                 </div>
+
+                                <script>
+                                function filterHousesTable() {
+                                    const input = document.getElementById('houseSearchInput');
+                                    const filter = input.value.toLowerCase();
+                                    const rows = document.querySelectorAll('.house-row');
+                                    rows.forEach(row => {
+                                        const title = row.querySelector('.house-title')?.textContent.toLowerCase() || '';
+                                        const country = row.querySelector('.house-country')?.textContent.toLowerCase() || '';
+                                        if (title.includes(filter) || country.includes(filter)) {
+                                            row.style.display = '';
+                                        } else {
+                                            row.style.display = 'none';
+                                        }
+                                    });
+                                }
+                                </script>
 
                             <?php else: ?>
                                 <!-- OVERVIEW SECTIONS LIST VIEW -->
