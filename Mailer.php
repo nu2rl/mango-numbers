@@ -94,8 +94,15 @@ class Mailer {
                 throw new Exception("STARTTLS failed: " . $res);
             }
 
-            // Upgrade connection to secure stream using TLS
-            if (!stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+            // Upgrade connection to secure stream using TLS (supporting TLS 1.2 and TLS 1.3)
+            $crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+            if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
+                $crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+            }
+            if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+                $crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+            }
+            if (!stream_socket_enable_crypto($socket, true, $crypto_method)) {
                 throw new Exception("TLS encryption negotiation failed");
             }
 
