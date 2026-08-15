@@ -1161,7 +1161,7 @@ foreach ($monthly_raw as $row) {
                     <li class="menu-item <?= $active_tab === 'catalog' ? 'active' : '' ?>" id="menu-catalog">
                         <a href="javascript:void(0);" onclick="switchSection('catalog')" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-edit"></i>
-                            <div data-i18n="Catalog">Edit Stock & Rates</div>
+                            <div data-i18n="Catalog">Manage Offers</div>
                         </a>
                     </li>
 
@@ -1423,7 +1423,7 @@ foreach ($monthly_raw as $row) {
 
                         <!-- SECTION 2: EDIT CATALOG / PRICES & STOCKS -->
                         <div id="section-catalog" class="admin-section <?= $active_tab === 'catalog' ? 'active' : '' ?>">
-                            <h4 class="fw-bold py-3 mb-2" style="font-family:'Outfit', sans-serif;">Manage Stock Levels & Rates</h4>
+                            <h4 class="fw-bold py-3 mb-2" style="font-family:'Outfit', sans-serif;">Manage Offers</h4>
                             
                             <!-- Exchange Rate Tool Card -->
                             <div class="card mb-4" style="border: 1px solid rgba(220, 200, 190, 0.4); border-radius: 16px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px);">
