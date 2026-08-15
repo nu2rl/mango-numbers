@@ -18,12 +18,16 @@ if (is_logged_in()) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
-    
-    if (empty($username) || empty($password)) {
-        $error = 'Username and password are required.';
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_token)) {
+        $error = 'CSRF verification failed. Please refresh the page and try again.';
     } else {
+        $username = trim($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+        
+        if (empty($username) || empty($password)) {
+            $error = 'Username and password are required.';
+        } else {
         $db = get_db_connection();
         if (!$db) {
             $error = 'Database connection failed. Please run <a href="db_init.php">db_init.php</a> first.';
@@ -89,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -343,6 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form action="login.php" method="POST" id="login-form">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="form-group">
                     <label for="username">Username or Email</label>
                     <input type="text" name="username" id="username" placeholder="Enter username or email" required value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">

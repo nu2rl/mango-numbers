@@ -93,7 +93,7 @@ if (is_logged_in()) {
             <div id="alert-success" class="alert-box alert-success"></div>
 
             <!-- Step 1 & 2: Email + OTP -->
-            <form id="otp-form" onsubmit="event.preventDefault(); verifyOtpCode();">
+            <form id="otp-form" onsubmit="handleForgotFormSubmit(event)">
                 <input type="hidden" name="csrf_token" id="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div id="email-verification-group">
                     <div class="form-group">
@@ -178,9 +178,19 @@ if (is_logged_in()) {
             if(timerInterval)clearInterval(timerInterval);
             timerInterval=setInterval(()=>{count--;timerSec.innerText=count;if(count<=0){clearInterval(timerInterval);btnResend.disabled=false;timerLabel.style.display='none';}},1000);
         }
+        function handleForgotFormSubmit(e) {
+            if (e) e.preventDefault();
+            var otpInput = document.getElementById('otp');
+            if (!otpInput || otpInput.disabled || !otpInput.value.trim()) {
+                sendOtpCode();
+            } else {
+                verifyOtpCode();
+            }
+        }
         function verifyOtpCode(){
             var btnVerify=document.getElementById('btn-verify');
             var email=document.getElementById('email').value.trim(), otp=document.getElementById('otp').value.trim();
+            if(!otp){showAlert('error','Please enter the 6-digit OTP code sent to your email.');return;}
             btnVerify.disabled=true; btnVerify.innerHTML='<span class="spinner"></span> Verifying...'; showAlert('none','');
             var fd=new FormData(); fd.append('email',email); fd.append('otp',otp); fd.append('csrf_token',csrfToken);
             fetch('auth_handler.php?action=verify-forgot-password-otp',{method:'POST',headers:{'X-CSRF-Token':csrfToken},body:fd})

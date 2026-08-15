@@ -172,7 +172,7 @@ if (is_logged_in()) {
                     Contact Owner on Telegram
                 </a>
             <?php else: ?>
-            <form id="signup-form" onsubmit="event.preventDefault(); verifyAndSignup();">
+            <form id="signup-form" onsubmit="handleSignupFormSubmit(event)">
                 <input type="hidden" name="csrf_token" id="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
                 <div class="form-group">
@@ -286,6 +286,15 @@ if (is_logged_in()) {
             }, 1000);
         }
 
+        function handleSignupFormSubmit(e) {
+            if (e) e.preventDefault();
+            var otpInput = document.getElementById('otp');
+            if (!otpInput || otpInput.disabled || !otpInput.value.trim()) {
+                sendOtpCode();
+            } else {
+                verifyAndSignup();
+            }
+        }
         function verifyAndSignup() {
             var btnSignup = document.getElementById('btn-signup');
             var name = document.getElementById('name').value.trim();
