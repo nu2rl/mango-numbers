@@ -1075,8 +1075,8 @@ if ($view_section_id > 0) {
         /* Section Management & Cards Redesign */
         .mn-section-card {
             background: #ffffff;
-            border-radius: 20px;
-            border: 1.5px solid rgba(0, 0, 0, 0.06);
+            border-radius: 22px;
+            border: 1.5px solid rgba(15, 23, 42, 0.08);
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
@@ -1086,9 +1086,9 @@ if ($view_section_id > 0) {
         }
 
         .mn-section-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(255, 94, 54, 0.12);
-            border-color: rgba(255, 94, 54, 0.25);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(255, 94, 54, 0.14);
+            border-color: rgba(255, 94, 54, 0.3);
         }
 
         .mn-section-card .mn-card-header-bar {
@@ -1108,15 +1108,16 @@ if ($view_section_id > 0) {
         }
 
         .mn-icon-box {
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             font-size: 26px;
             transition: transform 0.3s ease;
+            overflow: hidden;
         }
 
         .mn-section-card:hover .mn-icon-box {
@@ -1127,7 +1128,7 @@ if ($view_section_id > 0) {
             background: linear-gradient(135deg, #ff5e36, #fca834);
             color: #ffffff !important;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-weight: 700;
             box-shadow: 0 6px 18px rgba(255, 94, 54, 0.3);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1143,12 +1144,12 @@ if ($view_section_id > 0) {
             background: linear-gradient(135deg, #0f172a, #1e293b);
             color: #ffffff !important;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-weight: 700;
-            padding: 10px 16px;
+            padding: 11px 18px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 8px;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1158,34 +1159,38 @@ if ($view_section_id > 0) {
             background: linear-gradient(135deg, #ff5e36, #fca834);
             box-shadow: 0 8px 22px rgba(255, 94, 54, 0.35);
             color: #ffffff !important;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .mn-btn-delete-section {
-            background: #fee2e2 !important;
+            width: 44px !important;
+            height: 44px !important;
+            background: #fef2f2 !important;
             color: #dc2626 !important;
-            border: 1.5px solid #fca5a5 !important;
-            border-radius: 12px !important;
-            padding: 10px 14px !important;
+            border: 1.5px solid #fecaca !important;
+            border-radius: 14px !important;
+            padding: 0 !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15) !important;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12) !important;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
             cursor: pointer !important;
+            flex-shrink: 0 !important;
         }
 
         .mn-btn-delete-section:hover {
             background: #dc2626 !important;
             color: #ffffff !important;
             border-color: #dc2626 !important;
-            transform: scale(1.08) !important;
+            transform: translateY(-2px) scale(1.05) !important;
             box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4) !important;
         }
 
         .mn-btn-delete-section i {
             color: #dc2626 !important;
-            font-size: 18px !important;
+            font-size: 19px !important;
+            line-height: 1 !important;
             transition: color 0.2s ease !important;
         }
 
@@ -1204,8 +1209,8 @@ if ($view_section_id > 0) {
         }
 
         .mn-section-col.drag-over-target .mn-section-card {
-            border: 2px dashed #ff5e36 !important;
-            box-shadow: 0 0 20px rgba(255, 94, 54, 0.35) !important;
+            border: 2.5px dashed #ff5e36 !important;
+            box-shadow: 0 0 24px rgba(255, 94, 54, 0.35) !important;
             background: #fff8f5 !important;
         }
 
@@ -1215,22 +1220,28 @@ if ($view_section_id > 0) {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            background: rgba(15, 23, 42, 0.06);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11.5px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 700;
             color: #475569;
-            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mn-drag-handle:hover {
-            background: rgba(255, 94, 54, 0.14);
-            color: #ff5e36;
+            background: #fff7ed;
+            border-color: #ffedd5;
+            color: #ea580c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(234, 88, 12, 0.18);
         }
 
         .mn-drag-handle:active {
             cursor: grabbing;
+            transform: scale(0.96);
         }
 
         /* Screenshot light-box modal */
@@ -2208,24 +2219,29 @@ if ($view_section_id > 0) {
                                                     <div class="mn-card-header-bar"></div>
                                                     <div class="d-flex align-items-start justify-content-between mb-3 pt-1">
                                                         <div class="d-flex align-items-center gap-3">
-                                                            <div class="mn-icon-box" style="background: <?= $brand_icon_bg ?>; box-shadow: 0 8px 20px <?= $brand_shadow ?>;">
-                                                                <?php if ($sec_has_image): ?>
+                                                            <?php if ($sec_has_image): ?>
+                                                                <div class="mn-icon-box" style="background: #ffffff; border: 1.5px solid rgba(15, 23, 42, 0.08); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);">
                                                                     <img src="<?= htmlspecialchars($sec['icon']) ?>" style="width:100%; height:100%; object-fit:cover; border-radius: 16px;">
-                                                                <?php elseif (!empty($brand_png)): ?>
-                                                                    <img src="<?= $brand_png ?>" style="width:100%; height:100%; object-fit:contain; padding: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));">
-                                                                <?php else: ?>
+                                                                </div>
+                                                            <?php elseif (!empty($brand_png)): ?>
+                                                                <div class="mn-icon-box" style="background: #ffffff; border: 1.5px solid rgba(15, 23, 42, 0.08); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);">
+                                                                    <img src="<?= $brand_png ?>" style="width:100%; height:100%; object-fit:contain; padding: 4px;">
+                                                                </div>
+                                                            <?php else: ?>
+                                                                <div class="mn-icon-box" style="background: <?= $brand_icon_bg ?>; box-shadow: 0 8px 20px <?= $brand_shadow ?>;">
                                                                     <i class="bx <?= htmlspecialchars($icon_val) ?> text-white fs-2"></i>
-                                                                <?php endif; ?>
-                                                            </div>
+                                                                </div>
+                                                            <?php endif; ?>
                                                             <div>
                                                                 <h5 class="fw-bold mb-1" style="font-size: 17.5px; font-family:'Outfit', sans-serif; color: #0f172a; line-height: 1.2;"><?= htmlspecialchars($sec['name']) ?></h5>
-                                                                <span class="badge" style="background: <?= $brand_badge_bg ?>; color: <?= $brand_badge_color ?>; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;">
+                                                                <span class="badge" style="background: <?= $brand_badge_bg ?>; color: <?= $brand_badge_color ?>; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.3px;">
                                                                     <i class="bx bx-package"></i> <?= (int)$sec['house_count'] ?> Houses / Services
                                                                 </span>
                                                             </div>
                                                         </div>
                                                         <div class="mn-drag-handle" title="Click and drag to reorder section">
-                                                            <i class="bx bx-move fs-6"></i> Drag
+                                                            <i class="bx bx-grid-vertical fs-5" style="margin-right: -2px; opacity: 0.7;"></i>
+                                                            <span>Reorder</span>
                                                         </div>
                                                     </div>
                                                     
@@ -2248,7 +2264,7 @@ if ($view_section_id > 0) {
                                                             <input type="hidden" name="section_id" value="<?= $sec['id'] ?>">
                                                             <input type="hidden" name="action_delete_section" value="1">
                                                             <button type="submit" class="btn mn-btn-delete-section" title="Delete Section">
-                                                                <i class="bx bx-trash fs-5"></i>
+                                                                <i class="bx bx-trash"></i>
                                                             </button>
                                                         </form>
                                                     </div>
