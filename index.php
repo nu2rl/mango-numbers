@@ -1372,9 +1372,87 @@ function get_flag($country) {
       50%  { transform: translate(10px, -10px) rotate(6deg) scale(1.05); }
       100% { transform: translate(-5px, -18px) rotate(-8deg) scale(0.95); }
     }
+    /* ─── PAGE PRELOADER ANIMATION ─── */
+    #mn-page-preloader {
+      position: fixed; inset: 0; z-index: 99999;
+      background: #09090f;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+    }
+    #mn-page-preloader.loaded {
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    .preloader-inner {
+      display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center;
+    }
+    .preloader-logo-wrap {
+      position: relative; width: 76px; height: 76px;
+    }
+    .preloader-logo-glow {
+      position: absolute; inset: -12px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(249,115,22,0.65) 0%, transparent 70%);
+      animation: mnPulseRing 1.8s ease-in-out infinite;
+    }
+    .preloader-logo-icon {
+      position: relative; z-index: 2; width: 76px; height: 76px;
+      background: linear-gradient(135deg, #f97316, #fb923c);
+      border-radius: 22px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 12px 32px rgba(249,115,22,0.45);
+      animation: mnLogoFloat 2.2s ease-in-out infinite;
+    }
+    .preloader-logo-icon img { width: 44px; height: 44px; object-fit: contain; }
+    .preloader-title {
+      font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 900; color: #f1f5f9;
+      letter-spacing: -0.5px;
+    }
+    .preloader-title span { color: #f97316; }
+    .preloader-bar {
+      width: 150px; height: 4px; background: rgba(255,255,255,0.08);
+      border-radius: 99px; overflow: hidden; position: relative;
+    }
+    .preloader-progress {
+      height: 100%; width: 50%; background: linear-gradient(90deg, #f97316, #fb923c);
+      border-radius: 99px; animation: mnBarFill 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes mnPulseRing {
+      0%, 100% { transform: scale(0.9); opacity: 0.4; }
+      50% { transform: scale(1.35); opacity: 0.85; }
+    }
+    @keyframes mnLogoFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(4deg); }
+    }
+    @keyframes mnBarFill {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
   </style>
 </head>
 <body>
+  <!-- Page Preloader Overlay -->
+  <div id="mn-page-preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo-wrap">
+        <div class="preloader-logo-glow"></div>
+        <div class="preloader-logo-icon">
+          <img src="assets/img/logo.png" alt="Mango Numbers">
+        </div>
+      </div>
+      <div class="preloader-title">Mango<span>Number</span></div>
+      <div class="preloader-bar">
+        <div class="preloader-progress"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('load', function() {
+      const loader = document.getElementById('mn-page-preloader');
+      if (loader) {
+        loader.classList.add('loaded');
+        setTimeout(() => loader.remove(), 450);
+      }
+    });
+  </script>
 
   <!-- Background Blur Glows -->
   <div class="hero-bg-glow" aria-hidden="true"></div>
