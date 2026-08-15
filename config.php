@@ -98,11 +98,11 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Database Credentials (support .env overrides with local XAMPP defaults)
-define('DB_HOST', $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: '127.0.0.1');
-define('DB_USER', $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'uclrhzsi_numberuser');
-define('DB_PASS', $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '@Nutrlhubhai12');
-define('DB_NAME', $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'uclrhzsi_number');
+// Database Credentials (configured for Hostinger mangonumbers.bond)
+define('DB_HOST', $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost');
+define('DB_USER', $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'u266502536_usernumber');
+define('DB_PASS', $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '@Sidhu890');
+define('DB_NAME', $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'u266502536_number');
 
 // Business Configurations
 define('USDT_RATE', 89.0);               // 1 USDT = 89 INR
