@@ -41,9 +41,9 @@
         crash();
     }
 
-    // Window size difference check (highly reliable for docked DevTools)
+    // Window size difference check (reliably detects docked DevTools without false positives from browser Chrome)
     function checkSize() {
-        const threshold = 160;
+        const threshold = 260; // Safely exceeds browser UI chrome (address bar + bookmark bar + tab bar)
         const widthDiff = window.outerWidth - window.innerWidth;
         const heightDiff = window.outerHeight - window.innerHeight;
         
