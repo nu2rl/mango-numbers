@@ -133,6 +133,7 @@ function get_db_connection() {
 
         // Migrate service_type columns to VARCHAR(50) to support Canva Premium
         try { $pdo->exec("ALTER TABLE catalog MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
+        try { $pdo->exec("ALTER TABLE products MODIFY COLUMN availability_status ENUM('available', 'out_of_stock', 'disabled') DEFAULT 'available'"); } catch (PDOException $e) {}
         try { $pdo->exec("ALTER TABLE purchases MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
 
         // Auto-seed Canva Premium Lifetime if missing

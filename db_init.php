@@ -85,7 +85,7 @@ try {
         price_inr DECIMAL(10,2) NOT NULL DEFAULT 0.00,
         stock_type ENUM('finite', 'unlimited') DEFAULT 'finite',
         stock_quantity INT NOT NULL DEFAULT 0,
-        availability_status ENUM('available', 'out_of_stock') DEFAULT 'available',
+        availability_status ENUM('available', 'out_of_stock', 'disabled') DEFAULT 'available',
         status ENUM('active', 'inactive') DEFAULT 'active',
         display_order INT DEFAULT 0,
         badge VARCHAR(50) DEFAULT NULL,
