@@ -589,6 +589,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_delete_house']
     exit;
 }
 
+// 3f-2. Handle Manage Offers: Bulk Delete Houses
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_bulk_delete_houses'])) {
+    $sec_id = (int)($_POST['section_id'] ?? 0);
+    $ids = $_POST['selected_house_ids'] ?? [];
+    if (!empty($ids) && is_array($ids)) {
+        $valid_ids = array_map('intval', array_filter($ids, 'is_numeric'));
+        if (!empty($valid_ids)) {
+            $in_clause = implode(',', array_fill(0, count($valid_ids), '?'));
+            $stmt = $db->prepare("DELETE FROM products WHERE id IN ($in_clause)");
+            $stmt->execute($valid_ids);
+            $deleted_count = count($valid_ids);
+            $_SESSION['success_msg'] = "Successfully deleted {$deleted_count} selected house(s)!";
+        }
+    } else {
+        $_SESSION['error_msg'] = 'No houses were selected for deletion.';
+    }
+    header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
+    exit;
+}
+
 // 3g. Handle Manage Offers: Instant Toggle House Status (Enable/Disable)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_toggle_house_status'])) {
     $prod_id = (int)$_POST['product_id'];
@@ -1915,13 +1935,27 @@ if ($view_section_id > 0) {
 
                                 <!-- Houses List Table -->
                                 <div class="card" style="border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 18px; background: #ffffff; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04); overflow: hidden;">
-                                    <!-- Table Top Bar with Quick Search -->
+                                    <!-- Table Top Bar with Quick Search & Bulk Actions -->
                                     <div class="px-4 py-3 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
                                         <div class="d-flex align-items-center gap-2">
                                             <i class="bx bx-list-ul fs-4 text-primary"></i>
                                             <span class="fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">Manage Service Houses</span>
                                             <span class="badge rounded-pill bg-label-primary ms-1"><?= count($houses_list) ?> Total</span>
                                         </div>
+
+                                        <!-- Bulk Delete Action Form & Button -->
+                                        <form id="form-bulk-delete-houses" action="admin.php" method="POST" onsubmit="return mnConfirmBulkDeleteHouses(event);" style="margin:0;" class="d-inline-block me-auto ms-2">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                            <input type="hidden" name="active_tab" value="catalog">
+                                            <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
+                                            <input type="hidden" name="action_bulk_delete_houses" value="1">
+                                            
+                                            <button type="submit" id="btnBulkDeleteHouses" class="btn btn-sm px-3 py-2 d-none" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); transition: all 0.2s ease;">
+                                                <img src="assets/img/delete_icon.png" style="width: 16px; height: 16px; object-fit: contain;"> 
+                                                Delete Selected (<span id="selectedHousesCount">0</span>)
+                                            </button>
+                                        </form>
+
                                         <div style="max-width: 280px; width: 100%;">
                                             <div class="input-group input-group-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1;">
                                                 <span class="input-group-text bg-white border-0"><i class="bx bx-search text-muted"></i></span>
@@ -1934,6 +1968,9 @@ if ($view_section_id > 0) {
                                         <table class="table table-hover align-middle mb-0" id="housesTable" style="border-collapse: separate; border-spacing: 0;">
                                             <thead>
                                                 <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                                    <th style="width: 44px; padding: 16px 12px 16px 20px; text-align: center;">
+                                                        <input type="checkbox" id="selectAllHousesCb" class="form-check-input" style="width: 18px; height: 18px; cursor: pointer; border-color: #cbd5e1;" title="Select All Houses" onchange="toggleSelectAllHouses(this)">
+                                                    </th>
                                                     <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">House / Service Name</th>
                                                     <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Selling Price (₹)</th>
                                                     <th style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; padding: 16px 20px;">Available Stock</th>
@@ -1960,6 +1997,9 @@ if ($view_section_id > 0) {
                                                             $has_custom_image = (!empty($h['icon']) && (str_contains($h['icon'], 'uploads/') || str_contains($h['icon'], 'http')));
                                                         ?>
                                                         <tr class="house-row" style="border-bottom: 1px solid #f1f5f9;">
+                                                            <td style="width: 44px; padding: 16px 12px 16px 20px; text-align: center;">
+                                                                <input type="checkbox" name="selected_house_ids[]" value="<?= $h['id'] ?>" form="form-bulk-delete-houses" class="form-check-input house-cb" style="width: 18px; height: 18px; cursor: pointer; border-color: #cbd5e1;" onchange="updateBulkDeleteState()">
+                                                            </td>
                                                             <td style="padding: 16px 20px;">
                                                                 <form id="form-update-house-<?= $h['id'] ?>" action="admin.php" method="POST" enctype="multipart/form-data" style="display:none;">
                                                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -3792,6 +3832,69 @@ if ($view_section_id > 0) {
                 }, false);
             });
         });
+
+        // Select All & Bulk Delete Functions for Houses Table
+        function toggleSelectAllHouses(masterCb) {
+            const visibleRowCbs = Array.from(document.querySelectorAll('.house-row'))
+                .filter(tr => tr.style.display !== 'none')
+                .map(tr => tr.querySelector('.house-cb'))
+                .filter(Boolean);
+                
+            visibleRowCbs.forEach(cb => {
+                cb.checked = masterCb.checked;
+            });
+            updateBulkDeleteState();
+        }
+
+        function updateBulkDeleteState() {
+            const checkedCbs = document.querySelectorAll('.house-cb:checked');
+            const count = checkedCbs.length;
+            const btn = document.getElementById('btnBulkDeleteHouses');
+            const countSpan = document.getElementById('selectedHousesCount');
+            const masterCb = document.getElementById('selectAllHousesCb');
+            
+            const visibleRowCbs = Array.from(document.querySelectorAll('.house-row'))
+                .filter(tr => tr.style.display !== 'none')
+                .map(tr => tr.querySelector('.house-cb'))
+                .filter(Boolean);
+
+            if (countSpan) countSpan.textContent = count;
+            
+            if (btn) {
+                if (count > 0) {
+                    btn.classList.remove('d-none');
+                    btn.classList.add('d-inline-flex');
+                } else {
+                    btn.classList.add('d-none');
+                    btn.classList.remove('d-inline-flex');
+                }
+            }
+
+            if (masterCb) {
+                if (visibleRowCbs.length > 0 && checkedCbs.length === visibleRowCbs.length) {
+                    masterCb.checked = true;
+                    masterCb.indeterminate = false;
+                } else if (checkedCbs.length > 0) {
+                    masterCb.checked = false;
+                    masterCb.indeterminate = true;
+                } else {
+                    masterCb.checked = false;
+                    masterCb.indeterminate = false;
+                }
+            }
+        }
+
+        function mnConfirmBulkDeleteHouses(event) {
+            if (event) event.preventDefault();
+            const checkedCbs = document.querySelectorAll('.house-cb:checked');
+            const count = checkedCbs.length;
+            if (count === 0) {
+                return false;
+            }
+            const msg = `Are you sure you want to delete ${count} selected house(s)? This action cannot be undone.`;
+            mnConfirmAction(event, msg, 'assets/img/delete_icon.png', `Yes, Delete (${count})`);
+            return false;
+        }
     </script>
     <script src="assets/js/anti-devtools.js"></script>
 </body>
