@@ -312,23 +312,123 @@ function get_flag_icon($country) {
         .btn-buy:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(249,115,22,0.4); }
         .btn-buy.disabled { background: var(--elevated); color: var(--muted); cursor: not-allowed; box-shadow: none; transform: none; pointer-events: none; }
 
-        /* ── Table ── */
-        .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+        /* ── Order History Table Rebuild ── */
+        .table-wrap {
+            background: rgba(18, 18, 26, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 3px solid var(--accent);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
         .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-        thead th { background: var(--elevated); padding: 14px 16px; text-align: left; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); white-space: nowrap; }
-        tbody td { padding: 14px 16px; border-top: 1px solid var(--border); vertical-align: middle; color: var(--text); }
-        tbody tr:hover td { background: rgba(255,255,255,0.02); }
-        .badge { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
-        .badge-pending { background: rgba(234,179,8,0.1); color: #fde047; border: 1px solid rgba(234,179,8,0.2); }
-        .badge-approved { background: rgba(34,197,94,0.1); color: #86efac; border: 1px solid rgba(34,197,94,0.2); }
-        .badge-rejected { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
-        .otp-val { font-family: monospace; font-size: 14px; font-weight: 800; color: #22c55e; letter-spacing: 1.5px; background: rgba(34,197,94,0.08); padding: 4px 10px; border-radius: 6px; }
-        .vnum-val { font-size: 13.5px; font-weight: 700; color: var(--text); }
-        .btn-sm { padding: 6px 12px; border: none; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: transform 0.15s; }
-        .btn-sm:hover { transform: translateY(-1px); }
-        .btn-tg-sm { background: linear-gradient(135deg,#0088cc,#29b6f6); color: #fff; }
-        .btn-ag        /* ── Support Center Redesign ── */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+        thead th {
+            background: #141420;
+            padding: 16px 18px;
+            text-align: left;
+            font-family: 'Sora', sans-serif;
+            font-size: 11.5px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            white-space: nowrap;
+        }
+        tbody td {
+            padding: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            color: #f8fafc;
+        }
+        tbody tr { transition: background 0.2s; }
+        tbody tr:hover td { background: rgba(255, 255, 255, 0.03); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .service-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 3px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+        .service-telegram { background: rgba(0, 136, 204, 0.15); color: #38bdf8; border: 1px solid rgba(0, 136, 204, 0.3); }
+        .service-whatsapp { background: rgba(37, 211, 102, 0.15); color: #4ade80; border: 1px solid rgba(37, 211, 102, 0.3); }
+        .service-other { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3); }
+
+        .price-tag {
+            font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 800;
+            color: #f97316; letter-spacing: -0.5px;
+        }
+
+        .utr-code-box {
+            display: inline-flex; flex-direction: column; gap: 4px;
+        }
+        .utr-code {
+            font-family: monospace; font-size: 12px; font-weight: 700;
+            background: #12121c; border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 9px; border-radius: 7px; color: #cbd5e1;
+        }
+        .proof-link-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 700; color: #fb923c;
+            text-decoration: none; padding: 2px 6px; border-radius: 4px;
+            background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2);
+            transition: all 0.2s;
+        }
+        .proof-link-btn:hover { background: rgba(249, 115, 22, 0.25); color: #fff; }
+
+        .badge { font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 99px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-pending { background: rgba(234, 179, 8, 0.15); color: #fef08a; border: 1px solid rgba(234, 179, 8, 0.3); }
+        .badge-approved { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .badge-rejected { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .waiting-pulse {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 700; color: #94a3b8;
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 5px 12px; border-radius: 8px;
+        }
+
+        .vnum-box {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #141424; border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 5px 12px; border-radius: 9px;
+        }
+        .vnum-val { font-family: monospace; font-size: 14px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+
+        .otp-box {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 6px 14px; border-radius: 10px;
+        }
+        .otp-val { font-family: monospace; font-size: 15px; font-weight: 900; color: #4ade80; letter-spacing: 2px; }
+
+        .btn-copy-sm {
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f8fafc; border-radius: 6px; padding: 3px 8px; font-size: 11px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-copy-sm:hover { background: #f97316; border-color: #f97316; color: #fff; }
+
+        .btn-tg-sm {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 9px;
+            background: linear-gradient(135deg, #0088cc 0%, #00a8ff 100%);
+            color: #fff; font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800;
+            text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(0, 136, 204, 0.3);
+        }
+        .btn-tg-sm:hover { transform: translateY(-1.5px); box-shadow: 0 6px 18px rgba(0, 136, 204, 0.5); }
+
+        .btn-again {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 9px;
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            color: #fff; font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800;
+            text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+        }
+        .btn-again:hover { transform: translateY(-1.5px); box-shadow: 0 6px 18px rgba(249, 115, 22, 0.5); }
+        .empty-row { text-align: center; color: #64748b; padding: 40px 0; font-size: 14px; font-weight: 500; }        /* ── Support Center Redesign ── */
         .support-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
         .support-form-card, .support-log-card {
             background: rgba(18, 18, 26, 0.95);
@@ -728,18 +828,32 @@ function get_flag_icon($country) {
                                 <?php if (!empty($purchases)): ?>
                                     <?php foreach ($purchases as $p): ?>
                                         <tr data-purchase-id="<?= $p['id'] ?>">
-                                            <td style="white-space:nowrap; color:var(--muted);"><?= date('d M Y', strtotime($p['created_at'])) ?><br><span style="font-size:11px;"><?= date('h:i A', strtotime($p['created_at'])) ?></span></td>
-                                            <td><strong>[<?= htmlspecialchars($p['service_type']) ?>]</strong><br><span style="font-size:12px;color:var(--muted);"><?= htmlspecialchars($p['item_name']) ?></span></td>
-                                            <td style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent);">₹<?= number_format($p['price_paid_inr'], 0) ?></td>
+                                            <td style="white-space:nowrap;">
+                                                <div style="font-weight:700; color:#f8fafc; font-size:13.5px;"><?= date('d M Y', strtotime($p['created_at'])) ?></div>
+                                                <div style="font-size:11.5px; color:#94a3b8; font-weight:500; margin-top:2px;"><?= date('h:i A', strtotime($p['created_at'])) ?></div>
+                                            </td>
                                             <td>
-                                                <code style="font-size:12px;background:var(--elevated);padding:3px 7px;border-radius:5px;color:#94a3b8;"><?= htmlspecialchars($p['utr_number']) ?></code>
-                                                <?php if ($p['status'] === 'pending' && !empty($p['screenshot_path'])): ?>
-                                                    <br><a href="<?= htmlspecialchars($p['screenshot_path']) ?>" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:underline;">View Proof</a>
-                                                <?php endif; ?>
+                                                <?php 
+                                                    $stype = strtolower($p['service_type']);
+                                                    $sclass = str_contains($stype, 'telegram') ? 'service-telegram' : (str_contains($stype, 'whatsapp') ? 'service-whatsapp' : 'service-other');
+                                                ?>
+                                                <span class="service-badge <?= $sclass ?>"><?= htmlspecialchars($p['service_type']) ?></span>
+                                                <div style="font-size:13px; font-weight:700; color:#f1f5f9; margin-top:4px;"><?= htmlspecialchars($p['item_name']) ?></div>
+                                            </td>
+                                            <td>
+                                                <span class="price-tag">₹<?= number_format($p['price_paid_inr'], 0) ?></span>
+                                            </td>
+                                            <td>
+                                                <div class="utr-code-box">
+                                                    <code class="utr-code"><?= htmlspecialchars($p['utr_number']) ?></code>
+                                                    <?php if ($p['status'] === 'pending' && !empty($p['screenshot_path'])): ?>
+                                                        <a href="<?= htmlspecialchars($p['screenshot_path']) ?>" target="_blank" class="proof-link-btn">👁️ Proof</a>
+                                                    <?php endif; ?>
+                                                </div>
                                             </td>
                                             <td class="col-status">
                                                 <?php if ($p['status'] === 'pending'): ?>
-                                                    <span class="badge badge-pending">🕒 Pending</span>
+                                                    <span class="badge badge-pending">⏳ Pending</span>
                                                 <?php elseif ($p['status'] === 'approved'): ?>
                                                     <span class="badge badge-approved">✅ Approved</span>
                                                 <?php else: ?>
@@ -748,28 +862,32 @@ function get_flag_icon($country) {
                                             </td>
                                             <td class="col-vnum">
                                                 <?php if ($p['status'] === 'approved' && !empty($p['virtual_number_provided'])): ?>
-                                                    <span class="vnum-val"><?= htmlspecialchars($p['virtual_number_provided']) ?></span>
-                                                    <button class="btn-copy-sm" onclick="copyText('<?= htmlspecialchars($p['virtual_number_provided']) ?>', this)" title="Copy Number">📋</button>
+                                                    <div class="vnum-box">
+                                                        <span class="vnum-val"><?= htmlspecialchars($p['virtual_number_provided']) ?></span>
+                                                        <button class="btn-copy-sm" onclick="copyText('<?= htmlspecialchars($p['virtual_number_provided']) ?>', this)" title="Copy Number">📋 Copy</button>
+                                                    </div>
                                                 <?php else: ?>
-                                                    <span style="color:var(--muted);font-size:12px;">Waiting...</span>
+                                                    <span class="waiting-pulse">⏳ Processing...</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="col-otp">
                                                 <?php if ($p['status'] === 'approved' && !empty($p['otp_provided'])): ?>
-                                                    <span class="otp-val"><?= htmlspecialchars($p['otp_provided']) ?></span>
-                                                    <button class="btn-copy-sm" onclick="copyText('<?= htmlspecialchars($p['otp_provided']) ?>', this)" title="Copy OTP">📋</button>
+                                                    <div class="otp-box">
+                                                        <span class="otp-val"><?= htmlspecialchars($p['otp_provided']) ?></span>
+                                                        <button class="btn-copy-sm" onclick="copyText('<?= htmlspecialchars($p['otp_provided']) ?>', this)" title="Copy OTP">📋 Copy</button>
+                                                    </div>
                                                 <?php else: ?>
-                                                    <span style="color:var(--muted);font-size:12px;">Awaiting...</span>
+                                                    <span class="waiting-pulse">⌛ Awaiting SMS...</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <a href="https://t.me/nu9rl" target="_blank" class="btn-sm btn-tg-sm">Telegram</a>
+                                                <a href="https://t.me/nu9rl" target="_blank" class="btn-tg-sm">✈️ Telegram</a>
                                             </td>
                                             <td>
                                                 <?php if (!empty($p['catalog_id'])): ?>
-                                                    <a href="payment.php?id=<?= (int)$p['catalog_id'] ?>" class="btn-sm btn-again">🔁 Again</a>
+                                                    <a href="payment.php?id=<?= (int)$p['catalog_id'] ?>" class="btn-again">🔄 Re-order</a>
                                                 <?php else: ?>
-                                                    <span style="color:var(--muted);font-size:11px;">—</span>
+                                                    <span style="color:#64748b; font-size:12px;">—</span>
                                                 <?php endif; ?>
                                             </td>
                                         </tr>
