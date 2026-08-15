@@ -27,11 +27,24 @@ header("X-Content-Type-Options: nosniff");
 header("X-XSS-Protection: 1; mode=block");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
-// Content Security Policy (allows local styles, scripts, fonts, and google fonts CDN + external image URLs)
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'self';");
+// Content Security Policy (allows local styles, scripts, fonts, Google Fonts, and Boxicons CDN)
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' data: https://fonts.gstatic.com https://unpkg.com; img-src 'self' data: https:; connect-src 'self'; frame-src 'self';");
 
 if ($is_secure) {
     header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
+}
+
+// Polyfill for getallheaders() on non-Apache/Nginx/FPM environments
+if (!function_exists('getallheaders')) {
+    function getallheaders() {
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
+    }
 }
 
 // Configure secure session cookie options (XSS & CSRF protection)
