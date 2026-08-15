@@ -29,10 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
     }
     $catalog_id = (int)($_POST['catalog_id'] ?? 0);
     $utr_number = trim($_POST['utr_number'] ?? '');
-    $stmt = $db->prepare("SELECT * FROM catalog WHERE id = ? AND status = 'active'");
+    $stmt = $db->prepare("SELECT p.*, s.name as service_type FROM products p JOIN sections s ON p.section_id = s.id WHERE p.id = ? AND p.status = 'active'");
     $stmt->execute([$catalog_id]); $product = $stmt->fetch();
+    if (!$product) {
+        $stmt = $db->prepare("SELECT * FROM catalog WHERE id = ? AND status = 'active'");
+        $stmt->execute([$catalog_id]); $product = $stmt->fetch();
+    }
+    $stock = isset($product['stock_quantity']) ? (int)$product['stock_quantity'] : (int)($product['stock'] ?? 0);
     if (!$product) { $_SESSION['error_msg'] = 'Invalid product.'; header("Location: dashboard.php?section=buy"); exit; }
-    elseif ($product['stock'] <= 0) { $_SESSION['error_msg'] = 'Out of stock.'; header("Location: dashboard.php?section=buy"); exit; }
+    elseif ($stock <= 0) { $_SESSION['error_msg'] = 'Out of stock.'; header("Location: dashboard.php?section=buy"); exit; }
     elseif (empty($utr_number)) { $_SESSION['error_msg'] = 'UTR number is required.'; header("Location: dashboard.php?section=buy"); exit; }
     else {
         $chk_stmt = $db->prepare("SELECT id FROM purchases WHERE utr_number = ?"); $chk_stmt->execute([$utr_number]);
@@ -553,7 +558,7 @@ function get_flag_icon($country) {
                                         <?php if ($is_item_disabled): ?>
                                             <button class="btn-buy disabled" disabled style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 700; cursor: not-allowed;">Not available right now</button>
                                         <?php elseif ($item['stock_quantity'] > 0): ?>
-                                            <a href="checkout.php?product_id=<?= $item['id'] ?>" class="btn-buy">Buy Now</a>
+                                            <a href="payment.php?id=<?= $item['id'] ?>" class="btn-buy">Buy Now</a>
                                         <?php else: ?>
                                             <button class="btn-buy disabled" disabled>Out of Stock</button>
                                         <?php endif; ?>
