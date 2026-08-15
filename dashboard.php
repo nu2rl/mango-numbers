@@ -154,21 +154,28 @@ function get_flag_icon($country) {
     <link rel="stylesheet" href="assets/vendor/fonts/boxicons.css" />
     <style>
         :root {
-            --bg: #09090f; --surface: #111118; --elevated: #1a1a26;
-            --border: rgba(255,255,255,0.07); --border-bright: rgba(249,115,22,0.3);
-            --accent: #f97316; --accent-glow: rgba(249,115,22,0.15);
+            --bg: #09090f; --surface: rgba(18, 17, 28, 0.75); --elevated: rgba(26, 25, 40, 0.85);
+            --border: rgba(255,255,255,0.08); --border-bright: rgba(249,115,22,0.4);
+            --accent: #f97316; --accent-glow: rgba(249,115,22,0.18);
             --text: #f1f5f9; --muted: #64748b;
             --success: #22c55e; --warning: #eab308; --danger: #ef4444;
             --sidebar-w: 240px;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { -webkit-font-smoothing: antialiased; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 10% 0%, #1e122b 0%, #0d0c18 45%, #06060c 100%),
+                        radial-gradient(circle at 90% 90%, rgba(249, 115, 22, 0.12) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text); min-height: 100vh; display: flex;
+        }
 
         /* ── Sidebar ── */
         .sidebar {
             width: var(--sidebar-w); flex-shrink: 0;
-            background: var(--surface); border-right: 1px solid var(--border);
+            background: linear-gradient(180deg, rgba(22, 19, 32, 0.96) 0%, rgba(12, 11, 20, 0.98) 100%);
+            backdrop-filter: blur(20px); border-right: 1px solid var(--border);
             display: flex; flex-direction: column;
             position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
             transition: transform 0.3s ease;
@@ -236,7 +243,9 @@ function get_flag_icon($country) {
         /* ── Main ── */
         .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
         .topbar {
-            background: var(--surface); border-bottom: 1px solid var(--border);
+            background: linear-gradient(90deg, rgba(20, 18, 30, 0.92) 0%, rgba(28, 22, 38, 0.92) 100%);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
             padding: 14px 28px; display: flex; align-items: center; justify-content: space-between;
             gap: 16px; position: sticky; top: 0; z-index: 50; width: 100%;
         }
@@ -337,7 +346,7 @@ function get_flag_icon($country) {
 
         /* ── Order History Table Rebuild ── */
         .table-wrap {
-            background: rgba(18, 18, 26, 0.95);
+            background: linear-gradient(145deg, rgba(22, 20, 34, 0.95) 0%, rgba(13, 12, 22, 0.95) 100%);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-top: 3px solid var(--accent);
@@ -348,7 +357,7 @@ function get_flag_icon($country) {
         .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
         thead th {
-            background: #141420;
+            background: linear-gradient(90deg, rgba(26, 24, 40, 0.95) 0%, rgba(20, 18, 32, 0.95) 100%);
             padding: 16px 18px;
             text-align: left;
             font-family: 'Sora', sans-serif;
@@ -454,7 +463,7 @@ function get_flag_icon($country) {
         .empty-row { text-align: center; color: #64748b; padding: 40px 0; font-size: 14px; font-weight: 500; }        /* ── Support Center Redesign ── */
         .support-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
         .support-form-card, .support-log-card {
-            background: rgba(18, 18, 26, 0.95);
+            background: linear-gradient(145deg, rgba(24, 22, 36, 0.95) 0%, rgba(13, 12, 22, 0.95) 100%);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-top: 3px solid var(--accent);
@@ -464,7 +473,7 @@ function get_flag_icon($country) {
         .card-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 20px; letter-spacing: -0.3px; display: flex; align-items: center; justify-content: space-between; }
         label { display: block; font-size: 12.5px; font-weight: 700; color: #cbd5e1; margin-bottom: 8px; letter-spacing: 0.2px; }
         input[type="text"], select, textarea {
-            width: 100%; background: #141420;
+            width: 100%; background: linear-gradient(135deg, #161524 0%, #11101c 100%);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             padding: 13px 16px; font-family: 'Inter', sans-serif; font-size: 14px; color: #f8fafc;

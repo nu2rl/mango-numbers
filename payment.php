@@ -131,7 +131,7 @@ function get_country_flag($country) {
         :root{--bg:#09090f;--surface:#111118;--elevated:#1a1a26;--border:rgba(255,255,255,0.07);--accent:#f97316;--accent-glow:rgba(249,115,22,0.18);--text:#f1f5f9;--muted:#64748b;--success:#22c55e;--danger:#ef4444;}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
         html{-webkit-font-smoothing:antialiased;}
-        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 20px;position:relative;overflow-x:hidden;}
+        body{font-family:'Inter',sans-serif;background:radial-gradient(circle at 10% 0%, #1e122b 0%, #0d0c18 45%, #06060c 100%), radial-gradient(circle at 90% 90%, rgba(249, 115, 22, 0.12) 0%, transparent 50%);background-attachment:fixed;color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 20px;position:relative;overflow-x:hidden;}
         .glow{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none;}
         .glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(249,115,22,0.12)0%,transparent 70%);top:-100px;right:-100px;}
         .glow-2{width:400px;height:400px;background:radial-gradient(circle,rgba(249,115,22,0.06)0%,transparent 70%);bottom:-100px;left:-100px;}
@@ -139,7 +139,7 @@ function get_country_flag($country) {
         .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:20px;transition:color 0.2s;}
         .back-link:hover{color:var(--accent);}
         .back-link svg{width:16px;height:16px;}
-        .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px 28px;}
+        .card{background:linear-gradient(145deg, rgba(24, 22, 36, 0.95) 0%, rgba(13, 12, 22, 0.95) 100%);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-top:3px solid var(--accent);border-radius:20px;padding:32px 28px;box-shadow:0 12px 36px rgba(0,0,0,0.35);}
         .card-header{text-align:center;margin-bottom:24px;}
         .logo-icon{width:48px;height:48px;background:linear-gradient(135deg,#f97316,#fb923c);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 0 24px rgba(249,115,22,0.4);}
         .logo-icon img{width:30px;height:30px;object-fit:contain;}
