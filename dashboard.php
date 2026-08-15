@@ -869,12 +869,12 @@ function get_flag_icon($country) {
             <?php if (!empty($active_sections)): ?>
                 <?php foreach ($active_sections as $sec): ?>
                     <button class="nav-item" id="menu-section-<?= $sec['id'] ?>" onclick="switchSection('section-<?= $sec['id'] ?>')">
-                        <?php if (!empty($sec['icon']) && str_contains($sec['icon'], 'http')): ?>
+                        <?php if (!empty($sec['icon']) && (str_contains($sec['icon'], 'http') || str_contains($sec['icon'], 'uploads/') || str_contains($sec['icon'], 'assets/'))): ?>
                             <img src="<?= htmlspecialchars($sec['icon']) ?>" style="width:18px; height:18px; object-fit:contain; border-radius:3px;">
                         <?php else: ?>
-                            <i class="bx <?= htmlspecialchars(!empty($sec['icon']) ? $sec['icon'] : 'bx-layer') ?>"></i>
+                            <i class="bx <?= htmlspecialchars(!empty($sec['icon']) && !str_contains($sec['icon'], '.') ? $sec['icon'] : 'bx-layer') ?>"></i>
                         <?php endif; ?>
-                        <?= htmlspecialchars($sec['name']) ?>
+                        <?= htmlspecialchars(ucwords($sec['name'])) ?>
                     </button>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -925,25 +925,32 @@ function get_flag_icon($country) {
                 $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? ORDER BY display_order ASC, id DESC");
                 $prod_stmt->execute([$sec['id']]);
                 $sec_products = $prod_stmt->fetchAll();
+
+                // Fallback: If no products linked to section_id, check legacy catalog table by section name
+                if (empty($sec_products)) {
+                    $cat_stmt = $db->prepare("SELECT id, name, country, price_inr, price_usd, price_cost_inr, stock as stock_quantity, status, 'active' as availability_status, '' as badge, '' as icon FROM catalog WHERE (service_type LIKE ? OR name LIKE ?) AND status = 'active' ORDER BY price_inr ASC");
+                    $cat_stmt->execute(['%' . $sec['name'] . '%', '%' . $sec['name'] . '%']);
+                    $sec_products = $cat_stmt->fetchAll();
+                }
             ?>
                 <div id="section-section-<?= $sec['id'] ?>" class="dashboard-section">
-                    <h1 class="section-title"><?= htmlspecialchars($sec['name']) ?></h1>
+                    <h1 class="section-title"><?= htmlspecialchars(ucwords($sec['name'])) ?></h1>
                     <p class="section-sub"><?= htmlspecialchars(!empty($sec['description']) ? $sec['description'] : 'Browse available offers and services below.') ?></p>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
                         <?php if (!empty($sec_products)): ?>
                             <?php foreach ($sec_products as $item): ?>
-                                <div class="card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div class="card" style="background: linear-gradient(145deg, rgba(26, 24, 40, 0.9) 0%, rgba(16, 14, 26, 0.95) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div>
                                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <?php 
-                                                    $item_has_img = (!empty($item['icon']) && (str_contains($item['icon'], 'uploads/') || str_contains($item['icon'], 'http')));
+                                                    $item_has_img = (!empty($item['icon']) && (str_contains($item['icon'], 'uploads/') || str_contains($item['icon'], 'assets/') || str_contains($item['icon'], 'http')));
                                                 ?>
                                                 <?php if ($item_has_img): ?>
                                                     <img src="<?= htmlspecialchars($item['icon']) ?>" style="width:28px; height:28px; object-fit:contain; border-radius:6px;">
                                                 <?php else: ?>
-                                                    <i class="bx <?= htmlspecialchars(!empty($item['icon']) ? $item['icon'] : 'bx-package') ?>" style="font-size:24px; color: var(--accent);"></i>
+                                                    <i class="bx <?= htmlspecialchars(!empty($item['icon']) && !str_contains($item['icon'], '.') ? $item['icon'] : 'bx-package') ?>" style="font-size:24px; color: var(--accent);"></i>
                                                 <?php endif; ?>
                                                 <span style="font-family:'Sora', sans-serif; font-weight:700; font-size:15px; color: var(--text);"><?= htmlspecialchars($item['name']) ?></span>
                                             </div>
@@ -969,7 +976,7 @@ function get_flag_icon($country) {
                                             $is_item_disabled = ($item['status'] === 'inactive' || $item['availability_status'] === 'disabled');
                                         ?>
                                         <?php if ($is_item_disabled): ?>
-                                            <button class="btn-buy disabled" disabled style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 700; cursor: not-allowed;">Not available right now</button>
+                                            <button class="btn-buy disabled" disabled style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 700; cursor: not-allowed;">Not available</button>
                                         <?php elseif ($item['stock_quantity'] > 0): ?>
                                             <a href="payment.php?id=<?= $item['id'] ?>" class="btn-buy">Buy Now</a>
                                         <?php else: ?>
@@ -979,8 +986,10 @@ function get_flag_icon($country) {
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <div class="card p-4 text-center text-muted" style="grid-column: 1 / -1; background: var(--surface); border: 1px dashed var(--border); border-radius: 16px;">
-                                No items currently available in this category. Check back soon!
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: linear-gradient(145deg, rgba(24, 22, 36, 0.95) 0%, rgba(13, 12, 22, 0.95) 100%); border-radius: 20px; border: 1.5px dashed rgba(249,115,22,0.3); box-shadow: 0 12px 36px rgba(0,0,0,0.3);">
+                                <div style="font-size: 42px; margin-bottom: 12px;">📦</div>
+                                <div style="font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px;"><?= htmlspecialchars(ucwords($sec['name'])) ?> Stock Coming Soon!</div>
+                                <div style="font-size: 13.5px; color: var(--muted); max-width: 440px; margin: 0 auto; line-height: 1.5;">No active houses or numbers have been added to this section yet. The admin is preparing stock for this category!</div>
                             </div>
                         <?php endif; ?>
                     </div>
