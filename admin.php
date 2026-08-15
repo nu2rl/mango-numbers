@@ -1551,16 +1551,8 @@ if ($view_section_id > 0) {
                                                     <input type="number" step="0.01" name="price_inr" class="form-control" placeholder="150.00" required>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Cost Price (INR ₹)</label>
-                                                    <input type="number" step="0.01" name="price_cost_inr" class="form-control" placeholder="80.00">
-                                                </div>
-                                                <div class="col-md-3">
                                                     <label class="form-label">Selling Price (USD $)</label>
                                                     <input type="number" step="0.01" name="price_usd" class="form-control" placeholder="2.00">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Cost Price (USD $)</label>
-                                                    <input type="number" step="0.01" name="price_cost_usd" class="form-control" placeholder="1.00">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label">Initial Stock Quantity *</label>
@@ -1570,7 +1562,7 @@ if ($view_section_id > 0) {
                                                     <label class="form-label">Badge Tag</label>
                                                     <input type="text" name="badge" class="form-control" placeholder="e.g. HOT, INSTANT, POPULAR">
                                                 </div>
-                                                <div class="col-md-12">
+                                                <div class="col-md-6">
                                                     <label class="form-label">Icon (BoxIcon Class or PNG Image URL)</label>
                                                     <input type="text" name="house_icon" class="form-control" placeholder="e.g. bxl-whatsapp or https://example.com/icon.png">
                                                 </div>
@@ -1591,7 +1583,6 @@ if ($view_section_id > 0) {
                                                     <th>House Name</th>
                                                     <th>Country</th>
                                                     <th>Selling Price</th>
-                                                    <th>Cost Price</th>
                                                     <th>Available Stock</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
@@ -1630,7 +1621,6 @@ if ($view_section_id > 0) {
                                                                     <input type="number" step="0.01" name="price_inr" class="form-control form-control-sm" value="<?= htmlspecialchars($h['price_inr']) ?>" required>
                                                                 </div>
                                                             </td>
-                                                            <td>₹<?= number_format($h['price_cost_inr'], 2) ?></td>
                                                             <td>
                                                                 <input type="number" name="stock_quantity" class="form-control form-control-sm" style="max-width:90px;" value="<?= (int)$h['stock_quantity'] ?>" required>
                                                             </td>
@@ -1664,7 +1654,7 @@ if ($view_section_id > 0) {
                                                     <?php endforeach; ?>
                                                 <?php else: ?>
                                                     <tr>
-                                                        <td colspan="7" class="text-center text-muted py-4">No Houses / Services found in this Section. Click <strong>+ New House</strong> to add one!</td>
+                                                        <td colspan="6" class="text-center text-muted py-4">No Houses / Services found in this Section. Click <strong>+ New House</strong> to add one!</td>
                                                     </tr>
                                                 <?php endif; ?>
                                             </tbody>
