@@ -461,10 +461,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_house']
     $price_inr = (float)($_POST['price_inr'] ?? 0);
     $price_usd = (float)($_POST['price_usd'] ?? 0);
     $stock = (int)($_POST['stock_quantity'] ?? 0);
-    $status = ($stock > 0) ? 'available' : 'out_of_stock';
+    $status_input = trim($_POST['status'] ?? 'active');
 
-    $stmt = $db->prepare("UPDATE products SET price_inr = ?, price_usd = ?, stock_quantity = ?, availability_status = ? WHERE id = ?");
-    $stmt->execute([$price_inr, $price_usd, $stock, $status, $prod_id]);
+    $status = ($status_input === 'inactive' || $status_input === 'disabled') ? 'inactive' : 'active';
+    $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
+
+    $stmt = $db->prepare("UPDATE products SET price_inr = ?, price_usd = ?, stock_quantity = ?, status = ?, availability_status = ? WHERE id = ?");
+    $stmt->execute([$price_inr, $price_usd, $stock, $status, $availability, $prod_id]);
     $_SESSION['success_msg'] = 'House details updated successfully!';
     header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
     exit;
@@ -1655,15 +1658,18 @@ if ($view_section_id > 0) {
                                                                 <input type="number" name="stock_quantity" class="form-control form-control-sm text-center fw-bold" style="max-width:90px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 14.5px; color: #0f172a; padding: 7px 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);" value="<?= (int)$h['stock_quantity'] ?>" required>
                                                             </td>
                                                             <td style="padding: 16px 20px;">
-                                                                <?php if ($h['stock_quantity'] > 0): ?>
-                                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #047857; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1px solid rgba(16, 185, 129, 0.2); display: inline-flex; align-items: center; gap: 6px;">
-                                                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span> AVAILABLE
-                                                                    </span>
-                                                                <?php else: ?>
-                                                                    <span class="badge" style="background: rgba(239, 68, 68, 0.12); color: #b91c1c; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1px solid rgba(239, 68, 68, 0.2); display: inline-flex; align-items: center; gap: 6px;">
-                                                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> OUT OF STOCK
-                                                                    </span>
-                                                                <?php endif; ?>
+                                                                <?php 
+                                                                    $is_disabled = ($h['status'] === 'inactive' || $h['availability_status'] === 'disabled');
+                                                                    $is_out_of_stock = ($h['stock_quantity'] <= 0);
+                                                                ?>
+                                                                <select name="status" class="form-select form-select-sm fw-bold" style="border-radius: 10px; font-size: 12.5px; max-width: 145px; border: 1.5px solid <?= $is_disabled ? '#fca5a5' : ($is_out_of_stock ? '#fde68a' : '#a7f3d0') ?>; background: <?= $is_disabled ? '#fef2f2' : ($is_out_of_stock ? '#fffbeb' : '#ecfdf5') ?>; color: <?= $is_disabled ? '#991b1b' : ($is_out_of_stock ? '#92400e' : '#065f46') ?>; padding: 6px 10px; cursor: pointer;">
+                                                                    <option value="active" <?= !$is_disabled ? 'selected' : '' ?>>
+                                                                        <?= $is_out_of_stock ? '🟡 Out of Stock' : '🟢 Enabled' ?>
+                                                                    </option>
+                                                                    <option value="disabled" <?= $is_disabled ? 'selected' : '' ?>>
+                                                                        🔴 Disabled
+                                                                    </option>
+                                                                </select>
                                                             </td>
                                                             <td style="padding: 16px 20px; text-align: right;">
                                                                 <div class="d-flex align-items-center justify-content-end gap-2">
