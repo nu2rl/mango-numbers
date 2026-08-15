@@ -567,7 +567,9 @@ function get_flag_icon($country) {
         }
         .card-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 20px; letter-spacing: -0.3px; display: flex; align-items: center; justify-content: space-between; }
         label { display: block; font-size: 12.5px; font-weight: 700; color: #cbd5e1; margin-bottom: 8px; letter-spacing: 0.2px; }
-        input[type="text"], select, textarea {
+        
+        /* Input & Form Controls Styling */
+        input[type="text"], input[type="password"], input[type="email"], input[type="tel"], select, textarea {
             width: 100%; background: linear-gradient(135deg, #161524 0%, #11101c 100%);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
@@ -580,6 +582,14 @@ function get_flag_icon($country) {
             box-shadow: 0 0 0 3.5px rgba(249, 115, 22, 0.2);
         }
         input::placeholder, textarea::placeholder { color: #64748b; }
+
+        /* Icon Input Wrappers */
+        .input-icon-wrap { position: relative; width: 100%; margin-bottom: 18px; }
+        .input-icon-wrap i.icon-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 18px; pointer-events: none; transition: color 0.25s; z-index: 2; }
+        .input-icon-wrap i.toggle-pwd { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 18px; cursor: pointer; transition: color 0.25s; z-index: 2; }
+        .input-icon-wrap i.toggle-pwd:hover { color: #f97316; }
+        .input-icon-wrap input { padding-left: 42px !important; padding-right: 42px !important; margin-bottom: 0 !important; }
+        .input-icon-wrap input:focus + i.icon-prefix, .input-icon-wrap input:focus ~ i.icon-prefix { color: #f97316; }
         select option { background: #181826; color: #f8fafc; }
         textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
         .form-submit {
@@ -1126,7 +1136,7 @@ function get_flag_icon($country) {
                 <div class="section-title">Account Settings</div>
                 <div class="section-sub">Manage your personal profile details and account security password.</div>
 
-                <div class="support-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="support-grid" style="grid-template-columns: 1fr 1fr; gap: 24px;">
                     <!-- Card 1: Personal Details -->
                     <div class="support-form-card">
                         <div class="card-title">
@@ -1135,29 +1145,38 @@ function get_flag_icon($country) {
                         <form action="dashboard.php" method="POST">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             
-                            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 14px; border: 1px solid rgba(255,255,255,0.06);">
-                                <div class="avatar" style="width: 48px; height: 48px; font-size: 20px; flex-shrink: 0; box-shadow: 0 0 16px rgba(249,115,22,0.4);"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
+                            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px; padding: 14px 18px; background: linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(255,255,255,0.02) 100%); border-radius: 16px; border: 1px solid rgba(249,115,22,0.25);">
+                                <div class="avatar" style="width: 52px; height: 52px; font-size: 22px; flex-shrink: 0; box-shadow: 0 0 20px rgba(249,115,22,0.45);"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
                                 <div style="min-width: 0;">
-                                    <div style="font-size: 14px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($user_name) ?></div>
-                                    <div style="font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($user_email) ?></div>
+                                    <div style="font-size: 15px; font-weight: 800; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'Sora', sans-serif;"><?= htmlspecialchars($user_name) ?></div>
+                                    <div style="font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px;"><?= htmlspecialchars($user_email) ?></div>
                                 </div>
                             </div>
 
                             <label for="prof_name">Full Name</label>
-                            <input type="text" name="name" id="prof_name" value="<?= htmlspecialchars($user_name) ?>" required placeholder="Your Full Name">
+                            <div class="input-icon-wrap">
+                                <i class="bx bx-user icon-prefix"></i>
+                                <input type="text" name="name" id="prof_name" value="<?= htmlspecialchars($user_name) ?>" required placeholder="Your Full Name">
+                            </div>
 
                             <label>Registered Email Address</label>
-                            <input type="text" value="<?= htmlspecialchars($user_email) ?>" disabled style="opacity: 0.6; cursor: not-allowed;" title="Email cannot be modified for security reasons">
+                            <div class="input-icon-wrap">
+                                <i class="bx bx-envelope icon-prefix"></i>
+                                <input type="email" value="<?= htmlspecialchars($user_email) ?>" disabled style="opacity: 0.6; cursor: not-allowed;" title="Email cannot be modified for security reasons">
+                            </div>
 
                             <label for="prof_mobile">Mobile Number (Optional)</label>
-                            <input type="text" name="mobile" id="prof_mobile" value="<?= htmlspecialchars($user_mobile) ?>" placeholder="e.g. +91 9876543210">
+                            <div class="input-icon-wrap">
+                                <i class="bx bx-phone icon-prefix"></i>
+                                <input type="tel" name="mobile" id="prof_mobile" value="<?= htmlspecialchars($user_mobile) ?>" placeholder="e.g. +91 9876543210">
+                            </div>
 
-                            <button type="submit" name="update_profile_info" class="form-submit">Save Profile Changes 💾</button>
+                            <button type="submit" name="update_profile_info" class="form-submit" style="margin-top: 6px;">Save Profile Changes 💾</button>
                         </form>
                     </div>
 
                     <!-- Card 2: Change Password -->
-                    <div class="support-log-card">
+                    <div class="support-log-card" style="border-top: 3px solid #10b981;">
                         <div class="card-title">
                             <span>🔐 Security & Password</span>
                         </div>
@@ -1165,15 +1184,27 @@ function get_flag_icon($country) {
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
                             <label for="curr_pass">Current Password</label>
-                            <input type="password" name="current_password" id="curr_pass" required placeholder="Enter current password">
+                            <div class="input-icon-wrap">
+                                <i class="bx bx-key icon-prefix"></i>
+                                <input type="password" name="current_password" id="curr_pass" required placeholder="Enter current password">
+                                <i class="bx bx-hide toggle-pwd" onclick="togglePwdVisibility(this, 'curr_pass')"></i>
+                            </div>
 
                             <label for="new_pass">New Password</label>
-                            <input type="password" name="new_password" id="new_pass" required placeholder="Minimum 6 characters">
+                            <div class="input-icon-wrap">
+                                <i class="bx bx-lock-alt icon-prefix"></i>
+                                <input type="password" name="new_password" id="new_pass" required placeholder="Minimum 6 characters">
+                                <i class="bx bx-hide toggle-pwd" onclick="togglePwdVisibility(this, 'new_pass')"></i>
+                            </div>
 
                             <label for="conf_pass">Confirm New Password</label>
-                            <input type="password" name="confirm_password" id="conf_pass" required placeholder="Re-enter new password">
+                            <div class="input-icon-wrap">
+                                <i class="bx bx-shield-quarter icon-prefix"></i>
+                                <input type="password" name="confirm_password" id="conf_pass" required placeholder="Re-enter new password">
+                                <i class="bx bx-hide toggle-pwd" onclick="togglePwdVisibility(this, 'conf_pass')"></i>
+                            </div>
 
-                            <button type="submit" name="change_user_password" class="form-submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 24px rgba(16,185,129,0.35);">Update Password 🔒</button>
+                            <button type="submit" name="change_user_password" class="form-submit" style="margin-top: 6px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 24px rgba(16,185,129,0.35);">Update Password 🔒</button>
                         </form>
                     </div>
                 </div>
@@ -1249,6 +1280,21 @@ function get_flag_icon($country) {
             if (input) {
                 input.value = '';
                 filterSidebarNav('');
+            }
+        }
+
+        // Toggle Password Visibility Eye Button
+        function togglePwdVisibility(icon, targetId) {
+            const field = document.getElementById(targetId);
+            if (!field) return;
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('bx-hide');
+                icon.classList.add('bx-show');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('bx-show');
+                icon.classList.add('bx-hide');
             }
         }
 
