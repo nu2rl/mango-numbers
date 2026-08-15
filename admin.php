@@ -1512,25 +1512,31 @@ if ($view_section_id > 0) {
                         <div id="section-catalog" class="admin-section <?= $active_tab === 'catalog' ? 'active' : '' ?>">
                             <?php if ($active_section_data): ?>
                                 <!-- SECTION HOUSE DETAIL VIEW -->
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 py-3 mb-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <a href="admin.php?active_tab=catalog" class="btn btn-sm btn-outline-secondary" style="border-radius: 8px;">
-                                            <i class="bx bx-arrow-back me-1"></i> Back to Sections
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 py-3 mb-3" style="border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 16px !important;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <a href="admin.php?active_tab=catalog" class="btn btn-sm" style="background: #ffffff; border: 1.5px solid #e2e8f0; color: #475569; font-weight: 600; border-radius: 10px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: all 0.2s ease;">
+                                            <i class="bx bx-left-arrow-alt fs-5"></i> Back to Sections
                                         </a>
-                                        <h4 class="fw-bold mb-0 ms-2" style="font-family:'Outfit', sans-serif;">
-                                            <i class="bx <?= htmlspecialchars($active_section_data['icon']) ?> text-warning me-1"></i>
-                                            Houses in <?= htmlspecialchars($active_section_data['name']) ?>
-                                        </h4>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h3 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif; color: #0f172a; font-size: 22px;">
+                                                    Houses in <?= htmlspecialchars($active_section_data['name']) ?>
+                                                </h3>
+                                                <span class="badge" style="background: rgba(255, 94, 54, 0.12); color: var(--accent-orange); font-size: 12px; font-weight: 700; border-radius: 99px; padding: 4px 10px;"><?= count($houses_list) ?> Items</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <button class="btn btn-primary btn-sm px-3" style="background: var(--gradient-accent); border:none; border-radius:10px;" data-bs-toggle="collapse" data-bs-target="#newHouseCollapse">
-                                        <i class="bx bx-plus me-1"></i> New House
+                                    <button class="btn btn-sm px-3 py-2" style="background: linear-gradient(135deg, #ff5e36, #fca834); color: #ffffff; border:none; border-radius:10px; font-weight: 700; font-size: 13px; box-shadow: 0 4px 14px rgba(255, 94, 54, 0.35); display: inline-flex; align-items: center; gap: 6px;" data-bs-toggle="collapse" data-bs-target="#newHouseCollapse">
+                                        <i class="bx bx-plus fs-5"></i> New House
                                     </button>
                                 </div>
 
                                 <!-- Create New House Form Collapse -->
                                 <div class="collapse mb-4" id="newHouseCollapse">
-                                    <div class="card p-4" style="border: 1px solid rgba(255, 94, 54, 0.2); border-radius: 16px; background: #fffdfa;">
-                                        <h6 class="fw-bold mb-3" style="color: var(--accent-orange);">Create New House / Service under <?= htmlspecialchars($active_section_data['name']) ?></h6>
+                                    <div class="card p-4" style="border: 1px solid rgba(255, 94, 54, 0.25); border-radius: 16px; background: #ffffff; box-shadow: 0 10px 30px rgba(255,94,54,0.06);">
+                                        <h6 class="fw-bold mb-3" style="color: var(--accent-orange); font-family: 'Outfit', sans-serif; font-size: 16px;">
+                                            <i class="bx bx-plus-circle me-1"></i> Add New House / Service under <?= htmlspecialchars($active_section_data['name']) ?>
+                                        </h6>
                                         <form action="admin.php" method="POST">
                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                             <input type="hidden" name="active_tab" value="catalog">
@@ -1539,35 +1545,35 @@ if ($view_section_id > 0) {
                                             
                                             <div class="row g-3">
                                                 <div class="col-md-4">
-                                                    <label class="form-label font-weight-bold">House / Service Name *</label>
-                                                    <input type="text" name="house_name" class="form-control" placeholder="e.g. WhatsApp USA Virtual Number" required>
+                                                    <label class="form-label font-weight-bold" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">House / Service Name *</label>
+                                                    <input type="text" name="house_name" class="form-control" placeholder="e.g. WhatsApp USA Virtual Number" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Country</label>
-                                                    <input type="text" name="country" class="form-control" placeholder="e.g. USA, India, Global" value="Global">
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
+                                                    <input type="text" name="country" class="form-control" placeholder="e.g. USA, India, Global" value="Global" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Selling Price (INR ₹) *</label>
-                                                    <input type="number" step="0.01" name="price_inr" class="form-control" placeholder="150.00" required>
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Selling Price (INR ₹) *</label>
+                                                    <input type="number" step="0.01" name="price_inr" class="form-control" placeholder="150.00" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Selling Price (USD $)</label>
-                                                    <input type="number" step="0.01" name="price_usd" class="form-control" placeholder="2.00">
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Selling Price (USD $)</label>
+                                                    <input type="number" step="0.01" name="price_usd" class="form-control" placeholder="2.00" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Initial Stock Quantity *</label>
-                                                    <input type="number" name="stock_quantity" class="form-control" placeholder="10" value="10" required>
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Initial Stock Quantity *</label>
+                                                    <input type="number" name="stock_quantity" class="form-control" placeholder="10" value="10" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Badge Tag</label>
-                                                    <input type="text" name="badge" class="form-control" placeholder="e.g. HOT, INSTANT, POPULAR">
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Badge Tag</label>
+                                                    <input type="text" name="badge" class="form-control" placeholder="e.g. HOT, INSTANT, POPULAR" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label">Icon (BoxIcon Class or PNG Image URL)</label>
-                                                    <input type="text" name="house_icon" class="form-control" placeholder="e.g. bxl-whatsapp or https://example.com/icon.png">
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Icon (BoxIcon Class or PNG Image URL)</label>
+                                                    <input type="text" name="house_icon" class="form-control" placeholder="e.g. bxl-whatsapp or https://example.com/icon.png" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-12 mt-3 text-end">
-                                                    <button type="submit" class="btn btn-primary px-4" style="background: var(--gradient-accent); border:none; border-radius:10px;">Save New House</button>
+                                                    <button type="submit" class="btn btn-primary px-4 py-2" style="background: var(--gradient-accent); border:none; border-radius:10px; font-weight: 700;">Save New House</button>
                                                 </div>
                                             </div>
                                         </form>
@@ -1575,24 +1581,24 @@ if ($view_section_id > 0) {
                                 </div>
 
                                 <!-- Houses List Table -->
-                                <div class="card" style="border: 1px solid rgba(220, 200, 190, 0.4); border-radius: 16px;">
+                                <div class="card" style="border: 1px solid rgba(0, 0, 0, 0.07); border-radius: 16px; background: #ffffff; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); overflow: hidden;">
                                     <div class="table-responsive text-nowrap">
-                                        <table class="table table-hover align-middle mb-0">
+                                        <table class="table table-hover align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
                                             <thead>
-                                                <tr>
-                                                    <th>House Name</th>
-                                                    <th>Country</th>
-                                                    <th>Selling Price</th>
-                                                    <th>Available Stock</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
+                                                <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">House Name</th>
+                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Country</th>
+                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Selling Price</th>
+                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Available Stock</th>
+                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px;">Status</th>
+                                                    <th style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; padding: 16px 20px; text-align: right;">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php if (!empty($houses_list)): ?>
                                                     <?php foreach ($houses_list as $h): ?>
-                                                        <tr>
-                                                            <td>
+                                                        <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
+                                                            <td style="padding: 16px 20px;">
                                                                 <form id="form-update-house-<?= $h['id'] ?>" action="admin.php" method="POST">
                                                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                     <input type="hidden" name="active_tab" value="catalog">
@@ -1600,52 +1606,62 @@ if ($view_section_id > 0) {
                                                                     <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
                                                                     <input type="hidden" name="action_update_house" value="1">
                                                                     
-                                                                    <div class="d-flex align-items-center gap-2">
-                                                                        <?php if (!empty($h['icon']) && str_contains($h['icon'], 'http')): ?>
-                                                                            <img src="<?= htmlspecialchars($h['icon']) ?>" style="width:24px; height:24px; object-fit:contain;">
-                                                                        <?php else: ?>
-                                                                            <i class="bx <?= htmlspecialchars(!empty($h['icon']) ? $h['icon'] : 'bx-package') ?> fs-4 text-warning"></i>
-                                                                        <?php endif; ?>
+                                                                    <div class="d-flex align-items-center gap-3">
+                                                                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 94, 54, 0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                                            <?php if (!empty($h['icon']) && str_contains($h['icon'], 'http')): ?>
+                                                                                <img src="<?= htmlspecialchars($h['icon']) ?>" style="width:22px; height:22px; object-fit:contain;">
+                                                                            <?php else: ?>
+                                                                                <i class="bx <?= htmlspecialchars(!empty($h['icon']) ? $h['icon'] : 'bx-package') ?> fs-4" style="color: var(--accent-orange);"></i>
+                                                                            <?php endif; ?>
+                                                                        </div>
                                                                         <div>
-                                                                            <strong class="d-block" style="font-size:14px;"><?= htmlspecialchars($h['name']) ?></strong>
+                                                                            <strong class="d-block" style="font-size:14.5px; color: #0f172a; font-family: 'Inter', sans-serif;"><?= htmlspecialchars($h['name']) ?></strong>
                                                                             <?php if (!empty($h['badge'])): ?>
-                                                                                <span class="badge bg-warning text-dark" style="font-size:10px;"><?= htmlspecialchars($h['badge']) ?></span>
+                                                                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size:10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;"><?= htmlspecialchars($h['badge']) ?></span>
                                                                             <?php endif; ?>
                                                                         </div>
                                                                     </div>
                                                             </td>
-                                                            <td><span class="badge bg-label-secondary"><?= htmlspecialchars($h['country']) ?></span></td>
-                                                            <td>
-                                                                <div class="input-group input-group-sm" style="max-width:120px;">
-                                                                    <span class="input-group-text">₹</span>
-                                                                    <input type="number" step="0.01" name="price_inr" class="form-control form-control-sm" value="<?= htmlspecialchars($h['price_inr']) ?>" required>
+                                                            <td style="padding: 16px 20px;">
+                                                                <span class="badge" style="background: #f1f5f9; color: #334155; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-family: monospace;">
+                                                                    <?= htmlspecialchars(strtoupper($h['country'])) ?>
+                                                                </span>
+                                                            </td>
+                                                            <td style="padding: 16px 20px;">
+                                                                <div class="input-group input-group-sm" style="max-width:130px; border-radius: 10px; overflow: hidden; border: 1.5px solid #cbd5e1;">
+                                                                    <span class="input-group-text" style="background: #f8fafc; border: none; font-weight: 700; color: #64748b; padding-right: 4px;">₹</span>
+                                                                    <input type="number" step="0.01" name="price_inr" class="form-control form-control-sm" value="<?= htmlspecialchars($h['price_inr']) ?>" style="border: none; font-weight: 700; color: #0f172a; font-size: 14px;" required>
                                                                 </div>
                                                             </td>
-                                                            <td>
-                                                                <input type="number" name="stock_quantity" class="form-control form-control-sm" style="max-width:90px;" value="<?= (int)$h['stock_quantity'] ?>" required>
+                                                            <td style="padding: 16px 20px;">
+                                                                <input type="number" name="stock_quantity" class="form-control form-control-sm text-center" style="max-width:85px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-weight: 700; font-size: 14px; color: #0f172a;" value="<?= (int)$h['stock_quantity'] ?>" required>
                                                             </td>
-                                                            <td>
+                                                            <td style="padding: 16px 20px;">
                                                                 <?php if ($h['stock_quantity'] > 0): ?>
-                                                                    <span class="badge bg-label-success">Available</span>
+                                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 700; border-radius: 99px; padding: 5px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                                                                        <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span> Available
+                                                                    </span>
                                                                 <?php else: ?>
-                                                                    <span class="badge bg-label-danger">Out of Stock</span>
+                                                                    <span class="badge" style="background: rgba(239, 68, 68, 0.12); color: #dc2626; font-weight: 700; border-radius: 99px; padding: 5px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                                                                        <span style="width: 7px; height: 7px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> Out of Stock
+                                                                    </span>
                                                                 <?php endif; ?>
                                                             </td>
-                                                            <td>
-                                                                <div class="d-flex align-items-center gap-2">
-                                                                    <button type="submit" class="btn btn-sm btn-success px-2 py-1" style="border-radius:6px;" title="Save updates">
-                                                                        <i class="bx bx-check fs-5"></i>
+                                                            <td style="padding: 16px 20px; text-align: right;">
+                                                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                                                    <button type="submit" class="btn btn-sm" style="background: #10b981; color: #ffffff; border: none; border-radius: 9px; padding: 6px 14px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(16,185,129,0.3);" title="Save price and stock changes">
+                                                                        <i class="bx bx-check fs-5"></i> Save
                                                                     </button>
                                                                 </form>
 
-                                                                <form action="admin.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this House?');">
+                                                                <form action="admin.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this House?');" style="margin: 0;">
                                                                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                     <input type="hidden" name="active_tab" value="catalog">
                                                                     <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
                                                                     <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
                                                                     <input type="hidden" name="action_delete_house" value="1">
-                                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-1" style="border-radius:6px;" title="Delete House">
-                                                                        <i class="bx bx-trash fs-5"></i>
+                                                                    <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 9px; padding: 6px 10px; font-size: 14px;" title="Delete House">
+                                                                        <i class="bx bx-trash"></i>
                                                                     </button>
                                                                 </form>
                                                                 </div>
@@ -1654,7 +1670,11 @@ if ($view_section_id > 0) {
                                                     <?php endforeach; ?>
                                                 <?php else: ?>
                                                     <tr>
-                                                        <td colspan="6" class="text-center text-muted py-4">No Houses / Services found in this Section. Click <strong>+ New House</strong> to add one!</td>
+                                                        <td colspan="6" class="text-center text-muted py-5">
+                                                            <i class="bx bx-folder-open display-4 mb-2 text-muted opacity-50"></i>
+                                                            <p class="mb-0 fw-bold">No Houses / Services found in this Section.</p>
+                                                            <small>Click <strong>+ New House</strong> above to create your first service!</small>
+                                                        </td>
                                                     </tr>
                                                 <?php endif; ?>
                                             </tbody>
@@ -1664,17 +1684,22 @@ if ($view_section_id > 0) {
 
                             <?php else: ?>
                                 <!-- OVERVIEW SECTIONS LIST VIEW -->
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 py-3 mb-2">
-                                    <h4 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif;">Manage Offers & Sections</h4>
-                                    <button class="btn btn-primary btn-sm px-3" style="background: var(--gradient-accent); border:none; border-radius:10px;" data-bs-toggle="collapse" data-bs-target="#newSectionCollapse">
-                                        <i class="bx bx-plus me-1"></i> New Section
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 py-3 mb-3" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <div>
+                                        <h3 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif; color: #0f172a; font-size: 22px;">Manage Offers & Sections</h3>
+                                        <p class="text-muted small mb-0">Create and organize multi-level service categories for your customers.</p>
+                                    </div>
+                                    <button class="btn btn-sm px-3 py-2" style="background: linear-gradient(135deg, #ff5e36, #fca834); color: #ffffff; border:none; border-radius:10px; font-weight: 700; font-size: 13px; box-shadow: 0 4px 14px rgba(255, 94, 54, 0.35); display: inline-flex; align-items: center; gap: 6px;" data-bs-toggle="collapse" data-bs-target="#newSectionCollapse">
+                                        <i class="bx bx-plus fs-5"></i> New Section
                                     </button>
                                 </div>
 
                                 <!-- Create New Section Form Collapse -->
                                 <div class="collapse mb-4" id="newSectionCollapse">
-                                    <div class="card p-4" style="border: 1px solid rgba(255, 94, 54, 0.2); border-radius: 16px; background: #fffdfa;">
-                                        <h6 class="fw-bold mb-3" style="color: var(--accent-orange);">Create New Section</h6>
+                                    <div class="card p-4" style="border: 1px solid rgba(255, 94, 54, 0.25); border-radius: 16px; background: #ffffff; box-shadow: 0 10px 30px rgba(255,94,54,0.06);">
+                                        <h6 class="fw-bold mb-3" style="color: var(--accent-orange); font-family: 'Outfit', sans-serif; font-size: 16px;">
+                                            <i class="bx bx-folder-plus me-1"></i> Create New Section Category
+                                        </h6>
                                         <form action="admin.php" method="POST">
                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                             <input type="hidden" name="active_tab" value="catalog">
@@ -1682,19 +1707,19 @@ if ($view_section_id > 0) {
                                             
                                             <div class="row g-3">
                                                 <div class="col-md-5">
-                                                    <label class="form-label font-weight-bold">Section Name *</label>
-                                                    <input type="text" name="section_name" class="form-control" placeholder="e.g. Buy Numbers, Canva Premium" required>
+                                                    <label class="form-label font-weight-bold" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Name *</label>
+                                                    <input type="text" name="section_name" class="form-control" placeholder="e.g. WhatsApp Numbers, Canva Premium" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label">Section Icon (BoxIcon Class or PNG URL)</label>
-                                                    <input type="text" name="section_icon" class="form-control" placeholder="e.g. bxl-whatsapp or https://example.com/icon.png" value="bx-layer">
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Icon (BoxIcon Class or PNG URL)</label>
+                                                    <input type="text" name="section_icon" class="form-control" placeholder="e.g. bxl-whatsapp or https://example.com/icon.png" value="bx-layer" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-md-3 align-self-end">
-                                                    <button type="submit" class="btn btn-primary w-100" style="background: var(--gradient-accent); border:none; border-radius:10px;">Create Section</button>
+                                                    <button type="submit" class="btn btn-primary w-100 py-2" style="background: var(--gradient-accent); border:none; border-radius:10px; font-weight: 700;">Create Section</button>
                                                 </div>
                                                 <div class="col-md-12">
-                                                    <label class="form-label">Description (Optional)</label>
-                                                    <input type="text" name="section_description" class="form-control" placeholder="Short summary of items available in this section">
+                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Description (Optional)</label>
+                                                    <input type="text" name="section_description" class="form-control" placeholder="Short summary of items available in this section" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                             </div>
                                         </form>
@@ -1706,39 +1731,41 @@ if ($view_section_id > 0) {
                                     <?php if (!empty($sections_list)): ?>
                                         <?php foreach ($sections_list as $sec): ?>
                                             <div class="col-md-6 col-lg-4">
-                                                <div class="card h-100 p-3" style="border: 1px solid rgba(220, 200, 190, 0.4); border-radius: 16px; transition: transform 0.2s ease;">
+                                                <div class="card h-100 p-4" style="border: 1px solid rgba(0, 0, 0, 0.07); border-radius: 18px; background: #ffffff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03); transition: transform 0.2s ease, box-shadow 0.2s ease;">
                                                     <div class="d-flex align-items-center justify-content-between mb-3">
                                                         <div class="d-flex align-items-center gap-3">
-                                                            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 94, 54, 0.1); display: flex; align-items: center; justify-content: center;">
+                                                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 94, 54, 0.09); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                                                 <?php if (!empty($sec['icon']) && str_contains($sec['icon'], 'http')): ?>
-                                                                    <img src="<?= htmlspecialchars($sec['icon']) ?>" style="width:24px; height:24px; object-fit:contain;">
+                                                                    <img src="<?= htmlspecialchars($sec['icon']) ?>" style="width:26px; height:26px; object-fit:contain;">
                                                                 <?php else: ?>
-                                                                    <i class="bx <?= htmlspecialchars(!empty($sec['icon']) ? $sec['icon'] : 'bx-layer') ?> fs-3" style="color: var(--accent-orange);"></i>
+                                                                    <i class="bx <?= htmlspecialchars(!empty($sec['icon']) ? $sec['icon'] : 'bx-layer') ?> fs-2" style="color: var(--accent-orange);"></i>
                                                                 <?php endif; ?>
                                                             </div>
                                                             <div>
-                                                                <h5 class="fw-bold mb-0" style="font-size: 16px; font-family:'Outfit', sans-serif;"><?= htmlspecialchars($sec['name']) ?></h5>
-                                                                <span class="text-muted" style="font-size: 13px;"><?= (int)$sec['house_count'] ?> Houses / Services</span>
+                                                                <h5 class="fw-bold mb-0" style="font-size: 17px; font-family:'Outfit', sans-serif; color: #0f172a;"><?= htmlspecialchars($sec['name']) ?></h5>
+                                                                <span class="badge" style="background: #f1f5f9; color: #64748b; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; margin-top: 4px; display: inline-block;">
+                                                                    <?= (int)$sec['house_count'] ?> Houses / Services
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     
                                                     <?php if (!empty($sec['description'])): ?>
-                                                        <p class="text-muted small mb-3" style="font-size: 13px;"><?= htmlspecialchars($sec['description']) ?></p>
+                                                        <p class="text-muted small mb-3" style="font-size: 13.5px; line-height: 1.5; color: #64748b;"><?= htmlspecialchars($sec['description']) ?></p>
                                                     <?php endif; ?>
 
-                                                    <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top gap-2">
-                                                        <a href="admin.php?active_tab=catalog&view_section=<?= $sec['id'] ?>" class="btn btn-sm btn-outline-primary flex-grow-1" style="border-radius: 10px; font-weight: 600;">
-                                                            <i class="bx bx-folder-open me-1"></i> Open Section
+                                                    <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top gap-2" style="border-top-color: #f1f5f9 !important;">
+                                                        <a href="admin.php?active_tab=catalog&view_section=<?= $sec['id'] ?>" class="btn btn-sm flex-grow-1" style="background: #f8fafc; border: 1.5px solid #e2e8f0; color: #0f172a; border-radius: 10px; font-weight: 700; padding: 8px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+                                                            <i class="bx bx-folder-open text-warning fs-5"></i> Open Section
                                                         </a>
 
-                                                        <form action="admin.php" method="POST" onsubmit="return confirm('Deleting this Section will delete all houses inside it! Continue?');">
+                                                        <form action="admin.php" method="POST" onsubmit="return confirm('Deleting this Section will delete all houses inside it! Continue?');" style="margin: 0;">
                                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                             <input type="hidden" name="active_tab" value="catalog">
                                                             <input type="hidden" name="section_id" value="<?= $sec['id'] ?>">
                                                             <input type="hidden" name="action_delete_section" value="1">
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: 10px;" title="Delete Section">
-                                                                <i class="bx bx-trash"></i>
+                                                            <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; padding: 8px 12px;" title="Delete Section">
+                                                                <i class="bx bx-trash fs-5"></i>
                                                             </button>
                                                         </form>
                                                     </div>
@@ -1747,9 +1774,9 @@ if ($view_section_id > 0) {
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <div class="col-12">
-                                            <div class="card p-5 text-center text-muted" style="border: 1px dashed rgba(220, 200, 190, 0.6); border-radius: 16px;">
+                                            <div class="card p-5 text-center text-muted" style="border: 1px dashed rgba(220, 200, 190, 0.6); border-radius: 18px; background: #ffffff;">
                                                 <i class="bx bx-folder-plus display-4 mb-2 text-warning"></i>
-                                                <h5>No Offer Sections Created Yet</h5>
+                                                <h5 class="fw-bold" style="color: #0f172a;">No Offer Sections Created Yet</h5>
                                                 <p class="mb-3">Click on <strong>+ New Section</strong> above to create your first category (e.g., Buy Numbers, Canva Premium, Telegram Services).</p>
                                             </div>
                                         </div>
