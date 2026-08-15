@@ -1,0 +1,17 @@
+# OS & Tool files
+.DS_Store
+Thumbs.db
+
+# Environment & Sensitive files
+.env
+
+# Dependencies
+node_modules/
+
+# Logs and Uploads
+logs/
+uploads/
+*.log
+
+# Build output
+dist/
