@@ -334,6 +334,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_approve'])) {
                 $db->commit();
                 $_SESSION['success_msg'] = 'Order approved successfully! Stock decremented and virtual verification OTP sent to user dashboard.';
 
+                // Send instant Telegram Bot Notification
+                $uname = $purchase['username'] ?? 'User #'.$purchase['user_id'];
+                $notify_msg = "✅ <b>ORDER APPROVED!</b>\n\n"
+                            . "👤 <b>User:</b> <code>" . htmlspecialchars($uname) . "</code>\n"
+                            . "📦 <b>Item:</b> [" . htmlspecialchars($purchase['service_type']) . "] " . htmlspecialchars($purchase['item_name']) . "\n"
+                            . "💰 <b>Amount:</b> ₹" . number_format($purchase['price_paid_inr'], 0) . "\n"
+                            . "🆔 <b>Issued ID / Number:</b> <code>" . htmlspecialchars($virtual_number) . "</code>\n"
+                            . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+                send_telegram_notification($notify_msg);
+
                 // Delete screenshot proof from disk
                 if (!empty($purchase['screenshot_path'])) {
                     $file_path = __DIR__ . '/' . $purchase['screenshot_path'];
@@ -356,7 +366,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reject'])) {
     $purchase_id = (int)$_POST['purchase_id'];
     $active_tab = $_POST['active_tab'] ?? 'approvals';
     
-    $stmt = $db->prepare("SELECT id, screenshot_path FROM purchases WHERE id = ? AND status = 'pending'");
+    $stmt = $db->prepare("SELECT id, username, utr_number, service_type, item_name, screenshot_path FROM purchases WHERE id = ? AND status = 'pending'");
     $stmt->execute([$purchase_id]);
     $purchase = $stmt->fetch();
     
@@ -366,6 +376,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reject'])) {
         $update = $db->prepare("UPDATE purchases SET status = 'rejected', screenshot_path = NULL WHERE id = ?");
         if ($update->execute([$purchase_id])) {
             $_SESSION['success_msg'] = 'Order rejected successfully.';
+
+            // Send instant Telegram Bot Notification
+            $uname = $purchase['username'] ?? 'User #'.$purchase['user_id'];
+            $notify_msg = "❌ <b>ORDER REJECTED</b>\n\n"
+                        . "👤 <b>User:</b> <code>" . htmlspecialchars($uname) . "</code>\n"
+                        . "📦 <b>Item:</b> [" . htmlspecialchars($purchase['service_type']) . "] " . htmlspecialchars($purchase['item_name']) . "\n"
+                        . "🧾 <b>UTR:</b> <code>" . htmlspecialchars($purchase['utr_number']) . "</code>\n"
+                        . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+            send_telegram_notification($notify_msg);
 
             // Delete screenshot proof from disk
             if (!empty($purchase['screenshot_path'])) {

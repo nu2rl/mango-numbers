@@ -252,6 +252,13 @@ try {
             $stmt->execute([$name, $email, $username, $mobile, $hashed_password]);
             $user_id = $db->lastInsertId();
 
+            // Send instant Telegram Bot Notification
+            $notify_msg = "👤 <b>NEW USER SIGNUP!</b>\n\n"
+                        . "📛 <b>Name:</b> " . htmlspecialchars($name) . "\n"
+                        . "📧 <b>Email:</b> <code>" . htmlspecialchars($email) . "</code>\n"
+                        . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+            send_telegram_notification($notify_msg);
+
             // Regenerate session ID to prevent Session Fixation
             session_regenerate_id(true);
 

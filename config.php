@@ -369,3 +369,35 @@ function set_system_setting($key, $value) {
     }
     return false;
 }
+
+/**
+ * Send instant Telegram Bot notification for payments, orders, signups & tickets
+ * @param string $message
+ * @return bool
+ */
+function send_telegram_notification($message) {
+    $token = $_ENV['TELEGRAM_BOT_TOKEN'] ?? getenv('TELEGRAM_BOT_TOKEN') ?: '8787330129:AAH2IbQgbDvEBi1p4BSOLmEAo6mJWgkP2BU';
+    $chat_id = $_ENV['TELEGRAM_CHAT_ID'] ?? getenv('TELEGRAM_CHAT_ID') ?: '8861462825';
+    
+    if (empty($token) || empty($chat_id)) return false;
+
+    $url = "https://api.telegram.org/bot{$token}/sendMessage";
+    $params = [
+        'chat_id' => $chat_id,
+        'text' => $message,
+        'parse_mode' => 'HTML',
+        'disable_web_page_preview' => true
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    @curl_exec($ch);
+    curl_close($ch);
+    return true;
+}
+

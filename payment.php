@@ -89,6 +89,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
     $insert = $db->prepare("INSERT INTO purchases (user_id, catalog_id, service_type, item_name, price_cost_inr, price_paid_inr, utr_number, screenshot_path, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
     try {
         $insert->execute([$user_id,$product['id'],$product['service_type'],$product['name'],$product['price_cost_inr'],$product['price_inr'],$utr_number,$screenshot_path]);
+        
+        // Send instant Telegram Bot Notification
+        $user_name_text = $_SESSION['username'] ?? 'User #'.$user_id;
+        $notify_msg = "🛒 <b>NEW ORDER / PAYMENT SUBMITTED!</b>\n\n"
+                    . "👤 <b>User:</b> <code>" . htmlspecialchars($user_name_text) . "</code>\n"
+                    . "📦 <b>Item:</b> [" . htmlspecialchars($product['service_type']) . "] " . htmlspecialchars($product['name']) . "\n"
+                    . "💰 <b>Amount:</b> ₹" . number_format($product['price_inr'], 0) . "\n"
+                    . "🧾 <b>UTR:</b> <code>" . htmlspecialchars($utr_number) . "</code>\n"
+                    . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+        send_telegram_notification($notify_msg);
+
         $_SESSION['success_msg'] = 'Payment submitted! Verification is in progress.';
         $_SESSION['show_whatsapp_redirect_modal'] = true;
         $_SESSION['show_whatsapp_url'] = "https://t.me/nu9rl";

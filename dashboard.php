@@ -77,7 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_complaint'])) 
     $subject = trim($_POST['subject'] ?? ''); $message = trim($_POST['message'] ?? ''); $purchase_id = (int)($_POST['purchase_id'] ?? 0);
     if (empty($subject)||empty($message)) { $_SESSION['error_msg'] = 'Subject and message are required.'; header("Location: dashboard.php?section=support"); exit; }
     $ins = $db->prepare("INSERT INTO complaints (user_id, purchase_id, subject, message, status) VALUES (?, ?, ?, ?, 'open')");
-    try { $ins->execute([$user_id, $purchase_id > 0 ? $purchase_id : null, $subject, $message]); $_SESSION['success_msg'] = 'Support ticket opened!'; header("Location: dashboard.php?section=support"); exit; }
+    try {
+        $ins->execute([$user_id, $purchase_id > 0 ? $purchase_id : null, $subject, $message]);
+        
+        // Send instant Telegram Bot Notification
+        $user_name_txt = $_SESSION['username'] ?? 'User #'.$user_id;
+        $notify_msg = "💬 <b>NEW SUPPORT TICKET FILED!</b>\n\n"
+                    . "👤 <b>User:</b> <code>" . htmlspecialchars($user_name_txt) . "</code>\n"
+                    . "📌 <b>Subject:</b> " . htmlspecialchars($subject) . "\n"
+                    . "📝 <b>Message:</b> " . htmlspecialchars($message) . "\n"
+                    . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+        send_telegram_notification($notify_msg);
+
+        $_SESSION['success_msg'] = 'Support ticket opened!'; header("Location: dashboard.php?section=support"); exit;
+    }
     catch (PDOException $e) { $_SESSION['error_msg'] = 'Failed: '.$e->getMessage(); header("Location: dashboard.php?section=support"); exit; }
 }
 
@@ -93,6 +106,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_complaint_repl
     try {
         $ins->execute([$complaint_id, $reply_message]);
         $db->prepare("UPDATE complaints SET status = 'open' WHERE id = ?")->execute([$complaint_id]);
+        
+        // Send instant Telegram Bot Notification
+        $user_name_txt = $_SESSION['username'] ?? 'User #'.$user_id;
+        $notify_msg = "💬 <b>SUPPORT TICKET REPLY RECEIVED!</b>\n\n"
+                    . "👤 <b>User:</b> <code>" . htmlspecialchars($user_name_txt) . "</code>\n"
+                    . "🎟️ <b>Ticket ID:</b> #" . $complaint_id . "\n"
+                    . "📝 <b>Reply:</b> " . htmlspecialchars($reply_message) . "\n"
+                    . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+        send_telegram_notification($notify_msg);
+
         $_SESSION['success_msg'] = 'Reply sent.'; header("Location: dashboard.php?section=support"); exit;
     } catch (PDOException $e) { $_SESSION['error_msg'] = 'Failed: '.$e->getMessage(); header("Location: dashboard.php?section=support"); exit; }
 }
