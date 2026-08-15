@@ -325,9 +325,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_approve'])) {
                 $update = $db->prepare("UPDATE purchases SET status = 'approved', virtual_number_provided = ?, otp_provided = ?, screenshot_path = NULL WHERE id = ?");
                 $update->execute([$virtual_number, $otp_code, $purchase_id]);
                 
-                // Decrement stock in catalog
-                $dec_stock = $db->prepare("UPDATE catalog SET stock = GREATEST(0, stock - 1) WHERE id = ?");
-                $dec_stock->execute([$purchase['catalog_id']]);
+                // Decrement stock in products table
+                $dec_products = $db->prepare("UPDATE products SET stock_quantity = GREATEST(0, stock_quantity - 1), availability_status = CASE WHEN stock_quantity - 1 <= 0 THEN 'out_of_stock' ELSE availability_status END WHERE id = ?");
+                $dec_products->execute([$purchase['catalog_id']]);
+
+                // Decrement stock in legacy catalog table
+                $dec_catalog = $db->prepare("UPDATE catalog SET stock = GREATEST(0, stock - 1) WHERE id = ?");
+                $dec_catalog->execute([$purchase['catalog_id']]);
                 
                 $db->commit();
                 $_SESSION['success_msg'] = 'Order approved successfully! Stock decremented and virtual verification OTP sent to user dashboard.';
