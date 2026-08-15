@@ -172,8 +172,26 @@ if (is_logged_in()) {
                     Contact Owner on Telegram
                 </a>
             <?php else: ?>
-            <form id="signup-form" onsubmit="handleSignupFormSubmit(event)">
+            <form id="signup-form" onsubmit="handleSignupFormSubmit(event)" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" id="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+
+                <!-- Compulsory Profile Picture Upload -->
+                <div class="form-group" style="text-align: center; margin-bottom: 22px;">
+                    <label style="display: block; text-align: left; margin-bottom: 10px;">Profile Picture <span style="color: #ef4444;">* (Compulsory)</span></label>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; padding: 14px; background: rgba(255,255,255,0.03); border: 1.5px dashed rgba(249,115,22,0.4); border-radius: 16px;">
+                        <div id="pfp-preview-wrap" style="width: 58px; height: 58px; border-radius: 50%; background: var(--elevated); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; box-shadow: 0 0 16px rgba(249,115,22,0.3);">
+                            <span id="pfp-placeholder" style="font-size: 26px;">👤</span>
+                            <img id="pfp-img" src="" alt="PFP Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        </div>
+                        <div style="text-align: left; flex: 1;">
+                            <label for="avatar" style="display: inline-block; padding: 9px 16px; background: linear-gradient(135deg, #f97316, #fb923c); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 9px; cursor: pointer; transition: transform 0.2s; margin-bottom: 4px;">
+                                📷 Choose Photo
+                            </label>
+                            <input type="file" name="avatar" id="avatar" accept="image/jpeg,image/png,image/webp" required style="display: none;" onchange="previewAvatar(this)">
+                            <div style="font-size: 11px; color: var(--muted);" id="pfp-filename">JPEG, PNG or WebP (Max 10MB)</div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <label for="name">Full Name</label>
@@ -286,6 +304,22 @@ if (is_logged_in()) {
             }, 1000);
         }
 
+        function previewAvatar(input) {
+            var fnLabel = document.getElementById('pfp-filename');
+            var placeholder = document.getElementById('pfp-placeholder');
+            var imgPreview = document.getElementById('pfp-img');
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                if (fnLabel) fnLabel.innerText = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    if (imgPreview) { imgPreview.src = e.target.result; imgPreview.style.display = 'block'; }
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function handleSignupFormSubmit(e) {
             if (e) e.preventDefault();
             var otpInput = document.getElementById('otp');
@@ -297,6 +331,11 @@ if (is_logged_in()) {
         }
         function verifyAndSignup() {
             var btnSignup = document.getElementById('btn-signup');
+            var avatarInput = document.getElementById('avatar');
+            if (!avatarInput || !avatarInput.files || !avatarInput.files[0]) {
+                showAlert('error', 'Profile picture is compulsory! Please choose a photo before completing registration.');
+                return;
+            }
             var name = document.getElementById('name').value.trim();
             var email = document.getElementById('email').value.trim();
             var mobile = document.getElementById('mobile').value.trim();
@@ -308,6 +347,7 @@ if (is_logged_in()) {
             btnSignup.innerHTML = '<span class="spinner"></span> Verifying...';
             showAlert('none', '');
             var fd = new FormData();
+            fd.append('avatar', avatarInput.files[0]);
             fd.append('name', name); fd.append('email', email); fd.append('mobile', mobile);
             fd.append('otp', otp); fd.append('password', password);
             fd.append('confirm_password', confirmPassword); fd.append('csrf_token', csrfToken);

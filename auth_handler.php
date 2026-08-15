@@ -247,15 +247,55 @@ try {
                 }
             }
 
+            // Compulsory Profile Picture Upload Validation
+            if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+                echo json_encode(['success' => false, 'error' => 'Profile picture is compulsory! Please select a photo.']);
+                exit;
+            }
+
+            $avatar_tmp = $_FILES['avatar']['tmp_name'];
+            $avatar_size = $_FILES['avatar']['size'];
+            if ($avatar_size > 10 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'error' => 'Profile picture size must not exceed 10MB.']);
+                exit;
+            }
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $avatar_tmp);
+            finfo_close($finfo);
+
+            if (!in_array($mime, ['image/jpeg', 'image/jpg', 'image/png', 'image/x-png', 'image/webp'])) {
+                echo json_encode(['success' => false, 'error' => 'Invalid image format. Please upload JPG, PNG, or WebP photo.']);
+                exit;
+            }
+
+            $avatar_dir = __DIR__ . '/uploads/avatars/';
+            if (!is_dir($avatar_dir)) {
+                @mkdir($avatar_dir, 0755, true);
+            }
+
+            $ext = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+            if (empty($ext)) $ext = 'jpg';
+            $avatar_filename = 'pfp_' . bin2hex(random_bytes(16)) . '.' . strtolower($ext);
+            $avatar_destination = $avatar_dir . $avatar_filename;
+
+            if (!move_uploaded_file($avatar_tmp, $avatar_destination)) {
+                echo json_encode(['success' => false, 'error' => 'Failed to save profile picture. Please try again.']);
+                exit;
+            }
+
+            $avatar_path = 'uploads/avatars/' . $avatar_filename;
+
             $mobile = trim($_POST['mobile'] ?? '');
-            $stmt = $db->prepare("INSERT INTO users (name, email, username, mobile, password, role) VALUES (?, ?, ?, ?, ?, 'user')");
-            $stmt->execute([$name, $email, $username, $mobile, $hashed_password]);
+            $stmt = $db->prepare("INSERT INTO users (name, email, username, mobile, password, avatar_path, role) VALUES (?, ?, ?, ?, ?, ?, 'user')");
+            $stmt->execute([$name, $email, $username, $mobile, $hashed_password, $avatar_path]);
             $user_id = $db->lastInsertId();
 
             // Send instant Telegram Bot Notification
             $notify_msg = "👤 <b>NEW USER SIGNUP!</b>\n\n"
                         . "📛 <b>Name:</b> " . htmlspecialchars($name) . "\n"
                         . "📧 <b>Email:</b> <code>" . htmlspecialchars($email) . "</code>\n"
+                        . "🖼️ <b>PFP:</b> <i>Uploaded</i>\n"
                         . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
             send_telegram_notification($notify_msg);
 
@@ -264,8 +304,9 @@ try {
 
             // Set login sessions
             $_SESSION['user_id'] = $user_id;
-            $_SESSION['username'] = $username;
+            $_SESSION['username'] = $name;
             $_SESSION['role'] = 'user';
+            $_SESSION['avatar_path'] = $avatar_path;
 
             echo json_encode(['success' => true, 'message' => 'Email verified successfully! Creating account...']);
         } else {

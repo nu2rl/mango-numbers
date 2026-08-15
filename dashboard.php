@@ -136,8 +136,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile_info']
     }
 
     try {
-        $up = $db->prepare("UPDATE users SET name = ?, mobile = ? WHERE id = ?");
-        $up->execute([$new_name, $new_mobile, $user_id]);
+        $avatar_path = null;
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES['avatar']['tmp_name']);
+            finfo_close($finfo);
+            if (in_array($mime, ['image/jpeg', 'image/jpg', 'image/png', 'image/x-png', 'image/webp'])) {
+                $avatar_dir = __DIR__ . '/uploads/avatars/';
+                if (!is_dir($avatar_dir)) @mkdir($avatar_dir, 0755, true);
+                $ext = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+                if (empty($ext)) $ext = 'jpg';
+                $avatar_filename = 'pfp_' . bin2hex(random_bytes(16)) . '.' . strtolower($ext);
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $avatar_dir . $avatar_filename)) {
+                    $avatar_path = 'uploads/avatars/' . $avatar_filename;
+                }
+            }
+        }
+
+        if ($avatar_path) {
+            $up = $db->prepare("UPDATE users SET name = ?, mobile = ?, avatar_path = ? WHERE id = ?");
+            $up->execute([$new_name, $new_mobile, $avatar_path, $user_id]);
+            $_SESSION['avatar_path'] = $avatar_path;
+        } else {
+            $up = $db->prepare("UPDATE users SET name = ?, mobile = ? WHERE id = ?");
+            $up->execute([$new_name, $new_mobile, $user_id]);
+        }
+
         $_SESSION['username'] = $new_name;
         $_SESSION['success_msg'] = 'Profile details updated successfully!';
 
@@ -216,8 +240,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_user_password'
 }
 
 // Data fetch
-$user_stmt = $db->prepare("SELECT name, email, mobile FROM users WHERE id = ?"); $user_stmt->execute([$user_id]); $user_profile = $user_stmt->fetch();
-$user_name = $user_profile['name'] ?? 'User'; $user_email = $user_profile['email'] ?? $username; $user_mobile = $user_profile['mobile'] ?? '';
+$user_stmt = $db->prepare("SELECT name, email, mobile, avatar_path FROM users WHERE id = ?"); $user_stmt->execute([$user_id]); $user_profile = $user_stmt->fetch();
+$user_name = $user_profile['name'] ?? 'User'; $user_email = $user_profile['email'] ?? $username; $user_mobile = $user_profile['mobile'] ?? ''; $user_avatar = $user_profile['avatar_path'] ?? '';
 $spend_stmt = $db->prepare("SELECT SUM(price_paid_inr) FROM purchases WHERE user_id = ? AND status = 'approved'"); $spend_stmt->execute([$user_id]); $total_spending = $spend_stmt->fetchColumn() ?: 0;
 $order_count = $db->prepare("SELECT COUNT(*) FROM purchases WHERE user_id = ? AND status = 'approved'"); $order_count->execute([$user_id]); $approved_count = $order_count->fetchColumn() ?: 0;
 $stmt = $db->prepare("SELECT * FROM catalog WHERE status = 'active' ORDER BY service_type DESC, price_inr ASC"); $stmt->execute(); $catalog_items = $stmt->fetchAll();
@@ -802,7 +826,11 @@ function get_flag_icon($country) {
 
         <div class="sidebar-profile" onclick="switchSection('profile')" style="cursor: pointer; transition: background 0.2s; position: relative;" title="Click to manage account profile & password">
             <div class="profile-row">
-                <div class="avatar"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
+                <?php if (!empty($user_avatar) && file_exists(__DIR__ . '/' . $user_avatar)): ?>
+                    <img src="<?= htmlspecialchars($user_avatar) ?>" class="avatar" style="object-fit: cover; border: 2px solid var(--accent); shadow: 0 0 10px rgba(249,115,22,0.3);">
+                <?php else: ?>
+                    <div class="avatar"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
+                <?php endif; ?>
                 <div class="profile-info">
                     <div class="profile-name"><?= htmlspecialchars($user_name) ?></div>
                     <div class="profile-email"><?= htmlspecialchars($user_email) ?></div>
@@ -1142,15 +1170,25 @@ function get_flag_icon($country) {
                         <div class="card-title">
                             <span>👤 Personal Profile</span>
                         </div>
-                        <form action="dashboard.php" method="POST">
+                        <form action="dashboard.php" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             
                             <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px; padding: 14px 18px; background: linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(255,255,255,0.02) 100%); border-radius: 16px; border: 1px solid rgba(249,115,22,0.25);">
-                                <div class="avatar" style="width: 52px; height: 52px; font-size: 22px; flex-shrink: 0; box-shadow: 0 0 20px rgba(249,115,22,0.45);"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
-                                <div style="min-width: 0;">
+                                <?php if (!empty($user_avatar) && file_exists(__DIR__ . '/' . $user_avatar)): ?>
+                                    <img src="<?= htmlspecialchars($user_avatar) ?>" class="avatar" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); flex-shrink: 0; box-shadow: 0 0 20px rgba(249,115,22,0.45);">
+                                <?php else: ?>
+                                    <div class="avatar" style="width: 52px; height: 52px; font-size: 22px; flex-shrink: 0; box-shadow: 0 0 20px rgba(249,115,22,0.45);"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
+                                <?php endif; ?>
+                                <div style="min-width: 0; flex: 1;">
                                     <div style="font-size: 15px; font-weight: 800; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'Sora', sans-serif;"><?= htmlspecialchars($user_name) ?></div>
                                     <div style="font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px;"><?= htmlspecialchars($user_email) ?></div>
                                 </div>
+                            </div>
+
+                            <label for="prof_avatar">Change Profile Picture (Optional)</label>
+                            <div class="input-icon-wrap">
+                                <i class="bx bx-image-add icon-prefix"></i>
+                                <input type="file" name="avatar" id="prof_avatar" accept="image/jpeg,image/png,image/webp" style="padding-top: 10px;">
                             </div>
 
                             <label for="prof_name">Full Name</label>

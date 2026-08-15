@@ -36,11 +36,17 @@ try {
         username VARCHAR(150) NOT NULL UNIQUE,
         mobile VARCHAR(20) DEFAULT NULL,
         password VARCHAR(255) NOT NULL,
+        avatar_path VARCHAR(255) DEFAULT NULL,
         role ENUM('user', 'admin') DEFAULT 'user',
         status ENUM('active', 'disabled') DEFAULT 'active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;");
+
+    try {
+        $pdo->exec("ALTER TABLE users ADD COLUMN avatar_path VARCHAR(255) DEFAULT NULL;");
+    } catch (PDOException $e) {}
+
     echo "- Users table verified.<br>";
 
     // Email OTPs Table
