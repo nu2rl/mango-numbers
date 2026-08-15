@@ -708,6 +708,13 @@ function get_flag_icon($country) {
 
         <nav class="sidebar-nav">
             <div class="nav-label">Navigation</div>
+
+            <!-- Live Sidebar Navigation Search Bar -->
+            <div class="sidebar-search-wrap" style="position: relative; margin: 8px 0 14px 0;">
+                <i class="bx bx-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 16px; pointer-events: none;"></i>
+                <input type="text" id="navSearchInput" placeholder="Search service..." onkeyup="filterSidebarNav(this.value)" style="width: 100%; background: #141420; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 9px 30px 9px 34px; font-size: 13px; color: #f8fafc; outline: none; margin-bottom: 0; transition: border-color 0.2s;">
+                <span id="navSearchClear" onclick="clearNavSearch()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #64748b; cursor: pointer; display: none;">✕</span>
+            </div>
             <?php if (!empty($active_sections)): ?>
                 <?php foreach ($active_sections as $sec): ?>
                     <button class="nav-item" id="menu-section-<?= $sec['id'] ?>" onclick="switchSection('section-<?= $sec['id'] ?>')">
@@ -1049,6 +1056,37 @@ function get_flag_icon($country) {
     <?php endif; ?>
 
     <script>
+        // Sidebar Live Navigation & Catalog Filtering
+        function filterSidebarNav(query) {
+            query = query.toLowerCase().trim();
+            const clearBtn = document.getElementById('navSearchClear');
+            if (clearBtn) clearBtn.style.display = query ? 'block' : 'none';
+
+            // Filter Navigation items
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(btn => {
+                const text = btn.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    btn.style.display = 'flex';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+
+            // Also filter active category cards if on buy page
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = query;
+                if (typeof searchCatalog === 'function') searchCatalog();
+            }
+        }
+        function clearNavSearch() {
+            const input = document.getElementById('navSearchInput');
+            if (input) {
+                input.value = '';
+                filterSidebarNav('');
+            }
+        }
+
         // Sidebar
         function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('visible'); }
         function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('visible'); }
