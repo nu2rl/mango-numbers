@@ -850,8 +850,8 @@ function get_flag_icon($country) {
         // Restore section from URL
         document.addEventListener('DOMContentLoaded', () => {
             const p = new URLSearchParams(window.location.search).get('section');
-            if (p && ['history','support'].includes(p)) switchSection(p);
-            else switchSection('history');
+            if (p && ['buy','history','support'].includes(p)) switchSection(p);
+            else switchSection('buy');
         });
 
         // Copy text helper
