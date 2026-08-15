@@ -109,130 +109,125 @@ function get_db_connection() {
         ];
         $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         
-        // Auto-migration: Safely append mobile, status, and deletion_reason columns to users table if missing
-        try {
-            $pdo->exec("ALTER TABLE users ADD COLUMN mobile VARCHAR(20) DEFAULT NULL AFTER username");
-        } catch (PDOException $e) {}
-        try {
-            $pdo->exec("ALTER TABLE users ADD COLUMN status VARCHAR(20) DEFAULT 'active' AFTER role");
-        } catch (PDOException $e) {}
-        try {
-            $pdo->exec("ALTER TABLE users ADD COLUMN deletion_reason TEXT DEFAULT NULL AFTER status");
-        } catch (PDOException $e) {}
-        try {
-            $pdo->exec("ALTER TABLE complaints ADD COLUMN admin_deleted_at TIMESTAMP NULL DEFAULT NULL AFTER admin_response");
-        } catch (PDOException $e) {}
-        try {
-            $pdo->exec("DELETE FROM complaints WHERE admin_deleted_at IS NOT NULL AND admin_deleted_at <= DATE_SUB(NOW(), INTERVAL 3 DAY)");
-        } catch (PDOException $e) {}
+        // Auto-migration & Schema verification (runs only once per process)
+        static $migrated = false;
+        if (!$migrated) {
+            $migrated = true;
+            try { $pdo->exec("ALTER TABLE users ADD COLUMN mobile VARCHAR(20) DEFAULT NULL AFTER username"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE users ADD COLUMN status VARCHAR(20) DEFAULT 'active' AFTER role"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE users ADD COLUMN deletion_reason TEXT DEFAULT NULL AFTER status"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE complaints ADD COLUMN admin_deleted_at TIMESTAMP NULL DEFAULT NULL AFTER admin_response"); } catch (PDOException $e) {}
+            try { $pdo->exec("DELETE FROM complaints WHERE admin_deleted_at IS NOT NULL AND admin_deleted_at <= DATE_SUB(NOW(), INTERVAL 3 DAY)"); } catch (PDOException $e) {}
 
-        // Add performance indexes on purchases & users
-        try { $pdo->exec("CREATE INDEX idx_purchases_user_status ON purchases (user_id, status)"); } catch (PDOException $e) {}
-        try { $pdo->exec("CREATE INDEX idx_purchases_utr ON purchases (utr_number)"); } catch (PDOException $e) {}
-        try { $pdo->exec("CREATE INDEX idx_users_email ON users (email)"); } catch (PDOException $e) {}
+            // Add performance indexes on purchases & users
+            try { $pdo->exec("CREATE INDEX idx_purchases_user_status ON purchases (user_id, status)"); } catch (PDOException $e) {}
+            try { $pdo->exec("CREATE INDEX idx_purchases_utr ON purchases (utr_number)"); } catch (PDOException $e) {}
+            try { $pdo->exec("CREATE INDEX idx_users_email ON users (email)"); } catch (PDOException $e) {}
 
-        // Migrate service_type columns to VARCHAR(50) to support Canva Premium
-        try { $pdo->exec("ALTER TABLE catalog MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
-        try { $pdo->exec("ALTER TABLE products MODIFY COLUMN availability_status ENUM('available', 'out_of_stock', 'disabled') DEFAULT 'available'"); } catch (PDOException $e) {}
-        try { $pdo->exec("ALTER TABLE purchases MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
+            // Migrate service_type columns to VARCHAR(50) to support Canva Premium
+            try { $pdo->exec("ALTER TABLE catalog MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE products MODIFY COLUMN availability_status ENUM('available', 'out_of_stock', 'disabled') DEFAULT 'available'"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE purchases MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
 
-        // Auto-seed Canva Premium Lifetime if missing
-        try {
-            $stmt = $pdo->query("SELECT id FROM catalog WHERE name = 'Canva Premium Lifetime' LIMIT 1");
-            if ($stmt->fetchColumn() == 0) {
-                $inst = $pdo->prepare("INSERT INTO catalog (service_type, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock, status) VALUES ('Canva', 'Canva Premium Lifetime', 'Global', 0.50, 40.00, 1.80, 150.00, 999, 'active')");
-                $inst->execute();
-            }
-        } catch (PDOException $e) {}
-
-        // Auto-cleanup: Delete old screenshot files for approved purchases after 7 days
-        try {
-            $old_ss = $pdo->query("SELECT id, screenshot_path FROM purchases WHERE status = 'approved' AND screenshot_path IS NOT NULL AND created_at <= DATE_SUB(NOW(), INTERVAL 7 DAY)");
-            $to_clean = $old_ss->fetchAll();
-            foreach ($to_clean as $ss) {
-                $filepath = __DIR__ . '/' . $ss['screenshot_path'];
-                if (is_file($filepath)) @unlink($filepath);
-                $pdo->exec("UPDATE purchases SET screenshot_path = NULL WHERE id = " . (int)$ss['id']);
-            }
-        } catch (PDOException $e) {}
-        try {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS complaint_messages (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                complaint_id INT NOT NULL,
-                sender ENUM('user', 'admin') NOT NULL,
-                message TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (complaint_id) REFERENCES complaints(id) ON DELETE CASCADE
-            ) ENGINE=InnoDB;");
-
-            // Migration: Transfer existing admin responses to complaint_messages table
-            $pdo->exec("INSERT INTO complaint_messages (complaint_id, sender, message, created_at)
-                        SELECT id, 'admin', admin_response, created_at FROM complaints 
-                        WHERE admin_response IS NOT NULL AND admin_response != '' AND id NOT IN (
-                            SELECT DISTINCT complaint_id FROM complaint_messages WHERE sender = 'admin'
-                        )");
-        } catch (PDOException $e) {}
-
-        try {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS system_settings (
-                setting_key VARCHAR(50) PRIMARY KEY,
-                setting_value VARCHAR(255) DEFAULT NULL
-            ) ENGINE=InnoDB;");
-            
-            $stmt = $pdo->prepare("INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES ('allow_signups', '1')");
-            $stmt->execute();
-            
-            $stmt = $pdo->prepare("INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES ('allow_website_usage', '1')");
-            $stmt->execute();
-        } catch (PDOException $e) {}
-
-        try {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
-                ip_address VARCHAR(45) NOT NULL,
-                username VARCHAR(150) NOT NULL,
-                attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                KEY ip_time_idx (ip_address, attempted_at),
-                KEY user_time_idx (username, attempted_at)
-            ) ENGINE=InnoDB;");
-        } catch (PDOException $e) {}
-
-        try {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS smtp_settings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                host VARCHAR(255) DEFAULT NULL,
-                port INT DEFAULT NULL,
-                username VARCHAR(255) DEFAULT NULL,
-                password TEXT DEFAULT NULL,
-                encryption VARCHAR(20) DEFAULT NULL,
-                from_email VARCHAR(255) DEFAULT NULL,
-                from_name VARCHAR(255) DEFAULT NULL,
-                active TINYINT DEFAULT 1
-            ) ENGINE=InnoDB;");
-            
-            $env_host = $_ENV['MAIL_HOST'] ?? getenv('MAIL_HOST') ?: 'smtp-relay.brevo.com';
-            $env_port = (int)($_ENV['MAIL_PORT'] ?? getenv('MAIL_PORT') ?: 587);
-            $env_user = $_ENV['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME') ?: 'ad166f001@smtp-brevo.com';
-            $env_pass = $_ENV['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD') ?: '';
-            $env_enc = $_ENV['MAIL_ENCRYPTION'] ?? getenv('MAIL_ENCRYPTION') ?: 'tls';
-            $env_from = $_ENV['MAIL_FROM_ADDRESS'] ?? getenv('MAIL_FROM_ADDRESS') ?: 'deepakboy144@gmail.com';
-            $env_name = $_ENV['MAIL_FROM_NAME'] ?? getenv('MAIL_FROM_NAME') ?: 'Mango Numbers';
-
-            $stmt = $pdo->query("SELECT id FROM smtp_settings WHERE active = 1 LIMIT 1");
-            $existing_smtp = $stmt->fetch();
-            if ($existing_smtp) {
-                if (!empty($env_user) && !empty($env_pass)) {
-                    $up_stmt = $pdo->prepare("UPDATE smtp_settings SET host = ?, port = ?, username = ?, password = ?, encryption = ?, from_email = ?, from_name = ? WHERE id = ?");
-                    $up_stmt->execute([$env_host, $env_port, $env_user, $env_pass, $env_enc, $env_from, $env_name, $existing_smtp['id']]);
+            // Auto-seed Canva Premium Lifetime if missing
+            try {
+                $stmt = $pdo->query("SELECT id FROM catalog WHERE name = 'Canva Premium Lifetime' LIMIT 1");
+                if ($stmt->fetchColumn() == 0) {
+                    $inst = $pdo->prepare("INSERT INTO catalog (service_type, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock, status) VALUES ('Canva', 'Canva Premium Lifetime', 'Global', 0.50, 40.00, 1.80, 150.00, 999, 'active')");
+                    $inst->execute();
                 }
-            } else {
-                $inst = $pdo->prepare("INSERT INTO smtp_settings (host, port, username, password, encryption, from_email, from_name, active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
-                $inst->execute([$env_host, $env_port, $env_user, $env_pass, $env_enc, $env_from, $env_name]);
-            }
-        } catch (PDOException $e) {}
+            } catch (PDOException $e) {}
+
+            // Auto-cleanup: Delete old screenshot files for approved purchases after 7 days
+            try {
+                $old_ss = $pdo->query("SELECT id, screenshot_path FROM purchases WHERE status = 'approved' AND screenshot_path IS NOT NULL AND created_at <= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+                $to_clean = $old_ss->fetchAll();
+                foreach ($to_clean as $ss) {
+                    $filepath = __DIR__ . '/' . $ss['screenshot_path'];
+                    if (is_file($filepath)) @unlink($filepath);
+                    $pdo->exec("UPDATE purchases SET screenshot_path = NULL WHERE id = " . (int)$ss['id']);
+                }
+            } catch (PDOException $e) {}
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS complaint_messages (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    complaint_id INT NOT NULL,
+                    sender ENUM('user', 'admin') NOT NULL,
+                    message TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (complaint_id) REFERENCES complaints(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB;");
+
+                // Migration: Transfer existing admin responses to complaint_messages table
+                $pdo->exec("INSERT INTO complaint_messages (complaint_id, sender, message, created_at)
+                            SELECT id, 'admin', admin_response, created_at FROM complaints 
+                            WHERE admin_response IS NOT NULL AND admin_response != '' AND id NOT IN (
+                                SELECT DISTINCT complaint_id FROM complaint_messages WHERE sender = 'admin'
+                            )");
+            } catch (PDOException $e) {}
+
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS system_settings (
+                    setting_key VARCHAR(50) PRIMARY KEY,
+                    setting_value VARCHAR(255) DEFAULT NULL
+                ) ENGINE=InnoDB;");
+                
+                $stmt = $pdo->prepare("INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES ('allow_signups', '1')");
+                $stmt->execute();
+                
+                $stmt = $pdo->prepare("INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES ('allow_website_usage', '1')");
+                $stmt->execute();
+            } catch (PDOException $e) {}
+
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
+                    ip_address VARCHAR(45) NOT NULL,
+                    username VARCHAR(150) NOT NULL,
+                    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    KEY ip_time_idx (ip_address, attempted_at),
+                    KEY user_time_idx (username, attempted_at)
+                ) ENGINE=InnoDB;");
+            } catch (PDOException $e) {}
+
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS smtp_settings (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    host VARCHAR(255) DEFAULT NULL,
+                    port INT DEFAULT NULL,
+                    username VARCHAR(255) DEFAULT NULL,
+                    password TEXT DEFAULT NULL,
+                    encryption VARCHAR(20) DEFAULT NULL,
+                    from_email VARCHAR(255) DEFAULT NULL,
+                    from_name VARCHAR(255) DEFAULT NULL,
+                    active TINYINT DEFAULT 1
+                ) ENGINE=InnoDB;");
+            } catch (PDOException $e) {}
+
+            try {
+                $env_host = $_ENV['MAIL_HOST'] ?? getenv('MAIL_HOST') ?: 'smtp-relay.brevo.com';
+                $env_port = (int)($_ENV['MAIL_PORT'] ?? getenv('MAIL_PORT') ?: 587);
+                $env_user = $_ENV['MAIL_USERNAME'] ?? getenv('MAIL_USERNAME') ?: 'ad166f001@smtp-brevo.com';
+                $env_pass = $_ENV['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD') ?: '';
+                $env_enc = $_ENV['MAIL_ENCRYPTION'] ?? getenv('MAIL_ENCRYPTION') ?: 'tls';
+                $env_from = $_ENV['MAIL_FROM_ADDRESS'] ?? getenv('MAIL_FROM_ADDRESS') ?: 'deepakboy144@gmail.com';
+                $env_name = $_ENV['MAIL_FROM_NAME'] ?? getenv('MAIL_FROM_NAME') ?: 'Mango Numbers';
+
+                $stmt = $pdo->query("SELECT id FROM smtp_settings WHERE active = 1 LIMIT 1");
+                $existing_smtp = $stmt->fetch();
+                if ($existing_smtp) {
+                    if (!empty($env_user) && !empty($env_pass)) {
+                        $up_stmt = $pdo->prepare("UPDATE smtp_settings SET host = ?, port = ?, username = ?, password = ?, encryption = ?, from_email = ?, from_name = ? WHERE id = ?");
+                        $up_stmt->execute([$env_host, $env_port, $env_user, $env_pass, $env_enc, $env_from, $env_name, $existing_smtp['id']]);
+                    }
+                } else {
+                    $inst = $pdo->prepare("INSERT INTO smtp_settings (host, port, username, password, encryption, from_email, from_name, active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+                    $inst->execute([$env_host, $env_port, $env_user, $env_pass, $env_enc, $env_from, $env_name]);
+                }
+            } catch (PDOException $e) {}
+        }
         
         return $pdo;
     } catch (PDOException $e) {
-        // Return null if database or connection is not fully setup yet
         return null;
     }
 }
