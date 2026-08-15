@@ -484,6 +484,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_delete_house']
     exit;
 }
 
+// 3g. Handle Manage Offers: Instant Toggle House Status (Enable/Disable)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_toggle_house_status'])) {
+    $prod_id = (int)$_POST['product_id'];
+    $sec_id = (int)$_POST['section_id'];
+    $current_status = trim($_POST['current_status'] ?? 'active');
+    $new_status = ($current_status === 'active') ? 'inactive' : 'active';
+    $availability = ($new_status === 'inactive') ? 'disabled' : 'available';
+
+    $stmt = $db->prepare("UPDATE products SET status = ?, availability_status = ? WHERE id = ?");
+    $stmt->execute([$new_status, $availability, $prod_id]);
+
+    $label = ($new_status === 'active') ? 'Enabled' : 'Disabled';
+    $_SESSION['success_msg'] = "House status updated to {$label}!";
+    header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
+    exit;
+}
+
 // 4. Handle Support/Complaint Ticket Response (from Admin)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['submit_support_response']) || isset($_POST['submit_support_response_keep_open']))) {
     $complaint_id = (int)$_POST['complaint_id'];
@@ -1663,14 +1680,28 @@ if ($view_section_id > 0) {
                                                                     $is_disabled = ($h['status'] === 'inactive' || $h['availability_status'] === 'disabled');
                                                                     $is_out_of_stock = ($h['stock_quantity'] <= 0);
                                                                 ?>
-                                                                <select name="status" form="form-update-house-<?= $h['id'] ?>" class="form-select form-select-sm fw-bold" style="border-radius: 10px; font-size: 12.5px; max-width: 145px; border: 1.5px solid <?= $is_disabled ? '#fca5a5' : ($is_out_of_stock ? '#fde68a' : '#a7f3d0') ?>; background: <?= $is_disabled ? '#fef2f2' : ($is_out_of_stock ? '#fffbeb' : '#ecfdf5') ?>; color: <?= $is_disabled ? '#991b1b' : ($is_out_of_stock ? '#92400e' : '#065f46') ?>; padding: 6px 10px; cursor: pointer;">
-                                                                    <option value="active" <?= !$is_disabled ? 'selected' : '' ?>>
-                                                                        <?= $is_out_of_stock ? '🟡 Out of Stock' : '🟢 Enabled' ?>
-                                                                    </option>
-                                                                    <option value="disabled" <?= $is_disabled ? 'selected' : '' ?>>
-                                                                        🔴 Disabled
-                                                                    </option>
-                                                                </select>
+                                                                <form action="admin.php" method="POST" style="margin: 0; display: inline-block;">
+                                                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                                                    <input type="hidden" name="active_tab" value="catalog">
+                                                                    <input type="hidden" name="section_id" value="<?= $active_section_data['id'] ?>">
+                                                                    <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
+                                                                    <input type="hidden" name="current_status" value="<?= $h['status'] ?>">
+                                                                    <input type="hidden" name="action_toggle_house_status" value="1">
+                                                                    
+                                                                    <?php if ($is_disabled): ?>
+                                                                        <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.12); color: #b91c1c; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1.5px solid rgba(239, 68, 68, 0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to Enable this service">
+                                                                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> 🔴 Disabled
+                                                                        </button>
+                                                                    <?php elseif ($is_out_of_stock): ?>
+                                                                        <button type="submit" class="btn btn-sm" style="background: rgba(245, 158, 11, 0.12); color: #b45309; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1.5px solid rgba(245, 158, 11, 0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to Disable this service">
+                                                                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span> 🟡 Out of Stock
+                                                                        </button>
+                                                                    <?php else: ?>
+                                                                        <button type="submit" class="btn btn-sm" style="background: rgba(16, 185, 129, 0.12); color: #047857; font-weight: 700; border-radius: 99px; padding: 6px 14px; font-size: 12px; border: 1.5px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Click to Disable this service">
+                                                                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span> 🟢 Enabled
+                                                                        </button>
+                                                                    <?php endif; ?>
+                                                                </form>
                                                             </td>
                                                             <td style="padding: 16px 20px; text-align: right;">
                                                                 <div class="d-flex align-items-center justify-content-end gap-2">
