@@ -107,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         :root {
             --bg: #09090f;
@@ -355,11 +356,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="text" name="username" id="username" placeholder="Enter username or email" required value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
                 </div>
                 <div class="form-group">
-                    <div class="form-row">
+                    <div class="form-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <label for="password" style="margin-bottom:0;">Password</label>
                         <a href="forgot_password.php" class="forgot-link">Forgot password?</a>
                     </div>
-                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
+                    <div style="position: relative;">
+                        <input type="password" name="password" id="password" placeholder="Enter your password" required style="padding-right: 44px;">
+                        <i class="bx bx-hide" id="pwd-eye-icon" onclick="toggleLoginPassword()" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px; cursor: pointer; transition: color 0.2s;" title="Toggle Password Visibility"></i>
+                    </div>
                 </div>
                 <button type="submit" class="btn-primary" id="login-btn">Sign In</button>
             </form>
@@ -371,6 +375,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
+        function toggleLoginPassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('pwd-eye-icon');
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bx-hide');
+                icon.classList.add('bx-show');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bx-show');
+                icon.classList.add('bx-hide');
+            }
+        }
+
         document.getElementById('login-form').addEventListener('submit', function() {
             const btn = document.getElementById('login-btn');
             btn.disabled = true;

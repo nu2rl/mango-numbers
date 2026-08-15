@@ -2002,17 +2002,16 @@ function get_flag($country) {
 
   <script>
     // Tab filtering catalog switching
-    function switchTab(service) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    function switchTab(service, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.catalog-panel').forEach(panel => panel.classList.remove('active'));
       
-      const activeBtn = event.currentTarget;
-      activeBtn.classList.add('active');
+      const activeBtn = btn || (event ? event.currentTarget : null);
+      if (activeBtn) activeBtn.classList.add('active');
       
-      if (service === 'telegram') {
-        document.getElementById('panel-telegram').classList.add('active');
-      } else if (service === 'whatsapp') {
-        document.getElementById('panel-whatsapp').classList.add('active');
+      var targetPanel = document.getElementById('panel-' + service);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
       }
 
       // Clear search box on tab switch to reset visibility
@@ -2025,17 +2024,17 @@ function get_flag($country) {
 
     // Dynamic Country Search Filter Logic
     function filterCountryCatalog() {
-      var query = document.getElementById('countrySearchInput').value.toLowerCase().trim();
+      var query = document.getElementById('countrySearchInput') ? document.getElementById('countrySearchInput').value.toLowerCase().trim() : '';
       var clearBtn = document.getElementById('searchClearBtn');
 
       // Show/hide clear button
       if (clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
 
-      var panels = ['panel-telegram', 'panel-whatsapp'];
+      var panels = document.querySelectorAll('.catalog-panel');
       
-      panels.forEach(function(panelId) {
-        var panel = document.getElementById(panelId);
+      panels.forEach(function(panel) {
         if (!panel) return;
+        var panelId = panel.id;
         
         var cards = panel.querySelectorAll('.catalog-card');
         var visibleCount = 0;
