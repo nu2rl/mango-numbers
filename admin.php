@@ -1670,7 +1670,7 @@ if ($view_section_id > 0) {
                         </div>
                         <!-- Telegram Support Button -->
                         <div class="navbar-nav align-items-center">
-                            <a href="https://t.me/nu2rl" target="_blank" class="tg-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: linear-gradient(135deg, #0088cc 0%, #00a8ff 100%); border: 1px solid rgba(255,255,255,0.2); border-radius: 99px; font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; box-shadow: 0 4px 16px rgba(0, 136, 204, 0.35); transition: all 0.25s ease;">
+                            <a href="https://t.me/nu9rl" target="_blank" class="tg-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: linear-gradient(135deg, #0088cc 0%, #00a8ff 100%); border: 1px solid rgba(255,255,255,0.2); border-radius: 99px; font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; box-shadow: 0 4px 16px rgba(0, 136, 204, 0.35); transition: all 0.25s ease;">
                                 <i class="bx bxl-telegram" style="font-size: 18px;"></i>
                                 <span>Customer Support</span>
                             </a>
@@ -2779,7 +2779,7 @@ if ($view_section_id > 0) {
                                     <div class="row align-items-center mb-4">
                                         <div class="col-md-9 col-sm-12">
                                             <h5 class="fw-bold mb-1" style="color: var(--text-dark); font-size: 16px;">Allow User Registrations / Sign-ups</h5>
-                                            <p class="text-muted m-0" style="font-size: 13.5px; line-height: 1.6;">If disabled, new users will be prevented from registering or requesting OTP codes. A premium, glassmorphic contact page directing them to your Telegram (@nu2rl) will be shown instead.</p>
+                                            <p class="text-muted m-0" style="font-size: 13.5px; line-height: 1.6;">If disabled, new users will be prevented from registering or requesting OTP codes. A premium, glassmorphic contact page directing them to your Telegram (@nu9rl) will be shown instead.</p>
                                         </div>
                                         <div class="col-md-3 col-sm-12 text-md-end text-sm-start mt-md-0 mt-3">
                                             <div class="form-check form-switch d-inline-block">

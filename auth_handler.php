@@ -98,7 +98,7 @@ try {
         if (get_system_setting('allow_signups', '1') === '0') {
             echo json_encode([
                 'success' => false, 
-                'error' => 'Registration/Sign-ups are temporarily disabled by the administrator. If you need a new number, please contact the owner on Telegram: @nu2rl.'
+                'error' => 'Registration/Sign-ups are temporarily disabled by the administrator. If you need a new number, please contact the owner on Telegram: @nu9rl.'
             ]);
             exit;
         }

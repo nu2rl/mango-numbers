@@ -167,7 +167,7 @@ if (is_logged_in()) {
                     ⚠️ <strong>Sign-ups are currently closed.</strong><br>
                     Contact the owner to get access.
                 </div>
-                <a href="https://t.me/nu2rl" target="_blank" class="btn-telegram">
+                <a href="https://t.me/nu9rl" target="_blank" class="btn-telegram">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-1.85 8.74c-.14.62-.51.77-1.03.48l-2.82-2.08-1.36 1.31c-.15.15-.28.28-.57.28l.2-2.86 5.21-4.71c.23-.2-.05-.31-.36-.1l-6.44 4.05-2.77-.87c-.6-.19-.61-.6.13-.89l10.82-4.17c.5-.18.94.12.77.72z"/></svg>
                     Contact Owner on Telegram
                 </a>

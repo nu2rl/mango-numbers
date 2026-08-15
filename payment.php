@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
         $insert->execute([$user_id,$product['id'],$product['service_type'],$product['name'],$product['price_cost_inr'],$product['price_inr'],$utr_number,$screenshot_path]);
         $_SESSION['success_msg'] = 'Payment submitted! Verification is in progress.';
         $_SESSION['show_whatsapp_redirect_modal'] = true;
-        $_SESSION['show_whatsapp_url'] = "https://t.me/nu2rl";
+        $_SESSION['show_whatsapp_url'] = "https://t.me/nu9rl";
         $_SESSION['show_whatsapp_text'] = "I have paid ".(int)$product['price_inr']." Rupees for ".$product['service_type']." (".$product['name'].") virtual number at ".date('d-M-Y h:i A').". My Transaction UTR is: ".$utr_number.". Please verify my order & provide virtual number/OTP.";
         header("Location: dashboard.php?section=history"); exit;
     } catch (PDOException $e) {
@@ -279,7 +279,7 @@ function get_country_flag($country) {
                     <h5>Wise Transfer or Crypto Deposit</h5>
                     <p>Contact the owner directly on Telegram to get Wise or USDT/Crypto payment details and complete your order instantly.</p>
                 </div>
-                <a href="https://t.me/nu2rl" target="_blank" class="btn-tg">
+                <a href="https://t.me/nu9rl" target="_blank" class="btn-tg">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-1.85 8.74c-.14.62-.51.77-1.03.48l-2.82-2.08-1.36 1.31c-.15.15-.28.28-.57.28l.2-2.86 5.21-4.71c.23-.2-.05-.31-.36-.1l-6.44 4.05-2.77-.87c-.6-.19-.61-.6.13-.89l10.82-4.17c.5-.18.94.12.77.72z"/></svg>
                     Contact Owner on Telegram
                 </a>
