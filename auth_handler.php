@@ -444,6 +444,12 @@ try {
         $stmt = $db->prepare("UPDATE users SET password = ? WHERE email = ?");
         $stmt->execute([$hashed_password, $email]);
         
+        // Send instant Telegram Bot Notification
+        $notify_msg = "🔐 <b>USER PASSWORD CHANGED!</b>\n\n"
+                    . "📧 <b>Email:</b> <code>" . htmlspecialchars($email) . "</code>\n"
+                    . "⏰ <b>Time:</b> " . date('d M Y, h:i A');
+        send_telegram_notification($notify_msg);
+
         // Clear temp reset state from session & regenerate session ID
         unset($_SESSION['reset_email']);
         session_regenerate_id(true);
