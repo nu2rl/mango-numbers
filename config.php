@@ -50,6 +50,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Session Hijacking Safeguard: Bind active session to browser User-Agent signature
+if (isset($_SESSION['user_id'])) {
+    $ua_sig = md5($_SERVER['HTTP_USER_AGENT'] ?? 'unknown');
+    if (!isset($_SESSION['user_agent_sig'])) {
+        $_SESSION['user_agent_sig'] = $ua_sig;
+    } elseif ($_SESSION['user_agent_sig'] !== $ua_sig) {
+        session_unset();
+        session_destroy();
+        header("Location: login.php");
+        exit;
+    }
+}
+
 // Load .env variables natively
 if (file_exists(__DIR__ . '/.env')) {
     $lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
