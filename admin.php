@@ -1851,13 +1851,9 @@ if ($view_section_id > 0) {
                                                     <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Badge Tag</label>
                                                     <input type="text" name="badge" class="form-control" placeholder="e.g. HOT, INSTANT, POPULAR" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-9">
                                                     <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Upload Custom Image/Icon</label>
                                                     <input type="file" name="house_image_file" accept="image/*" class="form-control" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 7px 11px;">
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">OR Icon Class / Image URL</label>
-                                                    <input type="text" name="house_icon" class="form-control" placeholder="e.g. bxl-telegram or https://..." style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-12 mt-3 text-end">
                                                     <button type="submit" class="btn btn-primary px-4 py-2" style="background: var(--gradient-accent); border:none; border-radius:10px; font-weight: 700;">Save New House</button>
@@ -1996,10 +1992,6 @@ if ($view_section_id > 0) {
                                                                                         <input type="file" name="house_image_file" accept="image/*" class="form-control" style="border-radius: 10px;">
                                                                                         <small class="text-muted">Select image file (PNG, JPG, WEBP) to update photo icon.</small>
                                                                                     </div>
-                                                                                    <div class="mb-3">
-                                                                                        <label class="form-label fw-bold small text-uppercase">OR Icon Class / Image URL</label>
-                                                                                        <input type="text" name="house_icon" class="form-control" value="<?= htmlspecialchars($h['icon'] ?? '') ?>" placeholder="e.g. bxl-whatsapp" style="border-radius: 10px;">
-                                                                                    </div>
                                                                                 </div>
                                                                                 <div class="modal-footer border-top py-3 px-4">
                                                                                     <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 600;">Cancel</button>
@@ -2132,29 +2124,22 @@ if ($view_section_id > 0) {
                                             <input type="hidden" name="action_create_section" value="1">
                                             
                                             <div class="row g-3">
-                                                <div class="col-md-4">
+                                                <div class="col-md-6">
                                                     <label class="form-label font-weight-bold" style="font-size: 11.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Name *</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text" style="background: #f8fafc; border-color: #cbd5e1; border-top-left-radius: 12px; border-bottom-left-radius: 12px;"><i class="bx bx-tag text-muted"></i></span>
                                                         <input type="text" name="section_name" class="form-control" placeholder="e.g. WhatsApp Numbers, Canva Premium" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #cbd5e1; padding: 10px 14px;" required>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-6">
                                                     <label class="form-label" style="font-size: 11.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Icon Photo Upload</label>
                                                     <input type="file" name="section_image_file" accept="image/*" class="form-control" style="border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 8px 12px;">
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label" style="font-size: 11.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">OR Icon Class / Image URL</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text" style="background: #f8fafc; border-color: #cbd5e1; border-top-left-radius: 12px; border-bottom-left-radius: 12px;"><i class="bx bx-image text-muted"></i></span>
-                                                        <input type="text" name="section_icon" class="form-control" placeholder="e.g. bxl-whatsapp or https://..." value="bx-layer" style="border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-color: #cbd5e1; padding: 10px 14px;">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-9">
+                                                <div class="col-md-8">
                                                     <label class="form-label" style="font-size: 11.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Description (Optional)</label>
                                                     <input type="text" name="section_description" class="form-control" placeholder="Short summary of items available in this section" style="border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 10px 14px;">
                                                 </div>
-                                                <div class="col-md-3 align-self-end">
+                                                <div class="col-md-4 align-self-end">
                                                     <button type="submit" class="btn mn-btn-glow w-100 py-2.5" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px;">
                                                         <i class="bx bx-check-circle fs-5"></i> Create Section
                                                     </button>
