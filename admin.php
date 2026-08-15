@@ -495,7 +495,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_house']
     $price_inr = (float)($_POST['price_inr'] ?? 0);
     $price_usd = (float)($_POST['price_usd'] ?? 0);
     $stock = (int)($_POST['stock_quantity'] ?? 0);
-    $status_input = trim($_POST['status'] ?? 'active');
 
     $house_name = isset($_POST['house_name']) ? trim($_POST['house_name']) : '';
     $badge = isset($_POST['badge']) ? trim($_POST['badge']) : null;
@@ -506,10 +505,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_house']
         $icon = $uploaded_icon;
     }
 
-    $status = ($status_input === 'inactive' || $status_input === 'disabled') ? 'inactive' : 'active';
-    $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
-
-    $stmt_old = $db->prepare("SELECT name, badge, icon FROM products WHERE id = ?");
+    $stmt_old = $db->prepare("SELECT name, badge, icon, status, availability_status FROM products WHERE id = ?");
     $stmt_old->execute([$prod_id]);
     $old = $stmt_old->fetch();
 
@@ -521,6 +517,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_house']
     }
     if ($icon === null && $old) {
         $icon = $old['icon'];
+    }
+
+    if (isset($_POST['status'])) {
+        $status_input = trim($_POST['status']);
+        $status = ($status_input === 'inactive' || $status_input === 'disabled') ? 'inactive' : 'active';
+        $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
+    } else if ($old) {
+        $status = $old['status'];
+        $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
+    } else {
+        $status = 'active';
+        $availability = ($stock > 0) ? 'available' : 'out_of_stock';
     }
 
     $stmt = $db->prepare("UPDATE products SET name = ?, badge = ?, icon = ?, price_inr = ?, price_usd = ?, stock_quantity = ?, status = ?, availability_status = ? WHERE id = ?");
@@ -545,14 +553,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_delete_house']
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_toggle_house_status'])) {
     $prod_id = (int)$_POST['product_id'];
     $sec_id = (int)$_POST['section_id'];
-    $current_status = trim($_POST['current_status'] ?? 'active');
-    $new_status = ($current_status === 'active') ? 'inactive' : 'active';
-    $availability = ($new_status === 'inactive') ? 'disabled' : 'available';
+
+    $stmt_curr = $db->prepare("SELECT status, availability_status, stock_quantity FROM products WHERE id = ?");
+    $stmt_curr->execute([$prod_id]);
+    $curr = $stmt_curr->fetch();
+
+    $is_currently_disabled = ($curr && ($curr['status'] === 'inactive' || $curr['availability_status'] === 'disabled'));
+
+    if ($is_currently_disabled) {
+        $new_status = 'active';
+        $stock = (int)($curr['stock_quantity'] ?? 0);
+        $new_availability = ($stock > 0) ? 'available' : 'out_of_stock';
+        $label = 'Enabled';
+    } else {
+        $new_status = 'inactive';
+        $new_availability = 'disabled';
+        $label = 'Disabled';
+    }
 
     $stmt = $db->prepare("UPDATE products SET status = ?, availability_status = ? WHERE id = ?");
-    $stmt->execute([$new_status, $availability, $prod_id]);
+    $stmt->execute([$new_status, $new_availability, $prod_id]);
 
-    $label = ($new_status === 'active') ? 'Enabled' : 'Disabled';
     $_SESSION['success_msg'] = "House status updated to {$label}!";
     header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
     exit;
