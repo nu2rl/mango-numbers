@@ -1465,7 +1465,6 @@ function get_flag($country) {
         <span>Mango <b>Number</b></span>
       </a>
       <ul class="gm-nav-links" id="navLinks">
-        <li><a href="#pricing">Pricing Catalog</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
@@ -1488,7 +1487,6 @@ function get_flag($country) {
   <div class="mobile-menu" id="mobileMenu">
     <button class="mobile-close" onclick="toggleMobileMenu()">✕</button>
     <a href="index.php" onclick="toggleMobileMenu()">Home</a>
-    <a href="#pricing" onclick="toggleMobileMenu()">Pricing Catalog</a>
     <a href="#how-it-works" onclick="toggleMobileMenu()">How It Works</a>
     <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
     <?php if (is_logged_in()): ?>
@@ -1669,7 +1667,7 @@ function get_flag($country) {
 
     <!-- ─── EXISTING HERO CONTENT (unchanged) ─── -->
     <main class="hero-main">
-      <div class="gm-badge" role="note" onclick="location.href='#pricing'">
+      <div class="gm-badge" role="note" onclick="location.href='dashboard.php'">
         <span class="badge-dot" aria-hidden="true"></span>
         <span class="badge-text">Secure &amp; Instant OTP Verification</span>
       </div>
@@ -1845,143 +1843,6 @@ function get_flag($country) {
   </section>
 
 
-  <!-- ─── COUNTRY CATALOG PREVIEW ─── -->
-  <section class="section" id="pricing">
-    <div class="section-inner">
-      <div class="text-center">
-        <div class="section-tag">📈 Live Stock</div>
-        <h2 class="section-title">Country & Pricing Catalog</h2>
-        <p class="section-sub centered">Pick your preferred platform, filter by country, and select a secure virtual verification number from our catalog.</p>
-      </div>
-
-      <div class="tabs-container">
-        <div class="tabs">
-          <button class="tab-btn active" onclick="switchTab('telegram')">Telegram Numbers</button>
-          <button class="tab-btn" onclick="switchTab('whatsapp')">WhatsApp Numbers</button>
-        </div>
-      </div>
-
-      <!-- Premium Country Search Box -->
-      <div style="display: flex; justify-content: center; margin: -10px auto 36px auto; padding: 0 16px; max-width: 100%;">
-        <div style="
-          position: relative;
-          width: 100%;
-          max-width: 460px;
-          background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(46,125,50,0.12) 100%);
-          border: 2px solid transparent;
-          border-radius: 18px;
-          background-clip: padding-box;
-          box-shadow: 0 0 0 2px rgba(255,140,0,0.45), 0 8px 32px rgba(255,140,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-        ">
-          <!-- Left Icon -->
-          <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 17px; pointer-events: none; line-height: 1;">🔍</span>
-          <!-- Input -->
-          <input
-            type="text"
-            id="countrySearchInput"
-            placeholder="Search country... (China, India, USA)"
-            onkeyup="filterCountryCatalog()"
-            style="
-              width: 100%;
-              border: none;
-              background: transparent;
-              padding: 13px 42px 13px 42px;
-              border-radius: 16px;
-              font-family: inherit;
-              font-size: 14.5px;
-              color: #1A1208;
-              outline: none;
-              font-weight: 600;
-              letter-spacing: 0.1px;
-              box-sizing: border-box;
-            "
-          >
-          <!-- Clear button (shown when typing) -->
-          <span id="searchClearBtn" onclick="clearCountrySearch()" style="
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            font-size: 14px; cursor: pointer; color: rgba(26,18,8,0.4);
-            display: none; line-height: 1; padding: 4px; border-radius: 50%;
-            transition: color 0.2s;
-          ">✕</span>
-        </div>
-      </div>
-
-
-      <!-- Telegram Catalog panel -->
-      <div class="catalog-panel active" id="panel-telegram">
-        <?php if (!empty($telegram_items)): ?>
-          <?php foreach ($telegram_items as $item): ?>
-            <div class="catalog-card">
-              <div class="card-header-info">
-                <div class="country-flag-name">
-                  <span class="flag"><?= get_flag($item['country']) ?></span>
-                  <span class="country-name"><?= htmlspecialchars($item['country']) ?></span>
-                </div>
-                <span class="stock-badge <?= $item['stock'] > 0 ? 'stock-in' : 'stock-out' ?>">
-                  <?= $item['stock'] > 0 ? 'Stock: ' . $item['stock'] : 'Out of Stock' ?>
-                </span>
-              </div>
-              <div class="product-name">
-                <strong>Service:</strong> <?= htmlspecialchars($item['name']) ?>
-              </div>
-              <div class="card-footer">
-                <div class="price-box">
-                  <div class="price-inr">₹<?= number_format($item['price_inr'], 0) ?></div>
-                  <div class="price-usd">$<?= number_format($item['price_usd'], 2) ?></div>
-                </div>
-                <a href="<?= is_logged_in() ? 'dashboard.php' : 'login.php' ?>" class="btn-card-buy <?= $item['stock'] > 0 ? '' : 'disabled' ?>">
-                  <?= $item['stock'] > 0 ? 'Get Number' : 'Sold Out' ?>
-                </a>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <div style="grid-column: 1/-1; text-align: center; color: rgba(26,18,8,0.5); padding: 40px 0; font-weight: 500;">
-            No live Telegram stock catalog items available currently. Check back soon.
-          </div>
-        <?php endif; ?>
-      </div>
-
-      <!-- WhatsApp Catalog panel -->
-      <div class="catalog-panel" id="panel-whatsapp">
-        <?php if (!empty($whatsapp_items)): ?>
-          <?php foreach ($whatsapp_items as $item): ?>
-            <div class="catalog-card">
-              <div class="card-header-info">
-                <div class="country-flag-name">
-                  <span class="flag"><?= get_flag($item['country']) ?></span>
-                  <span class="country-name"><?= htmlspecialchars($item['country']) ?></span>
-                </div>
-                <span class="stock-badge <?= $item['stock'] > 0 ? 'stock-in' : 'stock-out' ?>">
-                  <?= $item['stock'] > 0 ? 'Stock: ' . $item['stock'] : 'Out of Stock' ?>
-                </span>
-              </div>
-              <div class="product-name">
-                <strong>Service:</strong> <?= htmlspecialchars($item['name']) ?>
-              </div>
-              <div class="card-footer">
-                <div class="price-box">
-                  <div class="price-inr">₹<?= number_format($item['price_inr'], 0) ?></div>
-                  <div class="price-usd">$<?= number_format($item['price_usd'], 2) ?></div>
-                </div>
-                <a href="<?= is_logged_in() ? 'dashboard.php' : 'login.php' ?>" class="btn-card-buy <?= $item['stock'] > 0 ? '' : 'disabled' ?>">
-                  <?= $item['stock'] > 0 ? 'Get Number' : 'Sold Out' ?>
-                </a>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <div style="grid-column: 1/-1; text-align: center; color: rgba(26,18,8,0.5); padding: 40px 0; font-weight: 500;">
-            No live WhatsApp stock catalog items available currently. Check back soon.
-          </div>
-        <?php endif; ?>
-      </div>
-
-    </div>
-  </section>
-
   <!-- ─── FEATURES PILLARS GRID ─── -->
   <section class="section" style="background: rgba(255, 255, 255, 0.4); border-top: 1px solid rgba(255,255,255,0.7);">
     <div class="section-inner">
@@ -2120,7 +1981,7 @@ function get_flag($country) {
         </div>
         <div class="footer-col">
           <h4>Platform Navigation</h4>
-          <a href="#pricing">Pricing Catalog</a>
+          <a href="dashboard.php">Buy Virtual Numbers</a>
           <a href="#how-it-works">How It Works</a>
           <a href="login.php">User Login</a>
           <a href="register.php">User Registration</a>
