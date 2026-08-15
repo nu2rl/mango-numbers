@@ -395,9 +395,18 @@ function get_flag_icon($country) {
         .dashboard-section.active { display: block; }
 
         /* ── Alerts ── */
-        .alert-bar { border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
-        .alert-success { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
-        .alert-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+        .alert-bar { 
+            border-radius: 14px; padding: 14px 20px; margin-bottom: 24px; 
+            font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; 
+            backdrop-filter: blur(12px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            animation: alertSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes alertSlideDown {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .alert-success { background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px solid rgba(34, 197, 94, 0.4); color: #86efac; }
+        .alert-error { background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(225, 29, 72, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
 
         /* ── Section header ── */
         .section-title { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
@@ -1185,10 +1194,23 @@ function get_flag_icon($country) {
                                 </div>
                             </div>
 
-                            <label for="prof_avatar">Change Profile Picture (Optional)</label>
-                            <div class="input-icon-wrap">
-                                <i class="bx bx-image-add icon-prefix"></i>
-                                <input type="file" name="avatar" id="prof_avatar" accept="image/jpeg,image/png,image/webp" style="padding-top: 10px;">
+                            <label>Change Profile Picture (Optional)</label>
+                            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px; padding: 14px 16px; background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%); border: 1.5px dashed rgba(249,115,22,0.35); border-radius: 14px; transition: border-color 0.2s;">
+                                <div id="prof-pfp-preview-wrap" style="width: 48px; height: 48px; border-radius: 50%; background: var(--elevated); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; box-shadow: 0 0 16px rgba(249,115,22,0.35);">
+                                    <?php if (!empty($user_avatar) && file_exists(__DIR__ . '/' . $user_avatar)): ?>
+                                        <img id="prof-pfp-img" src="<?= htmlspecialchars($user_avatar) ?>" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <?php else: ?>
+                                        <span id="prof-pfp-placeholder" style="font-size: 22px;">👤</span>
+                                        <img id="prof-pfp-img" src="" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                    <?php endif; ?>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <label for="prof_avatar" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, #f97316, #fb923c); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 9px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 14px rgba(249,115,22,0.3); margin-bottom: 3px;">
+                                        <i class="bx bx-camera" style="font-size: 16px;"></i> Choose New Photo
+                                    </label>
+                                    <input type="file" name="avatar" id="prof_avatar" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="previewProfAvatar(this)">
+                                    <div style="font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="prof-pfp-filename">Supports JPG, PNG, WebP (Max 10MB)</div>
+                                </div>
                             </div>
 
                             <label for="prof_name">Full Name</label>
@@ -1333,6 +1355,23 @@ function get_flag_icon($country) {
                 field.type = 'password';
                 icon.classList.remove('bx-show');
                 icon.classList.add('bx-hide');
+            }
+        }
+
+        // Preview Profile Avatar Image
+        function previewProfAvatar(input) {
+            var fnLabel = document.getElementById('prof-pfp-filename');
+            var placeholder = document.getElementById('prof-pfp-placeholder');
+            var imgPreview = document.getElementById('prof-pfp-img');
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                if (fnLabel) fnLabel.innerText = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    if (imgPreview) { imgPreview.src = e.target.result; imgPreview.style.display = 'block'; }
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
             }
         }
 
