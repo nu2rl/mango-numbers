@@ -818,7 +818,7 @@ function get_flag_icon($country) {
                                     <th>Amount</th>
                                     <th>UTR</th>
                                     <th>Status</th>
-                                    <th>Virtual Number</th>
+                                    <th>ID / Number</th>
                                     <th>Support</th>
                                     <th>Re-order</th>
                                 </tr>

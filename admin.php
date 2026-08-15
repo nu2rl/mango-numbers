@@ -305,9 +305,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_approve'])) {
     $active_tab = $_POST['active_tab'] ?? 'approvals';
     
     if (empty($virtual_number)) {
-        $_SESSION['error_msg'] = 'Virtual number is required for approval.';
-    } elseif (!preg_match('/^\+?[0-9]+$/', $virtual_number) || strlen($virtual_number) > 12) {
-        $_SESSION['error_msg'] = 'Virtual number must only contain digits and an optional leading plus sign (+), up to 12 characters in total.';
+        $_SESSION['error_msg'] = 'ID / Number is required for approval.';
+    } elseif (strlen($virtual_number) > 255) {
+        $_SESSION['error_msg'] = 'ID / Number exceeds maximum length of 255 characters.';
     } else {
         // Fetch purchase details
         $stmt = $db->prepare("SELECT * FROM purchases WHERE id = ? AND status = 'pending'");
@@ -1826,7 +1826,7 @@ if ($view_section_id > 0) {
                                                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                                 <input type="hidden" name="active_tab" value="approvals">
                                                                 <input type="hidden" name="purchase_id" value="<?= $p['id'] ?>">
-                                                                <input class="form-control form-control-sm" type="text" name="virtual_number" placeholder="Enter Virtual Number" style="width: 170px;" required maxlength="12" pattern="^\+?[0-9]+$" oninput="this.value = this.value.replace(/[^0-9+]/g, '')">
+                                                                <input class="form-control form-control-sm" type="text" name="virtual_number" placeholder="Enter ID / Number" style="width: 180px;" required maxlength="255">
                                                                 
                                                                 <button type="submit" name="action_approve" class="btn btn-sm btn-success">Approve</button>
                                                                 <button type="button" class="btn btn-sm btn-danger" onclick="confirmOrderRejection(this.form)">Reject</button>
