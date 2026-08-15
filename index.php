@@ -12,15 +12,23 @@ $db_error = false;
 
 if ($db) {
     try {
-        // Fetch Telegram items
+        // Fetch Telegram items (from products table first, fallback/merge catalog)
+        $stmt = $db->prepare("SELECT p.*, p.stock_quantity as stock, s.name as service_type FROM products p JOIN sections s ON p.section_id = s.id WHERE s.name LIKE '%Telegram%' AND p.status = 'active' ORDER BY p.price_inr ASC");
+        $stmt->execute();
+        $tg_products = $stmt->fetchAll();
+
         $stmt = $db->prepare("SELECT * FROM catalog WHERE service_type = 'Telegram' AND status = 'active' ORDER BY price_inr ASC");
         $stmt->execute();
-        $telegram_items = $stmt->fetchAll();
+        $telegram_items = array_merge($tg_products, $stmt->fetchAll());
 
         // Fetch WhatsApp items
+        $stmt = $db->prepare("SELECT p.*, p.stock_quantity as stock, s.name as service_type FROM products p JOIN sections s ON p.section_id = s.id WHERE s.name LIKE '%WhatsApp%' AND p.status = 'active' ORDER BY p.price_inr ASC");
+        $stmt->execute();
+        $wa_products = $stmt->fetchAll();
+
         $stmt = $db->prepare("SELECT * FROM catalog WHERE service_type = 'WhatsApp' AND status = 'active' ORDER BY price_inr ASC");
         $stmt->execute();
-        $whatsapp_items = $stmt->fetchAll();
+        $whatsapp_items = array_merge($wa_products, $stmt->fetchAll());
     } catch (PDOException $e) {
         $db_error = true;
     }

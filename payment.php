@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
     $tmp_name = $_FILES['payment_screenshot']['tmp_name'];
     $orig_name = $_FILES['payment_screenshot']['name'];
     $ext = strtolower(pathinfo($orig_name, PATHINFO_EXTENSION));
-    if (!in_array($ext, ['jpg','jpeg','png'])) { $_SESSION['error_msg'] = 'Only JPG, JPEG, and PNG are allowed.'; header("Location: payment.php?id=" . $catalog_id); exit; }
+    if (!in_array($ext, ['jpg','jpeg','png','webp'])) { $_SESSION['error_msg'] = 'Only JPG, JPEG, PNG, and WEBP images are allowed.'; header("Location: payment.php?id=" . $catalog_id); exit; }
     $finfo = finfo_open(FILEINFO_MIME_TYPE); $mime = finfo_file($finfo, $tmp_name); finfo_close($finfo);
-    if (!in_array($mime, ['image/jpeg','image/jpg','image/png','image/x-png'])) { $_SESSION['error_msg'] = 'Invalid image format.'; header("Location: payment.php?id=" . $catalog_id); exit; }
+    if (!in_array($mime, ['image/jpeg','image/jpg','image/png','image/x-png','image/webp'])) { $_SESSION['error_msg'] = 'Invalid image format.'; header("Location: payment.php?id=" . $catalog_id); exit; }
     ini_set('memory_limit', '256M');
     $has_gd = function_exists('imagecreatefromjpeg');
     if (!$has_gd) {
@@ -261,8 +261,8 @@ function get_country_flag($country) {
                         <input type="text" name="utr_number" id="utr_number" placeholder="Enter 12-digit UPI UTR" required maxlength="12" pattern="\d{12}">
                     </div>
                     <div>
-                        <label for="payment_screenshot">Payment Screenshot Proof (JPG, PNG)</label>
-                        <input type="file" name="payment_screenshot" id="payment_screenshot" accept="image/jpeg,image/jpg,image/png" required>
+                        <label for="payment_screenshot">Payment Screenshot Proof (JPG, PNG, WEBP)</label>
+                        <input type="file" name="payment_screenshot" id="payment_screenshot" accept="image/jpeg,image/jpg,image/png,image/webp" required>
                         <p class="file-hint">Max 10MB. Auto-compressed to WebP.</p>
                     </div>
                     <button type="submit" name="submit_purchase" class="btn-submit" id="submit-btn">
@@ -311,7 +311,7 @@ function get_country_flag($country) {
             const fileInput = document.getElementById('payment_screenshot');
             if (fileInput.files.length === 0) { alert("Please select your payment screenshot."); return false; }
             const file = fileInput.files[0];
-            if (!['jpg','jpeg','png'].includes(file.name.split('.').pop().toLowerCase())) { alert("Only JPG, JPEG, and PNG files are allowed."); return false; }
+            if (!['jpg','jpeg','png','webp'].includes(file.name.split('.').pop().toLowerCase())) { alert("Only JPG, JPEG, PNG, and WEBP files are allowed."); return false; }
             if (file.size > 10 * 1024 * 1024) { alert("File size exceeds 10MB limit."); return false; }
             const btn = document.getElementById('submit-btn');
             btn.style.pointerEvents = 'none';
