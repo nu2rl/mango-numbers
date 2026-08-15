@@ -518,8 +518,11 @@ function get_flag_icon($country) {
                                     <div>
                                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                <?php if (!empty($item['icon']) && str_contains($item['icon'], 'http')): ?>
-                                                    <img src="<?= htmlspecialchars($item['icon']) ?>" style="width:28px; height:28px; object-fit:contain;">
+                                                <?php 
+                                                    $item_has_img = (!empty($item['icon']) && (str_contains($item['icon'], 'uploads/') || str_contains($item['icon'], 'http')));
+                                                ?>
+                                                <?php if ($item_has_img): ?>
+                                                    <img src="<?= htmlspecialchars($item['icon']) ?>" style="width:28px; height:28px; object-fit:contain; border-radius:6px;">
                                                 <?php else: ?>
                                                     <i class="bx <?= htmlspecialchars(!empty($item['icon']) ? $item['icon'] : 'bx-package') ?>" style="font-size:24px; color: var(--accent);"></i>
                                                 <?php endif; ?>
