@@ -1,11 +1,25 @@
 {
   "version": 1,
   "skills": {
+    "anti-ui-slop": {
+      "source": "uizze.com",
+      "sourceUrl": "https://uizze.com/",
+      "sourceType": "well-known",
+      "computedHash": "84e84ab2044d5c7f6e5391ad32b4ad3e6ccaac12df84e4bda5e164a67e24e847",
+      "wellKnownDigest": "sha256:1ee631545edf8384f977f96e7c399dd056129ceb49fe4093e96ba033012ac0a8"
+    },
     "tailwind-4-docs": {
       "source": "Lombiq/Tailwind-Agent-Skills",
       "sourceType": "github",
       "skillPath": "skills/tailwind-4-docs/SKILL.md",
       "computedHash": "de756f5f03cc20a029983875b00b9dfef9d0ba8567d242c5cbb0262037d0a134"
+    },
+    "ui-design": {
+      "source": "uizze.com",
+      "sourceUrl": "https://uizze.com/",
+      "sourceType": "well-known",
+      "computedHash": "81a293cfc820db950e6dd2e10aac7f78890e69b85e5c4a4580db67e7ced03abd",
+      "wellKnownDigest": "sha256:90f48eadee56cbce4ce06afb8d3a382b4ad92633f403c03b0d9d480722247b75"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
