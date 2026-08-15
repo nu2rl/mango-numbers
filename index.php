@@ -225,6 +225,15 @@ function get_flag($country) {
     }
     .hero-hl:hover { transform: rotate(2deg) scale(1.05); }
 
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50% { transform: translateY(-5px) rotate(0.5deg); }
+    }
+    @keyframes floatSlowReverse {
+      0%, 100% { transform: translateY(0px) rotate(0.8deg); }
+      50% { transform: translateY(-5px) rotate(-0.8deg); }
+    }
+
     /* ── Telegram Pill ── */
     .hero-telegram-pill {
       display: inline-flex; align-items: center; gap: 8px;
@@ -232,13 +241,13 @@ function get_flag($country) {
       color: #fff; font-weight: 900;
       padding: 4px 20px 4px 10px; border-radius: 999px;
       box-shadow: 0 8px 28px rgba(0,136,204,0.38), inset 0 2px 0 rgba(255,255,255,0.25);
-      transform: rotate(-1deg); display: inline-flex; align-items: center; gap: 8px;
+      transform: rotate(-1deg); vertical-align: middle;
       transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), box-shadow 0.3s;
-      cursor: default; vertical-align: middle;
-      position: relative; top: -4px;
+      cursor: default; position: relative; top: -4px;
       backdrop-filter: blur(4px);
+      animation: floatSlow 4.5s ease-in-out infinite;
     }
-    .hero-telegram-pill:hover { transform: rotate(1deg) scale(1.04); box-shadow: 0 12px 36px rgba(0,136,204,0.5); }
+    .hero-telegram-pill:hover { transform: rotate(1deg) scale(1.06); box-shadow: 0 12px 36px rgba(0,136,204,0.5); }
     .hero-telegram-pill svg { width: 0.72em; height: 0.72em; flex-shrink: 0; }
 
     /* ── WhatsApp Pill ── */
@@ -248,13 +257,13 @@ function get_flag($country) {
       color: #fff; font-weight: 900;
       padding: 4px 20px 4px 10px; border-radius: 999px;
       box-shadow: 0 8px 28px rgba(37,211,102,0.38), inset 0 2px 0 rgba(255,255,255,0.25);
-      transform: rotate(0.8deg); display: inline-flex; align-items: center; gap: 8px;
+      transform: rotate(0.8deg); vertical-align: middle;
       transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), box-shadow 0.3s;
-      cursor: default; vertical-align: middle;
-      position: relative; top: -4px;
+      cursor: default; position: relative; top: -4px;
       backdrop-filter: blur(4px);
+      animation: floatSlowReverse 5.2s ease-in-out infinite;
     }
-    .hero-whatsapp-pill:hover { transform: rotate(-1deg) scale(1.04); box-shadow: 0 12px 36px rgba(37,211,102,0.5); }
+    .hero-whatsapp-pill:hover { transform: rotate(-1deg) scale(1.06); box-shadow: 0 12px 36px rgba(37,211,102,0.5); }
     .hero-whatsapp-pill svg { width: 0.72em; height: 0.72em; flex-shrink: 0; }
     
     .hero-sub {
