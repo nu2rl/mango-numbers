@@ -100,6 +100,7 @@ $order_count = $db->prepare("SELECT COUNT(*) FROM purchases WHERE user_id = ? AN
 $stmt = $db->prepare("SELECT * FROM catalog WHERE status = 'active' ORDER BY service_type DESC, price_inr ASC"); $stmt->execute(); $catalog_items = $stmt->fetchAll();
 $canva_stmt = $db->query("SELECT * FROM catalog WHERE name LIKE '%Canva Premium Lifetime%' AND status = 'active' LIMIT 1"); $canva_item = $canva_stmt ? $canva_stmt->fetch() : null;
 $stmt = $db->prepare("SELECT * FROM purchases WHERE user_id = ? ORDER BY id DESC"); $stmt->execute([$user_id]); $purchases = $stmt->fetchAll();
+$comp_stmt = $db->prepare("SELECT * FROM complaints WHERE user_id = ? ORDER BY id DESC"); $comp_stmt->execute([$user_id]); $complaints = $comp_stmt->fetchAll();
 $active_sections = [];
 try {
     $sections_stmt = $db->query("SELECT * FROM sections WHERE status = 'active' ORDER BY display_order ASC, id ASC");
