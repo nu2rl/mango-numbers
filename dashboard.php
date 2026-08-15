@@ -502,9 +502,6 @@ function get_flag_icon($country) {
                     <button class="filter-tab" id="tab-wa" onclick="filterService('WhatsApp', this)">
                         <i class="bx bxl-whatsapp" style="font-size:17px;color:#22c55e;"></i> WhatsApp
                     </button>
-                    <button class="filter-tab" id="tab-canva" onclick="filterService('Canva', this)">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" fill="#00C4CC"/></svg> Canva Premium
-                    </button>
                 </div>
 
                 <div class="search-wrap">
