@@ -933,8 +933,23 @@ foreach ($monthly_raw as $row) {
 }
 // Fetch Sections & Products for Manage Offers
 $sections_list = [];
+$total_services_count = 0;
+$active_services_count = 0;
+$disabled_services_count = 0;
+
 try {
-    $sections_list = $db->query("SELECT s.*, (SELECT COUNT(*) FROM products p WHERE p.section_id = s.id) as house_count FROM sections s ORDER BY s.display_order ASC, s.id DESC")->fetchAll();
+    $sections_list = $db->query("
+        SELECT s.*, 
+               (SELECT COUNT(*) FROM products p WHERE p.section_id = s.id) as house_count,
+               (SELECT COUNT(*) FROM products p WHERE p.section_id = s.id AND (p.status = 'active' AND p.availability_status != 'disabled')) as active_count,
+               (SELECT COUNT(*) FROM products p WHERE p.section_id = s.id AND (p.status = 'inactive' OR p.availability_status = 'disabled')) as disabled_count
+        FROM sections s 
+        ORDER BY s.display_order ASC, s.id DESC
+    ")->fetchAll();
+
+    $total_services_count = (int)$db->query("SELECT COUNT(*) FROM products")->fetchColumn();
+    $active_services_count = (int)$db->query("SELECT COUNT(*) FROM products WHERE status = 'active' AND availability_status != 'disabled'")->fetchColumn();
+    $disabled_services_count = (int)$db->query("SELECT COUNT(*) FROM products WHERE status = 'inactive' OR availability_status = 'disabled'")->fetchColumn();
 } catch (Exception $e) {}
 
 $view_section_id = isset($_GET['view_section']) ? (int)$_GET['view_section'] : 0;
@@ -964,7 +979,7 @@ if ($view_section_id > 0) {
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
     <!-- Core CSS -->
     <link rel="stylesheet" href="assets/vendor/css/core.css" class="template-customizer-core-css" />
@@ -976,77 +991,111 @@ if ($view_section_id > 0) {
 
     <style>
         :root {
-            --primary-bg: #fffbf5;
-            --accent-orange: #ff5e36;
-            --accent-yellow: #fca834;
-            --gradient-accent: linear-gradient(135deg, var(--accent-orange), var(--accent-yellow));
-            --text-dark: #231b15;
-            --text-light: #6e5e54;
+            --primary-accent: #FF8A1F;
+            --primary-hover: #E0730F;
+            --bg-body: #F7F8FA;
+            --bg-card: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --border-color: #E5E7EB;
+            --color-success: #16A34A;
+            --color-danger: #DC2626;
+            --color-warning: #F59E0B;
+            --color-info: #2563EB;
         }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--primary-bg) !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            background-color: var(--bg-body) !important;
+            color: var(--text-primary) !important;
         }
 
         .brand-text {
-            font-family: 'Outfit', sans-serif;
-            font-size: 22px;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 20px;
             font-weight: 800;
-            background: var(--gradient-accent);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #FFFFFF !important;
+            letter-spacing: -0.3px;
         }
 
-        /* Sidebar custom coloring */
+        /* Sidebar Clean SaaS Styling */
+        aside#layout-menu {
+            background-color: #111827 !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            height: 100vh !important;
+        }
+
+        aside#layout-menu .menu-inner {
+            flex: 1 1 auto !important;
+            overflow-y: auto !important;
+        }
+
         .bg-menu-theme {
-            background-color: #1e1b19 !important;
-            color: #d1c5bc !important;
-        }
-
-        .bg-menu-theme .menu-item.active > .menu-link {
-            background: var(--gradient-accent) !important;
-            color: #ffffff !important;
-            font-weight: 600;
+            background-color: #111827 !important;
+            color: #9CA3AF !important;
         }
 
         .bg-menu-theme .menu-link {
-            color: #9c8e85 !important;
+            color: #9CA3AF !important;
+            border-radius: 8px !important;
+            margin: 2px 14px !important;
+            padding: 9px 14px !important;
+            font-weight: 500 !important;
+            font-size: 13.5px !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .bg-menu-theme .menu-item.active > .menu-link {
+            background-color: var(--primary-accent) !important;
+            color: #FFFFFF !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 14px rgba(255, 138, 31, 0.3) !important;
         }
 
         .bg-menu-theme .menu-item:not(.active) .menu-link:hover {
-            color: #ffffff !important;
-            background-color: rgba(255, 255, 255, 0.04) !important;
+            color: #FFFFFF !important;
+            background-color: rgba(255, 255, 255, 0.06) !important;
         }
 
+        /* Top Navbar */
         .layout-navbar {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.8) !important;
-            border-bottom: 1px solid rgba(220, 200, 190, 0.4);
+            background: #FFFFFF !important;
+            border: 1px solid #E5E7EB !important;
+            border-radius: 14px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+            margin-top: 16px !important;
+            height: 64px !important;
         }
 
-        /* Widgets stats */
-        .stat-card {
-            border: 1px solid rgba(220, 200, 190, 0.4);
-            border-radius: 16px;
-            background: #ffffff;
-            box-shadow: 0 4px 15px rgba(25, 10, 5, 0.01);
-            transition: all 0.3s ease;
+        /* Stat Cards */
+        .stat-card-widget {
+            border: 1px solid #E5E7EB;
+            border-radius: 14px;
+            background: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-
-        .stat-card:hover {
+        .stat-card-widget:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 94, 54, 0.04);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
         }
 
-        .stat-icon-wrapper {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
+        /* Section Cards Hover Micro-interactions */
+        .section-card-item .card {
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            background: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .section-card-item .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+            border-color: #D1D5DB !important;
         }
 
         /* Admin Action Tabs */
@@ -1063,11 +1112,10 @@ if ($view_section_id > 0) {
             height: 50px;
             object-fit: cover;
             border-radius: 8px;
-            border: 1px solid rgba(220, 200, 190, 0.5);
+            border: 1px solid #E5E7EB;
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
         .screenshot-thumb:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -1099,221 +1147,45 @@ if ($view_section_id > 0) {
             max-width: 100%;
             max-height: 70vh;
             border-radius: 8px;
-            border: 1px solid rgba(220, 200, 190, 0.4);
+            border: 1px solid #E5E7EB;
             margin-bottom: 15px;
         }
 
-        /* Flexbox sidebar layout to keep profile widget at bottom */
-        aside#layout-menu {
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-            height: 100vh !important;
-        }
-        
-        aside#layout-menu .menu-inner {
-            flex: 1 1 auto !important;
-            overflow-y: auto !important;
-        }
-
-        /* Sidebar styling override for dark aesthetics */
-        .bg-menu-theme {
-            background-color: #18120e !important;
-            color: #d1c5bc !important;
-        }
-        
-        .bg-menu-theme .menu-inner-shadow {
-            background: linear-gradient(#18120e, rgba(24, 18, 14, 0));
-        }
-
-        .bg-menu-theme .menu-link {
-            color: #8c7e75 !important;
-        }
-
-        .bg-menu-theme .menu-item.active > .menu-link {
-            background: var(--gradient-accent) !important;
-            color: #ffffff !important;
-            font-weight: 600;
-        }
-
-        .bg-menu-theme .menu-item:not(.active) .menu-link:hover {
-            color: #ffffff !important;
-            background-color: rgba(255, 255, 255, 0.05) !important;
-        }
-
-        /* Profile Widget styling at the bottom of sidebar */
+        /* Compact Profile Card at Sidebar Bottom */
         .sidebar-profile-card {
-            background: linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(255, 140, 0, 0.15) 100%);
-            border: 1.5px solid rgba(255, 140, 0, 0.3);
-            border-radius: 20px;
-            padding: 16px;
-            margin: 15px;
-            text-align: center;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            position: relative;
-            z-index: 10;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 14px;
+            margin: 12px;
         }
 
-        .sidebar-profile-name {
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-            text-transform: capitalize;
-            letter-spacing: -0.2px;
-        }
-
-        .sidebar-profile-email-box {
-            background: rgba(24, 18, 14, 0.6);
-            border: 1.5px dashed rgba(46, 125, 50, 0.45);
-            border-radius: 12px;
-            padding: 6px 10px;
-            margin-bottom: 12px;
-            word-break: break-all;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .sidebar-profile-email {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 500;
-        }
-
-        .sidebar-profile-spend-box {
-            font-size: 11.5px;
-            color: rgba(209, 197, 188, 0.85);
-            margin-bottom: 14px;
-            font-weight: 600;
-        }
-
-        .sidebar-profile-spend-val {
-            font-family: 'Outfit', sans-serif;
-            font-size: 13.5px;
-            font-weight: 800;
-            color: #4caf50;
-            display: inline-block;
-            margin-left: 4px;
-        }
-
-        .sidebar-profile-logout-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #FF8C00 0%, #FFA726 100%);
-            color: #ffffff !important;
-            font-family: 'Outfit', sans-serif;
-            font-size: 12.5px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.25);
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .sidebar-profile-logout-btn:hover {
-            transform: translateY(-1.5px);
-            box-shadow: 0 6px 16px rgba(255, 140, 0, 0.4);
-            background: linear-gradient(135deg, #e65100 0%, #ff8f00 100%);
-        }
-
-        /* Responsive Mobile Layout Adjustments */
+        /* Responsive Adjustments */
         @media (max-width: 1199px) {
-            /* Enable toggling transition and keep profile pinned at bottom on mobile/tablet */
             aside#layout-menu {
                 transition: transform 0.3s ease-in-out !important;
                 height: 100dvh !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
                 overflow: hidden !important;
             }
-            aside#layout-menu .menu-inner {
-                flex: 1 1 auto !important;
-                overflow-y: auto !important;
-            }
-            /* Shift navbar title to make space for the floating hamburger button */
             #navbar-title-text {
                 padding-left: 45px !important;
-            }
-            /* Compact profile widget on mobile to prevent cutoffs and scrolling */
-            .sidebar-profile-card {
-                margin: 10px 12px min(25px, env(safe-area-inset-bottom)) 12px !important;
-                padding: 10px 12px !important;
-                border-radius: 14px !important;
-            }
-            .sidebar-profile-name {
-                font-size: 13.5px !important;
-                margin-bottom: 4px !important;
-            }
-            .sidebar-profile-email-box {
-                padding: 4px 8px !important;
-                margin-bottom: 6px !important;
-                border-radius: 8px !important;
-            }
-            .sidebar-profile-email {
-                font-size: 10px !important;
-            }
-            .sidebar-profile-spend-box {
-                font-size: 11px !important;
-                margin-bottom: 8px !important;
-            }
-            .sidebar-profile-spend-val {
-                font-size: 11.5px !important;
-            }
-            .sidebar-profile-logout-btn {
-                padding: 8px !important;
-                font-size: 11.5px !important;
-                border-radius: 8px !important;
-            }
-        }
-
-        @media (max-width: 767px) {
-            /* Table formatting and container optimizations for mobile */
-            .container-xxl {
-                padding-left: 14px !important;
-                padding-right: 14px !important;
-            }
-            .stat-card {
-                margin-bottom: 14px;
-            }
-            .table th, .table td {
-                padding: 12px 14px !important;
-                font-size: 13px !important;
-            }
-            /* Modals safety padding */
-            .lightbox-overlay {
-                padding: 14px !important;
-            }
-            .lightbox-overlay .card {
-                padding: 20px !important;
-                max-height: 90vh;
-                overflow-y: auto;
             }
         }
 
         .chart-period-btn {
             padding: 6px 16px;
             border-radius: 20px;
-            border: 1.5px solid rgba(220,200,190,0.6);
+            border: 1.5px solid #E5E7EB;
             background: transparent;
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-light);
+            color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .chart-period-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .chart-period-btn:hover { border-color: var(--primary-accent); color: var(--primary-accent); }
         .chart-period-btn.active {
-            background: var(--gradient-accent);
+            background: var(--primary-accent);
             border-color: transparent;
             color: #fff;
         }
@@ -1326,88 +1198,123 @@ if ($view_section_id > 0) {
         <div class="layout-container">
             <!-- Menu Sidebar -->
             <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-                <div class="app-brand demo" style="justify-content: space-between; padding: 25px 20px;">
-                    <a href="index.php" class="brand" style="text-decoration:none; display:flex; align-items:center; gap:8px;">
-                        <img src="assets/img/logo.png" alt="Mango Number Logo" style="width: 32px; height: 32px; object-fit: contain; border-radius: 6px;">
+                <!-- Brand Header -->
+                <div class="app-brand demo py-3 px-4 d-flex align-items-center justify-content-between border-bottom border-dark-subtle" style="border-bottom-color: rgba(255,255,255,0.08) !important;">
+                    <a href="dashboard.php" class="brand d-flex align-items-center gap-2.5 text-decoration-none">
+                        <img src="assets/img/logo.png" alt="Mango Logo" style="width: 30px; height: 30px; object-fit: contain; border-radius: 6px;">
                         <span class="brand-text">Mango Admin</span>
                     </a>
-                    <!-- Mobile Close Sidebar button -->
-                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none" style="padding: 0;">
-                        <i class="bx bx-chevron-left bx-sm align-middle" style="color: #8c7e75; font-size: 26px;"></i>
+                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none p-0">
+                        <i class="bx bx-x text-muted fs-4"></i>
                     </a>
                 </div>
 
                 <div class="menu-inner-shadow"></div>
 
-                <ul class="menu-inner py-1">
-                    <!-- Pending Approvals -->
+                <!-- Navigation Links -->
+                <ul class="menu-inner py-3 overflow-y-auto">
+                    
+                    <!-- OVERVIEW CATEGORY -->
+                    <li class="menu-header small text-uppercase px-4 py-1.5 font-weight-bold" style="font-size: 11px; letter-spacing: 0.8px; color: #6B7280 !important; font-family: 'Inter', sans-serif;">OVERVIEW</li>
+
                     <li class="menu-item <?= $active_tab === 'approvals' ? 'active' : '' ?>" id="menu-approvals">
                         <a href="javascript:void(0);" onclick="switchSection('approvals')" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-check-circle"></i>
-                            <div data-i18n="Approvals">Pending Verifications (<?= $pending_orders_count ?>)</div>
+                            <i class="menu-icon tf-icons bx bx-home-alt"></i>
+                            <div data-i18n="Dashboard">Dashboard</div>
                         </a>
                     </li>
 
-                    <!-- Catalog Management -->
+                    <!-- MANAGEMENT CATEGORY -->
+                    <li class="menu-header small text-uppercase px-4 py-1.5 mt-3 font-weight-bold" style="font-size: 11px; letter-spacing: 0.8px; color: #6B7280 !important; font-family: 'Inter', sans-serif;">MANAGEMENT</li>
+
+                    <li class="menu-item" id="menu-pending-verifications">
+                        <a href="javascript:void(0);" onclick="switchSection('approvals')" class="menu-link d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="menu-icon tf-icons bx bx-check-shield"></i>
+                                <span>Pending Verifications</span>
+                            </div>
+                            <?php if ($pending_orders_count > 0): ?>
+                                <span class="badge rounded-pill bg-warning text-dark px-2 py-0.5" style="font-size: 11px; font-weight: 700;"><?= $pending_orders_count ?></span>
+                            <?php else: ?>
+                                <span class="badge rounded-pill text-muted px-2 py-0.5" style="font-size: 11px; background: rgba(255,255,255,0.08) !important;">0</span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+
                     <li class="menu-item <?= $active_tab === 'catalog' ? 'active' : '' ?>" id="menu-catalog">
                         <a href="javascript:void(0);" onclick="switchSection('catalog')" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-edit"></i>
-                            <div data-i18n="Catalog">Manage Offers</div>
+                            <i class="menu-icon tf-icons bx bx-grid-alt"></i>
+                            <div data-i18n="Manage Offers">Manage Offers</div>
                         </a>
                     </li>
 
-                    <!-- Support tickets -->
                     <li class="menu-item <?= $active_tab === 'complaints' ? 'active' : '' ?>" id="menu-complaints">
-                        <a href="javascript:void(0);" onclick="switchSection('complaints')" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-message-error"></i>
-                            <div data-i18n="Complaints">Unresolved Complaints (<?= $unresolved_complaints_count ?>)</div>
+                        <a href="javascript:void(0);" onclick="switchSection('complaints')" class="menu-link d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="menu-icon tf-icons bx bx-message-square-detail"></i>
+                                <span>Unresolved Complaints</span>
+                            </div>
+                            <?php if ($unresolved_complaints_count > 0): ?>
+                                <span class="badge rounded-pill bg-danger px-2 py-0.5" style="font-size: 11px; font-weight: 700;"><?= $unresolved_complaints_count ?></span>
+                            <?php else: ?>
+                                <span class="badge rounded-pill text-muted px-2 py-0.5" style="font-size: 11px; background: rgba(255,255,255,0.08) !important;">0</span>
+                            <?php endif; ?>
                         </a>
                     </li>
 
-                    <!-- Registered Users -->
                     <li class="menu-item <?= $active_tab === 'users' ? 'active' : '' ?>" id="menu-users">
                         <a href="javascript:void(0);" onclick="switchSection('users')" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-group"></i>
-                            <div data-i18n="Users">Registered Users</div>
+                            <div data-i18n="Registered Users">Registered Users</div>
                         </a>
                     </li>
 
-                    <!-- Revenue Analytics -->
+                    <!-- ANALYTICS CATEGORY -->
+                    <li class="menu-header small text-uppercase px-4 py-1.5 mt-3 font-weight-bold" style="font-size: 11px; letter-spacing: 0.8px; color: #6B7280 !important; font-family: 'Inter', sans-serif;">ANALYTICS</li>
+
                     <li class="menu-item <?= $active_tab === 'revenue' ? 'active' : '' ?>" id="menu-revenue">
                         <a href="javascript:void(0);" onclick="switchSection('revenue')" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
-                            <div data-i18n="Revenue">Revenue Analytics</div>
+                            <div data-i18n="Revenue Analytics">Revenue Analytics</div>
                         </a>
                     </li>
 
-                    <!-- System Settings -->
+                    <!-- SYSTEM CATEGORY -->
+                    <li class="menu-header small text-uppercase px-4 py-1.5 mt-3 font-weight-bold" style="font-size: 11px; letter-spacing: 0.8px; color: #6B7280 !important; font-family: 'Inter', sans-serif;">SYSTEM</li>
+
                     <li class="menu-item <?= $active_tab === 'settings' ? 'active' : '' ?>" id="menu-settings">
                         <a href="javascript:void(0);" onclick="switchSection('settings')" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-cog"></i>
-                            <div data-i18n="Settings">System Settings</div>
+                            <div data-i18n="System Settings">System Settings</div>
                         </a>
                     </li>
 
-                    <!-- Go to Landing Page -->
-                    <li class="menu-item mt-4">
-                        <a href="index.php" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-home"></i>
-                            <div data-i18n="Landing">Go To Homepage</div>
+                    <hr style="border-color: rgba(255,255,255,0.08); margin: 16px 20px;">
+
+                    <li class="menu-item">
+                        <a href="dashboard.php" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-export"></i>
+                            <div data-i18n="Visit Homepage">Visit Homepage</div>
                         </a>
                     </li>
                 </ul>
 
-                <!-- User Profile Card Widget -->
+                <!-- Compact Administrator Profile Card at Sidebar Bottom -->
                 <div class="sidebar-profile-card">
-                    <div class="sidebar-profile-name"><?= htmlspecialchars($user_name) ?></div>
-                    <div class="sidebar-profile-email-box">
-                        <span class="sidebar-profile-email"><?= htmlspecialchars($user_email) ?></span>
+                    <div class="d-flex align-items-center gap-2.5 mb-2">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #FF8A1F; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13.5px; flex-shrink: 0;">
+                            <?= strtoupper(substr($user_name, 0, 1)) ?>
+                        </div>
+                        <div style="overflow: hidden;">
+                            <div style="font-size: 13px; font-weight: 700; color: #ffffff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= htmlspecialchars($user_name) ?></div>
+                            <div style="font-size: 11px; color: #9CA3AF;">System Admin</div>
+                        </div>
                     </div>
-                    <div class="sidebar-profile-spend-box">
-                        Role: <span class="sidebar-profile-spend-val">System Admin</span>
+                    <div style="font-size: 11px; color: #9CA3AF; word-break: break-all; margin-bottom: 10px; padding: 4px 8px; background: rgba(0,0,0,0.25); border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <?= htmlspecialchars($user_email) ?>
                     </div>
-                    <a href="logout.php" class="sidebar-profile-logout-btn">
-                        <i class="bx bx-power-off"></i> Log Out
+                    <a href="logout.php" class="btn btn-sm w-100 d-flex align-items-center justify-content-center gap-1.5" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; font-size: 12px; font-weight: 600; padding: 6px 10px; transition: all 0.2s ease;">
+                        <i class="bx bx-power-off fs-6"></i> Log Out
                     </a>
                 </div>
             </aside>
@@ -1896,7 +1803,7 @@ if ($view_section_id > 0) {
                                     rows.forEach(row => {
                                         const title = row.querySelector('.house-title')?.textContent.toLowerCase() || '';
                                         if (title.includes(filter)) {
-                                            row.style.display = '';
+                                                    row.style.display = '';
                                         } else {
                                             row.style.display = 'none';
                                         }
@@ -1904,23 +1811,22 @@ if ($view_section_id > 0) {
                                 }
                                 </script>
 
-                            <?php else: ?>
-                                <!-- OVERVIEW SECTIONS LIST VIEW -->
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 py-3 mb-3" style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                <!-- PAGE HEADER -->
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
                                     <div>
-                                        <h3 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif; color: #0f172a; font-size: 22px;">Manage Offers & Sections</h3>
-                                        <p class="text-muted small mb-0">Create and organize multi-level service categories for your customers.</p>
+                                        <h2 class="fw-bold mb-1" style="font-family: 'Inter', sans-serif; color: #111827; font-size: 26px;">Manage Offers & Sections</h2>
+                                        <p class="text-muted mb-0" style="font-size: 14px;">Organize and manage the services available to your customers.</p>
                                     </div>
-                                    <button class="btn btn-sm px-3 py-2" style="background: linear-gradient(135deg, #ff5e36, #fca834); color: #ffffff; border:none; border-radius:10px; font-weight: 700; font-size: 13px; box-shadow: 0 4px 14px rgba(255, 94, 54, 0.35); display: inline-flex; align-items: center; gap: 6px;" data-bs-toggle="collapse" data-bs-target="#newSectionCollapse">
-                                        <i class="bx bx-plus fs-5"></i> New Section
+                                    <button class="btn px-3.5 py-2.5 d-inline-flex align-items-center gap-2" style="background: #FF8A1F; color: #ffffff; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 14px rgba(255, 138, 31, 0.3); transition: all 0.2s ease;" data-bs-toggle="collapse" data-bs-target="#newSectionCollapse">
+                                        <i class="bx bx-plus fs-5"></i> Create Section
                                     </button>
                                 </div>
 
                                 <!-- Create New Section Form Collapse -->
                                 <div class="collapse mb-4" id="newSectionCollapse">
-                                    <div class="card p-4" style="border: 1px solid rgba(255, 94, 54, 0.25); border-radius: 16px; background: #ffffff; box-shadow: 0 10px 30px rgba(255,94,54,0.06);">
-                                        <h6 class="fw-bold mb-3" style="color: var(--accent-orange); font-family: 'Outfit', sans-serif; font-size: 16px;">
-                                            <i class="bx bx-folder-plus me-1"></i> Create New Section Category
+                                    <div class="card p-4" style="border: 1px solid #E5E7EB; border-radius: 16px; background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                                        <h6 class="fw-bold mb-3" style="color: #111827; font-size: 16px;">
+                                            <i class="bx bx-folder-plus text-primary me-1"></i> Create Section
                                         </h6>
                                         <form action="admin.php" method="POST" enctype="multipart/form-data">
                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -1929,94 +1835,207 @@ if ($view_section_id > 0) {
                                             
                                             <div class="row g-3">
                                                 <div class="col-md-4">
-                                                    <label class="form-label font-weight-bold" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Name *</label>
-                                                    <input type="text" name="section_name" class="form-control" placeholder="e.g. WhatsApp Numbers, Canva Premium" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;" required>
+                                                    <label class="form-label font-weight-bold" style="font-size: 12px; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Section Name *</label>
+                                                    <input type="text" name="section_name" class="form-control" placeholder="e.g. Telegram Numbers, WhatsApp Numbers" style="border-radius: 10px; border: 1px solid #D1D5DB; padding: 9px 13px;" required>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Section Icon Photo Upload</label>
-                                                    <input type="file" name="section_image_file" accept="image/*" class="form-control" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 7px 11px;">
+                                                    <label class="form-label" style="font-size: 12px; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Upload Icon Image</label>
+                                                    <input type="file" name="section_image_file" accept="image/*" class="form-control" style="border-radius: 10px; border: 1px solid #D1D5DB; padding: 7px 11px;">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">OR Icon Class / Image URL</label>
-                                                    <input type="text" name="section_icon" class="form-control" placeholder="e.g. bxl-whatsapp or https://..." value="bx-layer" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
+                                                    <label class="form-label" style="font-size: 12px; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">OR Icon Class / Image URL</label>
+                                                    <input type="text" name="section_icon" class="form-control" placeholder="e.g. bxl-telegram or https://..." value="bx-layer" style="border-radius: 10px; border: 1px solid #D1D5DB; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <label class="form-label" style="font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Description (Optional)</label>
-                                                    <input type="text" name="section_description" class="form-control" placeholder="Short summary of items available in this section" style="border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 9px 13px;">
+                                                    <label class="form-label" style="font-size: 12px; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Description (Optional)</label>
+                                                    <input type="text" name="section_description" class="form-control" placeholder="Virtual numbers for Telegram verification." style="border-radius: 10px; border: 1px solid #D1D5DB; padding: 9px 13px;">
                                                 </div>
                                                 <div class="col-md-3 align-self-end">
-                                                    <button type="submit" class="btn btn-primary w-100 py-2" style="background: var(--gradient-accent); border:none; border-radius:10px; font-weight: 700;">Create Section</button>
+                                                    <button type="submit" class="btn w-100 py-2.5" style="background: #FF8A1F; color: #ffffff; border:none; border-radius:10px; font-weight: 600;">Create Section</button>
                                                 </div>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
 
-                                <!-- Sections Cards Grid -->
-                                <div class="row g-3">
+                                <!-- SUMMARY STATISTICS ROW -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6 col-md-3">
+                                        <div class="card p-3" style="border: 1px solid #E5E7EB; border-radius: 14px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                                            <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                                <span style="font-size: 12.5px; font-weight: 600; color: #6B7280;">Sections</span>
+                                                <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(255, 138, 31, 0.1); color: #FF8A1F; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                                    <i class="bx bx-folder"></i>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 24px; font-weight: 700; color: #111827;"><?= count($sections_list) ?></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6 col-md-3">
+                                        <div class="card p-3" style="border: 1px solid #E5E7EB; border-radius: 14px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                                            <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                                <span style="font-size: 12.5px; font-weight: 600; color: #6B7280;">Services</span>
+                                                <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(37, 99, 235, 0.1); color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                                    <i class="bx bx-package"></i>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 24px; font-weight: 700; color: #111827;"><?= $total_services_count ?></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6 col-md-3">
+                                        <div class="card p-3" style="border: 1px solid #E5E7EB; border-radius: 14px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                                            <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                                <span style="font-size: 12.5px; font-weight: 600; color: #6B7280;">Active</span>
+                                                <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(22, 163, 74, 0.1); color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                                    <i class="bx bx-check-circle"></i>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 24px; font-weight: 700; color: #111827;"><?= $active_services_count ?></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6 col-md-3">
+                                        <div class="card p-3" style="border: 1px solid #E5E7EB; border-radius: 14px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                                            <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                                <span style="font-size: 12.5px; font-weight: 600; color: #6B7280;">Disabled</span>
+                                                <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(220, 38, 38, 0.1); color: #DC2626; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                                                    <i class="bx bx-minus-circle"></i>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 24px; font-weight: 700; color: #111827;"><?= $disabled_services_count ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SEARCH AND FILTER TOOLBAR -->
+                                <div class="card p-3 mb-4" style="border: 1px solid #E5E7EB; border-radius: 14px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                                    <div class="row g-2 align-items-center justify-content-between">
+                                        <div class="col-md-6 col-lg-5">
+                                            <div class="input-group input-group-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #D1D5DB;">
+                                                <span class="input-group-text bg-white border-0"><i class="bx bx-search text-muted"></i></span>
+                                                <input type="text" id="sectionSearchInput" onkeyup="filterSectionCards()" class="form-control border-0 shadow-none" placeholder="Search sections..." style="font-size: 13.5px;">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-lg-3 d-flex align-items-center gap-2">
+                                            <select id="sectionStatusFilter" onchange="filterSectionCards()" class="form-select form-select-sm fw-semibold" style="border-radius: 8px; border: 1px solid #D1D5DB; font-size: 13px;">
+                                                <option value="all">All Status</option>
+                                                <option value="active">Active</option>
+                                                <option value="disabled">Disabled</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SECTIONS GRID -->
+                                <div class="row g-4" id="sectionsGridContainer">
                                     <?php if (!empty($sections_list)): ?>
                                         <?php foreach ($sections_list as $sec): ?>
                                             <?php
+                                                $sec_name_lower = strtolower($sec['name']);
+                                                $icon_bg = 'rgba(255, 138, 31, 0.1)';
+                                                $icon_color = '#FF8A1F';
+                                                $default_icon = 'bx-layer';
+
+                                                if (str_contains($sec_name_lower, 'telegram')) {
+                                                    $icon_bg = 'rgba(0, 136, 204, 0.1)'; $icon_color = '#0088cc'; $default_icon = 'bxl-telegram';
+                                                } elseif (str_contains($sec_name_lower, 'whatsapp')) {
+                                                    $icon_bg = 'rgba(37, 211, 102, 0.1)'; $icon_color = '#25D366'; $default_icon = 'bxl-whatsapp';
+                                                } elseif (str_contains($sec_name_lower, 'canva')) {
+                                                    $icon_bg = 'rgba(125, 42, 232, 0.1)'; $icon_color = '#7d2ae8'; $default_icon = 'bx-paint';
+                                                }
+
                                                 $sec_has_image = (!empty($sec['icon']) && (str_contains($sec['icon'], 'uploads/') || str_contains($sec['icon'], 'http')));
+                                                $active_c = (int)($sec['active_count'] ?? $sec['house_count']);
+                                                $disabled_c = (int)($sec['disabled_count'] ?? 0);
+                                                $total_c = (int)$sec['house_count'];
                                             ?>
-                                            <div class="col-md-6 col-lg-4">
-                                                <div class="card h-100 p-4" style="border: 1px solid rgba(0, 0, 0, 0.07); border-radius: 18px; background: #ffffff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03); transition: transform 0.2s ease, box-shadow 0.2s ease;">
-                                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <div class="col-md-6 col-lg-6 section-card-item" data-name="<?= htmlspecialchars($sec_name_lower) ?>" data-active="<?= $active_c ?>" data-disabled="<?= $disabled_c ?>">
+                                                <div class="card h-100 p-4" style="border: 1px solid #E5E7EB; border-radius: 16px; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;">
+                                                    
+                                                    <!-- Card Header -->
+                                                    <div class="d-flex align-items-start justify-content-between mb-3">
                                                         <div class="d-flex align-items-center gap-3">
-                                                            <div style="width: 50px; height: 50px; border-radius: 14px; background: rgba(255, 94, 54, 0.09); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                                                            <div style="width: 48px; height: 48px; border-radius: 12px; background: <?= $icon_bg ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 1px solid rgba(0,0,0,0.04);">
                                                                 <?php if ($sec_has_image): ?>
                                                                     <img src="<?= htmlspecialchars($sec['icon']) ?>" style="width:100%; height:100%; object-fit:cover;">
                                                                 <?php else: ?>
-                                                                    <i class="bx <?= htmlspecialchars(!empty($sec['icon']) ? $sec['icon'] : 'bx-layer') ?> fs-2" style="color: var(--accent-orange);"></i>
+                                                                    <i class="bx <?= htmlspecialchars(!empty($sec['icon']) ? $sec['icon'] : $default_icon) ?> fs-2" style="color: <?= $icon_color ?>;"></i>
                                                                 <?php endif; ?>
                                                             </div>
                                                             <div>
-                                                                <h5 class="fw-bold mb-0" style="font-size: 17px; font-family:'Outfit', sans-serif; color: #0f172a;"><?= htmlspecialchars($sec['name']) ?></h5>
-                                                                <span class="badge" style="background: #f1f5f9; color: #64748b; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 6px; margin-top: 4px; display: inline-block;">
-                                                                    <?= (int)$sec['house_count'] ?> Houses / Services
+                                                                <h5 class="fw-bold mb-1" style="font-family:'Inter', sans-serif; color: #111827; font-size: 18px;"><?= htmlspecialchars($sec['name']) ?></h5>
+                                                                <span class="badge" style="background: #F3F4F6; color: #4B5563; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px;">
+                                                                    <?= $total_c ?> services
                                                                 </span>
                                                             </div>
                                                         </div>
+                                                        <span class="badge" style="background: rgba(22, 163, 74, 0.1); color: #16A34A; font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 99px; text-transform: uppercase;">
+                                                            ACTIVE
+                                                        </span>
                                                     </div>
                                                     
-                                                    <?php if (!empty($sec['description'])): ?>
-                                                        <p class="text-muted small mb-3" style="font-size: 13.5px; line-height: 1.5; color: #64748b;"><?= htmlspecialchars($sec['description']) ?></p>
-                                                    <?php endif; ?>
+                                                    <!-- Description -->
+                                                    <p class="text-muted small mb-3" style="font-size: 13.5px; line-height: 1.5; color: #6B7280; min-height: 40px;">
+                                                        <?= htmlspecialchars(!empty($sec['description']) ? $sec['description'] : 'Browse available services and numbers in this section.') ?>
+                                                    </p>
 
-                                                    <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top gap-2" style="border-top-color: #f1f5f9 !important;">
-                                                        <a href="admin.php?active_tab=catalog&view_section=<?= $sec['id'] ?>" class="btn btn-sm flex-grow-1" style="background: #f8fafc; border: 1.5px solid #e2e8f0; color: #0f172a; border-radius: 10px; font-weight: 700; padding: 8px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
-                                                            <i class="bx bx-folder-open text-warning fs-5"></i> Open Section
+                                                    <!-- Service Counts Breakdown -->
+                                                    <div class="d-flex align-items-center gap-4 py-2.5 px-3 mb-4" style="background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 10px;">
+                                                        <div>
+                                                            <div style="font-size: 11px; color: #6B7280; font-weight: 500;">Active Services</div>
+                                                            <div style="font-size: 16px; font-weight: 700; color: #111827;"><?= $active_c ?></div>
+                                                        </div>
+                                                        <div style="width: 1px; height: 24px; background: #E5E7EB;"></div>
+                                                        <div>
+                                                            <div style="font-size: 11px; color: #6B7280; font-weight: 500;">Disabled</div>
+                                                            <div style="font-size: 16px; font-weight: 700; color: #DC2626;"><?= $disabled_c ?></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card Footer Action -->
+                                                    <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top gap-2" style="border-top-color: #E5E7EB !important;">
+                                                        <a href="admin.php?active_tab=catalog&view_section=<?= $sec['id'] ?>" class="btn btn-sm flex-grow-1" style="background: #F3F4F6; border: 1px solid #E5E7EB; color: #111827; border-radius: 8px; font-weight: 600; padding: 8px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+                                                            <span>Manage Section</span> <i class="bx bx-right-arrow-alt fs-5"></i>
                                                         </a>
 
-                                                        <form action="admin.php" method="POST" onsubmit="return confirm('Deleting this Section will delete all houses inside it! Continue?');" style="margin: 0;">
+                                                        <form action="admin.php" method="POST" onsubmit="return confirm('Deleting this Section will delete all services inside it! Continue?');" style="margin: 0;">
                                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                                             <input type="hidden" name="active_tab" value="catalog">
                                                             <input type="hidden" name="section_id" value="<?= $sec['id'] ?>">
                                                             <input type="hidden" name="action_delete_section" value="1">
-                                                            <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; padding: 8px 12px;" title="Delete Section">
+                                                            <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.08); color: #DC2626; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 8px 12px;" title="Delete Section">
                                                                 <i class="bx bx-trash fs-5"></i>
                                                             </button>
                                                         </form>
                                                     </div>
+
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
                                     <?php else: ?>
+                                        <!-- EMPTY STATE -->
                                         <div class="col-12">
-                                            <div class="card p-5 text-center text-muted" style="border: 1px dashed rgba(220, 200, 190, 0.6); border-radius: 18px; background: #ffffff;">
-                                                <i class="bx bx-folder-plus display-4 mb-2 text-warning"></i>
-                                                <h5 class="fw-bold" style="color: #0f172a;">No Offer Sections Created Yet</h5>
-                                                <p class="mb-3">Click on <strong>+ New Section</strong> above to create your first category (e.g., Buy Numbers, Canva Premium, Telegram Services).</p>
+                                            <div class="card p-5 text-center text-muted" style="border: 1px dashed #D1D5DB; border-radius: 16px; background: #ffffff;">
+                                                <i class="bx bx-folder-plus display-4 mb-2" style="color: #FF8A1F;"></i>
+                                                <h5 class="fw-bold" style="color: #111827;">No sections yet</h5>
+                                                <p class="mb-3 text-muted">Create your first service section to start managing offers.</p>
+                                                <div>
+                                                    <button class="btn btn-sm px-4 py-2" style="background: #FF8A1F; color: #ffffff; border-radius: 8px; font-weight: 600;" data-bs-toggle="collapse" data-bs-target="#newSectionCollapse">
+                                                        + Create Section
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         </div>
+                        </div>
 
                         <!-- SECTION 3: COMPLAINTS / SUPPORT TICKET RESOLUTIONS -->
                         <div id="section-complaints" class="admin-section <?= $active_tab === 'complaints' ? 'active' : '' ?>">
-                            <h4 class="fw-bold py-3 mb-2" style="font-family:'Outfit', sans-serif;">Unresolved Support Complaints</h4>
                             
                             <div class="card" style="border: 1px solid rgba(220, 200, 190, 0.4); border-radius: 16px;">
                                 <div class="table-responsive text-nowrap">
@@ -3003,6 +3022,34 @@ if ($view_section_id > 0) {
                 }
             });
         });
+
+        // Real-time Section cards search and status filter
+        function filterSectionCards() {
+            const searchVal = (document.getElementById('sectionSearchInput')?.value || '').toLowerCase().trim();
+            const statusVal = document.getElementById('sectionStatusFilter')?.value || 'all';
+
+            const cards = document.querySelectorAll('.section-card-item');
+            cards.forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const activeCount = parseInt(card.getAttribute('data-active')) || 0;
+                const disabledCount = parseInt(card.getAttribute('data-disabled')) || 0;
+
+                let matchesSearch = name.includes(searchVal);
+                let matchesStatus = true;
+
+                if (statusVal === 'active') {
+                    matchesStatus = activeCount > 0;
+                } else if (statusVal === 'disabled') {
+                    matchesStatus = disabledCount > 0;
+                }
+
+                if (matchesSearch && matchesStatus) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
 
         // Real-time catalog table row filter
         function filterCatalogRows() {
