@@ -21,6 +21,9 @@ $show_whatsapp_url = $_SESSION['show_whatsapp_url'] ?? '';
 $show_whatsapp_text = $_SESSION['show_whatsapp_text'] ?? '';
 unset($_SESSION['show_whatsapp_redirect_modal'], $_SESSION['show_whatsapp_url'], $_SESSION['show_whatsapp_text']);
 
+$show_welcome_crack_modal = $_SESSION['show_welcome_crack_modal'] ?? false;
+unset($_SESSION['show_welcome_crack_modal']);
+
 // Handle Purchase Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
     $csrf_token = $_POST['csrf_token'] ?? '';
@@ -1505,6 +1508,57 @@ function get_flag_icon($country) {
             fetch('auth_handler.php?action=check-status').then(r => r.json()).then(d => { if (d.logged_in === false) window.location.href = 'account_deleted.php'; }).catch(() => {});
         }, 3000);
     </script>
+    <!-- Welcome App Crack & Subscription Unlock Modal Popup -->
+    <?php if ($show_welcome_crack_modal): ?>
+    <div id="welcomeCrackModal" class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 20px;">
+        <div style="background: #111827; border: 1.5px solid rgba(255, 138, 31, 0.4); border-radius: 24px; max-width: 480px; width: 100%; padding: 32px 28px; box-shadow: 0 30px 90px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 94, 54, 0.2); text-align: center; position: relative; animation: modalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);">
+            <button onclick="closeWelcomeCrackModal()" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #9ca3af; font-size: 1.2rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">&times;</button>
+
+            <div style="width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #ff5e36, #ff8a1f); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 25px rgba(255, 94, 54, 0.5); font-size: 1.8rem;">
+                🚀
+            </div>
+
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.45rem; font-weight: 800; color: #ffffff; margin-bottom: 10px;">
+                Need Any Subscription or App Unlocked?
+            </h3>
+
+            <p style="font-size: .92rem; color: #d1d5db; line-height: 1.6; margin-bottom: 20px;">
+                Hum saare <strong>Subscriptions, Premium Apps &amp; Paid Softwares</strong> ko unlocked &amp; crack karke dete hain at dirt-cheap prices!
+            </p>
+
+            <!-- Platform Tags -->
+            <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+                <span style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb; font-size: .8rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+                    🪟 Windows
+                </span>
+                <span style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb; font-size: .8rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+                    🍏 macOS
+                </span>
+                <span style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb; font-size: .8rem; font-weight: 700; padding: 6px 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+                    🤖 Android
+                </span>
+            </div>
+
+            <a href="https://t.me/nu9rl" target="_blank" onclick="closeWelcomeCrackModal()" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border-radius: 14px; background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #ffffff; font-weight: 800; font-size: .95rem; text-decoration: none; box-shadow: 0 10px 30px rgba(255, 94, 54, 0.4); transition: transform 0.2s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                Request Custom App / Softwares
+            </a>
+        </div>
+    </div>
+    <style>
+    @keyframes modalPop {
+        0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    </style>
+    <script>
+    function closeWelcomeCrackModal() {
+        const modal = document.getElementById('welcomeCrackModal');
+        if (modal) modal.remove();
+    }
+    </script>
+    <?php endif; ?>
+
     <script src="assets/js/anti-devtools.js"></script>
 </body>
 </html>

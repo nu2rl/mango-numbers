@@ -308,6 +308,7 @@ try {
             $_SESSION['username'] = $name;
             $_SESSION['role'] = 'user';
             $_SESSION['avatar_path'] = $avatar_path;
+            $_SESSION['show_welcome_crack_modal'] = true;
 
             echo json_encode(['success' => true, 'message' => 'Email verified successfully! Creating account...']);
         } else {

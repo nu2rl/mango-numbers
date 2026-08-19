@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $_SESSION['username'] = $user['username'];
                             $_SESSION['role'] = $user['role'];
                             $_SESSION['status'] = $user['status'];
+                            $_SESSION['show_welcome_crack_modal'] = true;
                             if ($user['role'] === 'admin') {
                                 header("Location: admin.php");
                             } else {
