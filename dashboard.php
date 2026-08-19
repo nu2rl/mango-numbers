@@ -277,7 +277,7 @@ function get_flag_icon($country) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>Dashboard – Mango Number</title>
     <link rel="icon" type="image/png" href="assets/img/logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,6 +294,7 @@ function get_flag_icon($country) {
             --sidebar-w: 240px;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; max-width: 100%; overflow-x: hidden !important; touch-action: manipulation; }
         html { -webkit-font-smoothing: antialiased; }
         body {
             font-family: 'Inter', sans-serif;

@@ -73,7 +73,7 @@ function get_flag($country) {
     
     <meta name="description" content="Access 100+ premium virtual numbers, Telegram & WhatsApp OTP verifications, Canva Premium, productivity suites and AI tools with Mango Number.">
     <meta name="keywords" content="virtual numbers, telegram otp, whatsapp verification, canva premium, free sms verification, Mango Number">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Unlock 100+ Premium Virtual Numbers &amp; AI Tools | Mango Number">
@@ -114,14 +114,17 @@ function get_flag($country) {
     }
     html, body {
       height: 100%;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden !important;
       scroll-behavior: smooth;
+      touch-action: manipulation;
     }
     body {
       margin: 0;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       color: var(--text-main);
       background: var(--bg);
-      overflow-x: hidden;
       position: relative;
     }
 
@@ -1038,6 +1041,15 @@ function get_flag($country) {
       .metrics-strip {
         border-radius: 24px;
         padding: 20px 24px;
+      }
+    }
+    @media (max-width: 991px) {
+      .hero-inner {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+      }
+      .features-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
     @media (max-width: 768px) {
