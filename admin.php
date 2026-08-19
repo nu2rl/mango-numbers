@@ -1120,22 +1120,17 @@ if ($view_section_id > 0) {
 
     <style>
         :root {
-            --primary-bg: #0b0f19;
+            --primary-bg: #fffbf5;
             --accent-orange: #ff5e36;
-            --accent-yellow: #ff8a1f;
+            --accent-yellow: #fca834;
             --gradient-accent: linear-gradient(135deg, var(--accent-orange), var(--accent-yellow));
-            --text-dark: #f3f4f6;
-            --text-light: #9ca3af;
+            --text-dark: #231b15;
+            --text-light: #6e5e54;
         }
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0b0f19 !important;
-            color: #f3f4f6 !important;
-        }
-
-        .content-wrapper {
-            background-color: #0b0f19 !important;
+            background-color: var(--primary-bg) !important;
         }
 
         .brand-text {
@@ -1149,40 +1144,37 @@ if ($view_section_id > 0) {
 
         /* Sidebar custom coloring */
         .bg-menu-theme {
-            background-color: #111827 !important;
+            background-color: #1e1b19 !important;
             color: #d1c5bc !important;
-            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
 
         .bg-menu-theme .menu-item.active > .menu-link {
             background: var(--gradient-accent) !important;
             color: #ffffff !important;
             font-weight: 600;
-            box-shadow: 0 4px 16px rgba(255, 94, 54, 0.35);
         }
 
         .bg-menu-theme .menu-link {
-            color: #9ca3af !important;
+            color: #9c8e85 !important;
         }
 
         .bg-menu-theme .menu-item:not(.active) .menu-link:hover {
             color: #ffffff !important;
-            background-color: rgba(255, 255, 255, 0.06) !important;
+            background-color: rgba(255, 255, 255, 0.04) !important;
         }
 
         .layout-navbar {
-            backdrop-filter: blur(16px);
-            background: rgba(17, 24, 39, 0.88) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-bottom: 1px solid rgba(220, 200, 190, 0.4);
         }
 
         /* Widgets stats */
         .stat-card {
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(220, 200, 190, 0.4);
             border-radius: 16px;
-            background: rgba(17, 24, 39, 0.85) !important;
-            color: #f3f4f6 !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(25, 10, 5, 0.01);
             transition: all 0.3s ease;
         }
 
@@ -1211,30 +1203,28 @@ if ($view_section_id > 0) {
 
         /* Section Management & Cards Redesign */
         .mn-section-card {
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(16px);
+            background: #ffffff;
             border-radius: 22px;
-            border: 1.5px solid rgba(255, 138, 31, 0.35);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
             position: relative;
             display: flex;
             flex-direction: column;
-            color: #ffffff;
         }
 
         .mn-section-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 20px 45px rgba(255, 94, 54, 0.25);
-            border-color: rgba(255, 94, 54, 0.6);
+            box-shadow: 0 20px 40px rgba(255, 94, 54, 0.14);
+            border-color: rgba(255, 94, 54, 0.3);
         }
 
         .mn-section-card .mn-card-header-bar {
             height: 4px;
             width: 100%;
-            background: linear-gradient(90deg, #ff5e36, #ff8a1f);
-            opacity: 0.8;
+            background: linear-gradient(90deg, #ff5e36, #fca834);
+            opacity: 0;
             transition: opacity 0.3s ease;
             position: absolute;
             top: 0;
@@ -1264,23 +1254,23 @@ if ($view_section_id > 0) {
         }
 
         .mn-btn-glow {
-            background: linear-gradient(135deg, #ff5e36, #ff8a1f);
+            background: linear-gradient(135deg, #ff5e36, #fca834);
             color: #ffffff !important;
             border: none;
             border-radius: 14px;
             font-weight: 700;
-            box-shadow: 0 6px 18px rgba(255, 94, 54, 0.4);
+            box-shadow: 0 6px 18px rgba(255, 94, 54, 0.3);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mn-btn-glow:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(255, 94, 54, 0.6);
+            box-shadow: 0 10px 24px rgba(255, 94, 54, 0.45);
             color: #ffffff !important;
         }
 
         .mn-btn-open-section {
-            background: linear-gradient(135deg, #ff5e36, #ff8a1f);
+            background: linear-gradient(135deg, #0f172a, #1e293b);
             color: #ffffff !important;
             border: none;
             border-radius: 14px;
@@ -1290,13 +1280,13 @@ if ($view_section_id > 0) {
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            box-shadow: 0 6px 20px rgba(255, 94, 54, 0.4);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mn-btn-open-section:hover {
-            background: linear-gradient(135deg, #ff5e36, #ff8a1f);
-            box-shadow: 0 10px 28px rgba(255, 94, 54, 0.6);
+            background: linear-gradient(135deg, #ff5e36, #fca834);
+            box-shadow: 0 8px 22px rgba(255, 94, 54, 0.35);
             color: #ffffff !important;
             transform: translateY(-2px);
         }
@@ -1304,36 +1294,36 @@ if ($view_section_id > 0) {
         .mn-btn-delete-section {
             width: 44px !important;
             height: 44px !important;
-            background: rgba(239, 68, 68, 0.15) !important;
-            color: #f87171 !important;
-            border: 1.5px solid rgba(239, 68, 68, 0.35) !important;
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+            border: 1.5px solid #fecaca !important;
             border-radius: 14px !important;
             padding: 0 !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2) !important;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12) !important;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
             cursor: pointer !important;
             flex-shrink: 0 !important;
         }
 
         .mn-btn-delete-section:hover {
-            background: #ef4444 !important;
+            background: #dc2626 !important;
             color: #ffffff !important;
-            border-color: #ef4444 !important;
+            border-color: #dc2626 !important;
             transform: translateY(-2px) scale(1.05) !important;
-            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.5) !important;
+            box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4) !important;
         }
 
-        .mn-btn-delete-section i {
-            color: #ef4444 !important;
+        .mn-btn-delete-section i, .mn-btn-delete-section svg {
+            color: #dc2626 !important;
             font-size: 19px !important;
             line-height: 1 !important;
             transition: color 0.2s ease !important;
         }
 
-        .mn-btn-delete-section:hover i {
+        .mn-btn-delete-section:hover i, .mn-btn-delete-section:hover svg {
             color: #ffffff !important;
         }
 
@@ -2051,7 +2041,7 @@ if ($view_section_id > 0) {
                                             <input type="hidden" name="action_bulk_delete_houses" value="1">
                                             
                                             <button type="submit" id="btnBulkDeleteHouses" class="btn btn-sm px-3 py-2 d-none" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); transition: all 0.2s ease;">
-                                                <img src="assets/img/delete_icon.png" style="width: 16px; height: 16px; object-fit: contain;"> 
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> 
                                                 Delete Selected (<span id="selectedHousesCount">0</span>)
                                             </button>
                                         </form>
@@ -2259,7 +2249,7 @@ if ($view_section_id > 0) {
                                                                         <input type="hidden" name="product_id" value="<?= $h['id'] ?>">
                                                                         <input type="hidden" name="action_delete_house" value="1">
                                                                         <button type="submit" class="btn btn-sm px-3 py-2" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1.5px solid rgba(239, 68, 68, 0.25); border-radius: 10px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;" title="Delete this house item">
-                                                                            <img src="assets/img/delete_icon.png" style="width: 16px; height: 16px; object-fit: contain;"> Delete
+                                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> Delete
                                                                         </button>
                                                                     </form>
                                                                 </div>
@@ -2294,24 +2284,27 @@ if ($view_section_id > 0) {
                                             row.style.display = 'none';
                                         }
                                     });
-                                                                <!-- OVERVIEW SECTIONS LIST VIEW -->
-                                <div class="card p-4 mb-4" style="border: 1.5px solid rgba(255, 138, 31, 0.35); border-radius: 20px; background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;">
-                                    <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,94,54,0.2) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+                                }
+                                </script>
+
+                            <?php else: ?>
+                                <!-- OVERVIEW SECTIONS LIST VIEW -->
+                                <div class="card p-4 mb-4" style="border: 1px solid rgba(255, 94, 54, 0.15); border-radius: 20px; background: linear-gradient(135deg, #ffffff 0%, #fff7f2 100%); box-shadow: 0 10px 30px rgba(255, 94, 54, 0.05); position: relative; overflow: hidden;">
+                                    <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,94,54,0.12) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="z-index: 1;">
                                         <div class="d-flex align-items-center gap-3">
-                                            <div style="width: 58px; height: 58px; border-radius: 18px; background: rgba(255, 94, 54, 0.15); border: 1.5px solid rgba(255, 94, 54, 0.35); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(255, 94, 54, 0.25); flex-shrink: 0; overflow: hidden; padding: 4px;">
+                                            <div style="width: 58px; height: 58px; border-radius: 18px; background: #ffffff; border: 1.5px solid rgba(255, 94, 54, 0.25); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(255, 94, 54, 0.15); flex-shrink: 0; overflow: hidden; padding: 4px;">
                                                 <img src="assets/img/offers_icon.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                                             </div>
                                             <div>
                                                 <div class="d-flex align-items-center gap-2 mb-1">
-                                                    <h3 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif; color: #ffffff; font-size: 22px; letter-spacing: -0.3px;">Manage Offers &amp; Sections</h3>
-                                                    <span class="badge" style="background: rgba(255, 94, 54, 0.2); color: #ff8a1f; font-size: 11px; font-weight: 800; border-radius: 20px; padding: 4px 10px; border: 1px solid rgba(255,94,54,0.35);">
+                                                    <h3 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif; color: #0f172a; font-size: 22px; letter-spacing: -0.3px;">Manage Offers & Sections</h3>
+                                                    <span class="badge" style="background: rgba(255, 94, 54, 0.12); color: #ff5e36; font-size: 11px; font-weight: 800; border-radius: 20px; padding: 4px 10px; border: 1px solid rgba(255,94,54,0.2);">
                                                         <?= count($sections_list ?? []) ?> CATEGORIES
                                                     </span>
                                                 </div>
-                                                <p class="text-muted small mb-0" style="font-size: 13.5px; color: #9ca3af;">Create, organize, and customize multi-level service categories for your customers.</p>
+                                                <p class="text-muted small mb-0" style="font-size: 13.5px; color: #64748b;">Create, organize, and customize multi-level service categories for your customers.</p>
                                             </div>
-                                        </div>                                    </div>
                                         </div>
                                         <button class="btn px-3.5 py-2.5 mn-btn-glow" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;" data-bs-toggle="collapse" data-bs-target="#newSectionCollapse">
                                             <i class="bx bx-plus-circle fs-5"></i> New Section
@@ -2454,8 +2447,8 @@ if ($view_section_id > 0) {
                                                                 </div>
                                                             <?php endif; ?>
                                                             <div>
-                                                                <h5 class="fw-bold mb-1" style="font-size: 17.5px; font-family:'Outfit', sans-serif; color: #ffffff; line-height: 1.2;"><?= htmlspecialchars($sec['name']) ?></h5>
-                                                                <span class="badge" style="background: <?= $brand_badge_bg ?>; color: <?= $brand_badge_color ?>; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid rgba(255,255,255,0.1);">
+                                                                <h5 class="fw-bold mb-1" style="font-size: 17.5px; font-family:'Outfit', sans-serif; color: #0f172a; line-height: 1.2;"><?= htmlspecialchars($sec['name']) ?></h5>
+                                                                <span class="badge" style="background: <?= $brand_badge_bg ?>; color: <?= $brand_badge_color ?>; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.3px;">
                                                                     <i class="bx bx-package"></i> <?= (int)$sec['house_count'] ?> Houses / Services
                                                                 </span>
                                                             </div>
@@ -2485,7 +2478,7 @@ if ($view_section_id > 0) {
                                                             <input type="hidden" name="section_id" value="<?= $sec['id'] ?>">
                                                             <input type="hidden" name="action_delete_section" value="1">
                                                             <button type="submit" class="btn mn-btn-delete-section" title="Delete Section">
-                                                                <img src="assets/img/delete_icon.png" style="width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.2));">
+                                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                                             </button>
                                                         </form>
                                                     </div>
@@ -3719,7 +3712,7 @@ if ($view_section_id > 0) {
             <div class="modal-content" style="border-radius: 24px; border: 1.5px solid rgba(255, 94, 54, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; background: #ffffff;">
                 <div class="modal-body p-4 text-center">
                     <div class="mb-3 d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px; border-radius: 22px; background: #fef2f2; border: 1.5px solid #fecaca; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.15);">
-                        <img id="mnConfirmIcon" src="assets/img/delete_icon.png" style="width: 42px; height: 42px; object-fit: contain;">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                     </div>
                     <h5 id="mnConfirmTitle" class="fw-bold mb-2" style="font-family: 'Outfit', sans-serif; color: #0f172a; font-size: 20px;">Confirm Action</h5>
                     <p id="mnConfirmMessage" class="text-muted mb-4" style="font-size: 14px; line-height: 1.5; color: #64748b;">Are you sure you want to proceed with this action?</p>
