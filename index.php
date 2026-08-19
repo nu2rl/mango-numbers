@@ -1,6 +1,6 @@
 <?php
 /**
- * Mango Number - World-Class SaaS Landing Page
+ * Mango Number - Premium SaaS Landing Page
  */
 
 require_once __DIR__ . '/config.php';
@@ -73,7 +73,7 @@ function get_flag($country) {
     
     <meta name="description" content="Access 100+ premium virtual numbers, Telegram & WhatsApp OTP verifications, Canva Premium, productivity suites and AI tools with Mango Number.">
     <meta name="keywords" content="virtual numbers, telegram otp, whatsapp verification, canva premium, free sms verification, Mango Number">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Unlock 100+ Premium Virtual Numbers &amp; AI Tools | Mango Number">
@@ -85,7 +85,7 @@ function get_flag($country) {
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/img/logo.png">
     
-    <!-- Font -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
@@ -120,12 +120,28 @@ function get_flag($country) {
       margin: 0;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       color: var(--text-main);
-      background:
-        radial-gradient(circle at 0% 0%, rgba(255, 94, 54, 0.22) 0, transparent 55%),
-        radial-gradient(circle at 100% 0%, rgba(255, 138, 31, 0.25) 0, transparent 55%),
-        radial-gradient(circle at 50% 100%, rgba(124, 58, 237, 0.18) 0, transparent 55%),
-        var(--bg);
+      background: var(--bg);
       overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Animated Mesh Canvas Background */
+    .bg-mesh-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255, 94, 54, 0.22) 0, transparent 45%),
+        radial-gradient(circle at 90% 10%, rgba(255, 138, 31, 0.22) 0, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(124, 58, 237, 0.16) 0, transparent 55%),
+        var(--bg);
+      background-size: 140% 140%;
+      animation: meshPulse 18s ease-in-out infinite alternate;
+    }
+    @keyframes meshPulse {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 100%; }
     }
 
     /* Layout */
@@ -153,14 +169,50 @@ function get_flag($country) {
       text-decoration: none;
     }
 
+    /* Live Activity Ticker Bar */
+    .ticker-bar {
+      background: rgba(17, 24, 39, 0.85);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: .8rem;
+      padding: 8px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      z-index: 60;
+      backdrop-filter: blur(10px);
+    }
+    .ticker-content {
+      display: inline-flex;
+      gap: 32px;
+      animation: tickerScroll 35s linear infinite;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #d1d5db;
+    }
+    .ticker-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes tickerScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
     /* Header */
     .site-header {
       position: sticky;
       top: 0;
       z-index: 50;
       background: rgba(3, 7, 18, 0.88);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     .header-inner {
@@ -184,6 +236,10 @@ function get_flag($country) {
       align-items: center;
       justify-content: center;
       box-shadow: 0 0 20px rgba(255, 94, 54, 0.4);
+      transition: transform 0.3s ease;
+    }
+    .brand:hover .brand-logo-icon {
+      transform: scale(1.06) rotate(-3deg);
     }
     .brand-logo-icon img {
       width: 24px;
@@ -216,9 +272,27 @@ function get_flag($country) {
     .nav a {
       color: var(--text-muted);
       transition: color 0.2s;
+      position: relative;
+    }
+    .nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #ff5e36;
+      border-radius: 2px;
+      opacity: 0;
+      transform: scaleX(0);
+      transition: all 0.25s ease;
     }
     .nav a:hover {
       color: #ffffff;
+    }
+    .nav a:hover::after {
+      opacity: 1;
+      transform: scaleX(1);
     }
     .header-actions {
       display: flex;
@@ -226,7 +300,7 @@ function get_flag($country) {
       gap: 12px;
     }
 
-    /* Buttons */
+    /* Buttons with Sheen & Glow Animations */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -239,17 +313,43 @@ function get_flag($country) {
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
-      transition: all .2s ease;
+      transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
     }
     .btn-primary {
       background: linear-gradient(135deg, #ff5e36, #ff8a1f);
       color: #ffffff;
-      box-shadow: 0 10px 30px rgba(255, 94, 54, 0.45);
+      box-shadow: 0 8px 24px rgba(255, 94, 54, 0.4);
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 70%
+      );
+      transform: rotate(30deg) translateY(-100%);
+      animation: sheenSweep 4s infinite;
+    }
+    @keyframes sheenSweep {
+      0% { transform: rotate(30deg) translateY(-100%); }
+      22% { transform: rotate(30deg) translateY(100%); }
+      100% { transform: rotate(30deg) translateY(100%); }
     }
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 14px 40px rgba(255, 94, 54, 0.6);
+      box-shadow: 0 12px 36px rgba(255, 94, 54, 0.6);
       color: #ffffff;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
     }
     .btn-ghost {
       background: rgba(255, 255, 255, 0.06);
@@ -258,7 +358,9 @@ function get_flag($country) {
     }
     .btn-ghost:hover {
       background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 94, 54, 0.4);
       color: #ffffff;
+      transform: translateY(-1px);
     }
     .btn-sm {
       padding: 8px 16px;
@@ -297,9 +399,15 @@ function get_flag($country) {
       border-radius: 999px;
       background: #22c55e;
       box-shadow: 0 0 10px #22c55e;
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
     }
     .hero-title {
-      font-size: 2.85rem;
+      font-size: clamp(2.2rem, 5vw, 2.85rem);
       line-height: 1.15;
       font-weight: 800;
       font-family: 'Outfit', sans-serif;
@@ -335,9 +443,15 @@ function get_flag($country) {
       font-size: .85rem;
       font-weight: 500;
       color: #e5e7eb;
+      transition: all 0.2s ease;
+    }
+    .hero-pill:hover {
+      border-color: rgba(255, 94, 54, 0.35);
+      background: rgba(17, 24, 39, 0.95);
+      transform: translateY(-1px);
     }
 
-    /* Hero Card (Registration) */
+    /* Hero Card (Registration Form) */
     .hero-card {
       background: rgba(17, 24, 39, 0.85);
       backdrop-filter: blur(20px);
@@ -346,6 +460,11 @@ function get_flag($country) {
       border: 1.5px solid rgba(255, 138, 31, 0.3);
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       padding: 28px 24px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hero-card:hover {
+      border-color: rgba(255, 94, 54, 0.5);
+      box-shadow: 0 30px 90px rgba(255, 94, 54, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .hero-card-title {
       font-size: 1.25rem;
@@ -414,12 +533,16 @@ function get_flag($country) {
       backdrop-filter: blur(16px);
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 16px 32px;
+      padding: 18px 36px;
       display: flex;
       flex-wrap: wrap;
       gap: 24px;
       justify-content: space-between;
       align-items: center;
+      transition: border-color 0.3s;
+    }
+    .metrics-strip:hover {
+      border-color: rgba(255, 94, 54, 0.35);
     }
     .metric {
       display: flex;
@@ -427,7 +550,7 @@ function get_flag($country) {
     }
     .metric-value {
       font-weight: 800;
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-family: 'Outfit', sans-serif;
       background: linear-gradient(135deg, #ff5e36, #ff8a1f);
       -webkit-background-clip: text;
@@ -436,6 +559,32 @@ function get_flag($country) {
     .metric-label {
       color: var(--text-muted);
       font-size: .82rem;
+    }
+
+    /* Filter Tabs for Catalog */
+    .catalog-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      font-size: .86rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: linear-gradient(135deg, #ff5e36, #ff8a1f);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(255, 94, 54, 0.35);
     }
 
     /* Sections */
@@ -455,7 +604,7 @@ function get_flag($country) {
       margin-bottom: 8px;
     }
     .section-title {
-      font-size: 2rem;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
       font-weight: 800;
       font-family: 'Outfit', sans-serif;
       margin-bottom: 10px;
@@ -469,7 +618,7 @@ function get_flag($country) {
       line-height: 1.6;
     }
 
-    /* Features Grid */
+    /* Features Grid Cards */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -477,29 +626,36 @@ function get_flag($country) {
     }
     .feature-card {
       background: rgba(17, 24, 39, 0.7);
-      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      border-radius: 22px;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 24px;
-      transition: transform 0.2s, border-color 0.2s;
+      padding: 26px 24px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
     .feature-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(255, 94, 54, 0.4);
+      transform: translateY(-6px) scale(1.01);
+      border-color: rgba(255, 94, 54, 0.45);
+      box-shadow: 0 20px 45px rgba(255, 94, 54, 0.12);
     }
     .feature-icon {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 14px;
       background: linear-gradient(135deg, rgba(255, 94, 54, 0.15), rgba(255, 138, 31, 0.15));
       color: #ff8a1f;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 14px;
-      font-size: 1.25rem;
+      margin-bottom: 16px;
+      font-size: 1.35rem;
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover .feature-icon {
+      transform: translateY(-3px) scale(1.08);
     }
     .feature-title {
-      font-size: 1.1rem;
+      font-size: 1.12rem;
       font-weight: 700;
       font-family: 'Outfit', sans-serif;
       margin-bottom: 8px;
@@ -509,23 +665,6 @@ function get_flag($country) {
       font-size: .88rem;
       color: var(--text-muted);
       line-height: 1.6;
-    }
-
-    /* Catalog Offer Cards Section */
-    .catalog-card {
-      background: rgba(17, 24, 39, 0.85);
-      border-radius: 20px;
-      border: 1.5px solid rgba(255, 255, 255, 0.08);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.25s ease;
-    }
-    .catalog-card:hover {
-      border-color: rgba(255, 94, 54, 0.45);
-      box-shadow: 0 16px 40px rgba(255, 94, 54, 0.15);
-      transform: translateY(-3px);
     }
 
     /* Steps */
@@ -538,20 +677,27 @@ function get_flag($country) {
       background: rgba(17, 24, 39, 0.7);
       border-radius: 20px;
       border: 1px dashed rgba(255, 138, 31, 0.4);
-      padding: 24px;
+      padding: 26px 24px;
+      transition: all 0.3s ease;
+    }
+    .step-card:hover {
+      border-color: rgba(255, 94, 54, 0.7);
+      transform: translateY(-4px);
+      background: rgba(17, 24, 39, 0.85);
     }
     .step-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      font-size: .95rem;
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
       font-weight: 800;
       border-radius: 999px;
       background: linear-gradient(135deg, #ff5e36, #ff8a1f);
       color: #ffffff;
       margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(255, 94, 54, 0.35);
     }
     .step-title {
       font-size: 1.05rem;
@@ -566,6 +712,58 @@ function get_flag($country) {
       line-height: 1.6;
     }
 
+    /* FAQ Accordion Section */
+    .faq-grid {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .faq-item {
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.25s ease;
+    }
+    .faq-item:hover, .faq-item.active {
+      border-color: rgba(255, 94, 54, 0.4);
+    }
+    .faq-header {
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      user-select: none;
+    }
+    .faq-chevron {
+      font-size: 1.2rem;
+      color: #ff8a1f;
+      transition: transform 0.3s ease;
+    }
+    .faq-item.active .faq-chevron {
+      transform: rotate(180deg);
+    }
+    .faq-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 22px;
+      font-size: .9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .faq-item.active .faq-body {
+      max-height: 200px;
+      padding: 0 22px 18px;
+    }
+
     /* Testimonials */
     .testimonial-grid {
       display: grid;
@@ -577,6 +775,11 @@ function get_flag($country) {
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       padding: 24px;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 94, 54, 0.35);
     }
     .testimonial-quote {
       font-size: .9rem;
@@ -647,7 +850,7 @@ function get_flag($country) {
       gap: 12px;
     }
 
-    /* Mobile Navigation Drawer */
+    /* Mobile Drawer */
     .mobile-menu-toggle {
       display: none;
       background: rgba(255, 255, 255, 0.08);
@@ -693,7 +896,7 @@ function get_flag($country) {
       justify-content: space-between;
     }
 
-    /* Responsive & Mobile Enhancements */
+    /* Responsive */
     @media (max-width: 992px) {
       .hero-inner {
         grid-template-columns: 1fr;
@@ -719,12 +922,6 @@ function get_flag($country) {
       }
       .hero {
         padding: 28px 0 40px;
-      }
-      .hero-title {
-        font-size: clamp(1.85rem, 6vw, 2.5rem);
-      }
-      .section-title {
-        font-size: clamp(1.45rem, 5vw, 2rem);
       }
       .btn {
         min-height: 44px;
@@ -771,7 +968,28 @@ function get_flag($country) {
     </style>
 </head>
 <body>
+
+<!-- Ambient Animated Background Canvas Mesh -->
+<div class="bg-mesh-canvas"></div>
+
 <div class="page">
+
+  <!-- Live Activity Ticker Bar -->
+  <div class="ticker-bar">
+    <div class="ticker-content">
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇺🇸 USA Telegram OTP — Delivered 12s ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇨🇦 Canada WhatsApp Number — Activated 34s ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🎨 Canva Pro Lifetime — Approved 1m ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇮🇳 India WhatsApp OTP — Delivered 2m ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇬🇧 UK Telegram Number — Activated 3m ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇷🇺 Russia OTP Number — Delivered 4m ago</div>
+      <!-- Loop set -->
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇺🇸 USA Telegram OTP — Delivered 12s ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇨🇦 Canada WhatsApp Number — Activated 34s ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🎨 Canva Pro Lifetime — Approved 1m ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> 🇮🇳 India WhatsApp OTP — Delivered 2m ago</div>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="site-header">
@@ -790,6 +1008,7 @@ function get_flag($country) {
           <a href="#services">Services</a>
           <a href="#why-mango">Why Mango?</a>
           <a href="#how-it-works">How it works</a>
+          <a href="#faq">FAQ</a>
           <a href="#testimonials">Reviews</a>
         </nav>
         <div class="header-actions">
@@ -812,6 +1031,7 @@ function get_flag($country) {
       <a href="#services" onclick="closeMobileDrawer()"><i class="bx bx-store-alt"></i> Catalog Services <i class="bx bx-chevron-right"></i></a>
       <a href="#why-mango" onclick="closeMobileDrawer()"><i class="bx bx-shield-quarter"></i> Why Mango Number? <i class="bx bx-chevron-right"></i></a>
       <a href="#how-it-works" onclick="closeMobileDrawer()"><i class="bx bx-cog"></i> How It Works <i class="bx bx-chevron-right"></i></a>
+      <a href="#faq" onclick="closeMobileDrawer()"><i class="bx bx-help-circle"></i> FAQ <i class="bx bx-chevron-right"></i></a>
       <a href="#testimonials" onclick="closeMobileDrawer()"><i class="bx bx-star"></i> Reviews <i class="bx bx-chevron-right"></i></a>
       <?php if (is_logged_in()): ?>
         <a href="dashboard.php" style="background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #fff;"><i class="bx bx-grid-alt"></i> Go to Dashboard <i class="bx bx-right-arrow-alt"></i></a>
@@ -908,24 +1128,24 @@ function get_flag($country) {
         </div>
 
         <!-- Metrics Strip -->
-        <div class="metrics-strip">
+        <div class="metrics-strip" id="metricsStrip">
           <div class="metric">
-            <span class="metric-value">Up to 90% OFF</span>
+            <span class="metric-value" data-counter="90" data-suffix="% OFF">0% OFF</span>
             <span class="metric-label">cheaper than original market prices</span>
           </div>
           <div class="metric">
-            <span class="metric-value">1,200+ Active Users</span>
-            <span class="metric-label">saving on virtual numbers &amp; subscriptions</span>
+            <span class="metric-value" data-counter="1200" data-suffix="+">0+</span>
+            <span class="metric-label">active users saving on virtual numbers</span>
           </div>
           <div class="metric">
-            <span class="metric-value">95k+ Delivered</span>
+            <span class="metric-value" data-counter="95" data-suffix="k+ Delivered">0k+ Delivered</span>
             <span class="metric-label">instant OTP verifications worldwide</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Services / Offers Catalog -->
+    <!-- Services / Offers Catalog Section -->
     <section class="section" id="services">
       <div class="container">
         <div class="section-header">
@@ -934,15 +1154,23 @@ function get_flag($country) {
           <p class="section-text">Explore active virtual country numbers and premium digital subscriptions available at dirt-cheap prices.</p>
         </div>
 
-        <div class="features-grid">
+        <!-- Interactive Category Filter Tabs -->
+        <div class="catalog-tabs">
+          <button class="tab-btn active" onclick="filterCatalog('all', this)">All Offers</button>
+          <button class="tab-btn" onclick="filterCatalog('telegram', this)">Telegram Numbers</button>
+          <button class="tab-btn" onclick="filterCatalog('whatsapp', this)">WhatsApp Verification</button>
+          <button class="tab-btn" onclick="filterCatalog('digital', this)">Canva &amp; AI Tools</button>
+        </div>
+
+        <div class="features-grid" id="catalogGrid">
           <!-- Telegram OTP Numbers -->
-          <div class="feature-card">
+          <div class="feature-card" data-category="telegram">
             <div class="feature-icon" style="background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 168, 255, 0.2)); color: #0088cc;">
               <i class="bxl-telegram"></i>
             </div>
             <h3 class="feature-title">Telegram OTP Numbers</h3>
             <p class="feature-text">Fresh, dedicated virtual numbers from India, USA, Canada, UK, and Russia for Telegram account &amp; channel creation at wholesale cheap rates.</p>
-            <div style="margin-top: 16px;">
+            <div style="margin-top: 18px;">
               <a href="dashboard.php?section=buy" class="btn btn-ghost btn-sm w-100" style="border-color: rgba(0, 136, 204, 0.5); color: #38bdf8;">
                 Buy Telegram Numbers <i class="bx bx-chevron-right"></i>
               </a>
@@ -950,13 +1178,13 @@ function get_flag($country) {
           </div>
 
           <!-- WhatsApp Verification -->
-          <div class="feature-card">
+          <div class="feature-card" data-category="whatsapp">
             <div class="feature-icon" style="background: linear-gradient(135deg, rgba(37, 211, 102, 0.2), rgba(18, 140, 126, 0.2)); color: #25d366;">
               <i class="bxl-whatsapp"></i>
             </div>
             <h3 class="feature-title">WhatsApp Verification</h3>
             <p class="feature-text">Establish secondary WhatsApp accounts without exposing your personal phone number. 100% private &amp; up to 80% cheaper.</p>
-            <div style="margin-top: 16px;">
+            <div style="margin-top: 18px;">
               <a href="dashboard.php?section=buy" class="btn btn-ghost btn-sm w-100" style="border-color: rgba(37, 211, 102, 0.5); color: #4ade80;">
                 Buy WhatsApp Numbers <i class="bx bx-chevron-right"></i>
               </a>
@@ -964,13 +1192,13 @@ function get_flag($country) {
           </div>
 
           <!-- Canva Premium Lifetime -->
-          <div class="feature-card">
+          <div class="feature-card" data-category="digital">
             <div class="feature-icon" style="background: linear-gradient(135deg, rgba(125, 42, 232, 0.2), rgba(0, 196, 204, 0.2)); color: #a855f7;">
               <i class="bx bx-paint"></i>
             </div>
             <h3 class="feature-title">Canva Premium Lifetime</h3>
             <p class="feature-text">Unlock full access to Canva Pro templates, brand kits, and AI tools for just ₹150 instead of the original ₹3,999/yr price.</p>
-            <div style="margin-top: 16px;">
+            <div style="margin-top: 18px;">
               <a href="payment.php?id=1" class="btn btn-ghost btn-sm w-100" style="border-color: rgba(168, 85, 247, 0.5); color: #c084fc;">
                 Get Canva Pro <i class="bx bx-chevron-right"></i>
               </a>
@@ -978,21 +1206,21 @@ function get_flag($country) {
           </div>
 
           <!-- Instant Manual Audit Desk -->
-          <div class="feature-card">
+          <div class="feature-card" data-category="all">
             <div class="feature-icon">⚡</div>
             <h3 class="feature-title">Fast Manual Audit Desk</h3>
             <p class="feature-text">Our active verification operators audit Paytm/PhonePe UTR receipts and USDT transfers within minutes.</p>
           </div>
 
           <!-- AI Tools & Subscriptions -->
-          <div class="feature-card">
+          <div class="feature-card" data-category="digital">
             <div class="feature-icon">🤖</div>
             <h3 class="feature-title">AI Assistants &amp; Utilities</h3>
             <p class="feature-text">Discover productivity suites, chatbots, and AI tools to write, code, and automate at heavily discounted rates.</p>
           </div>
 
           <!-- Total Anonymity & Security -->
-          <div class="feature-card">
+          <div class="feature-card" data-category="all">
             <div class="feature-icon">🔒</div>
             <h3 class="feature-title">100% Anonymity &amp; Privacy</h3>
             <p class="feature-text">No KYC or identity documents required. Generate dynamic verifications without leaving any traces or linking logs.</p>
@@ -1057,6 +1285,47 @@ function get_flag($country) {
             <h3 class="step-title">Receive OTP &amp; Enjoy</h3>
             <p class="step-text">Our live verification operators approve your order and release your OTP code straight to your dashboard.</p>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive FAQ Section -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-kicker">Got Questions?</div>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p class="section-text">Everything you need to know about our virtual SMS numbers and digital services.</p>
+        </div>
+
+        <div class="faq-grid">
+          <div class="faq-item active" onclick="toggleFaq(this)">
+            <div class="faq-header">
+              <span>Are these virtual numbers safe for Telegram &amp; WhatsApp?</span>
+              <i class="bx bx-chevron-down faq-chevron"></i>
+            </div>
+            <div class="faq-body">
+              Yes, absolutely! Every virtual number provided by Mango Number is dedicated, fresh, isolated, and tested for high OTP delivery success.
+            </div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-header">
+              <span>Why are your prices up to 90% cheaper than original costs?</span>
+              <i class="bx bx-chevron-down faq-chevron"></i>
+            </div>
+            <div class="faq-body">
+              We work directly with volume suppliers to aggregate bulk wholesale perks and rates, passing the massive savings straight to our users.
+            </div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-header">
+              <span>How fast is the UTR verification and OTP delivery?</span>
+              <i class="bx bx-chevron-down faq-chevron"></i>
+            </div>
+            <div class="faq-body">
+              Our manual verification operators audit Paytm/PhonePe UTR receipts within minutes. Once approved, your OTP is updated live in your dashboard.
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1150,5 +1419,71 @@ function get_flag($country) {
   </footer>
 
 </div>
+
+<!-- Interactive Scripts -->
+<script>
+// Catalog Filter Functionality
+function filterCatalog(category, btn) {
+  const tabs = document.querySelectorAll('.tab-btn');
+  tabs.forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const cards = document.querySelectorAll('#catalogGrid .feature-card');
+  cards.forEach(card => {
+    const cat = card.getAttribute('data-category');
+    if (category === 'all' || cat === category || cat === 'all') {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// FAQ Accordion Functionality
+function toggleFaq(element) {
+  const isAlreadyActive = element.classList.contains('active');
+  const allFaqs = document.querySelectorAll('.faq-item');
+  allFaqs.forEach(item => item.classList.remove('active'));
+  if (!isAlreadyActive) {
+    element.classList.add('active');
+  }
+}
+
+// Counter Animation on Scroll
+let animatedCounters = false;
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !animatedCounters) {
+      animatedCounters = true;
+      animateNumbers();
+    }
+  });
+}, { threshold: 0.5 });
+
+const metricsStrip = document.getElementById('metricsStrip');
+if (metricsStrip) observer.observe(metricsStrip);
+
+function animateNumbers() {
+  const counters = document.querySelectorAll('[data-counter]');
+  counters.forEach(el => {
+    const target = parseInt(el.getAttribute('data-counter'));
+    const suffix = el.getAttribute('data-suffix') || '';
+    let current = 0;
+    const step = Math.max(1, Math.floor(target / 40));
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) {
+        current = target;
+        clearInterval(timer);
+      }
+        if (target === 90) {
+          el.innerText = 'Up to ' + current + suffix;
+        } else {
+          el.innerText = current.toLocaleString() + suffix;
+        }
+    }, 30);
+  });
+}
+</script>
 </body>
 </html>
