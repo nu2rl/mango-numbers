@@ -310,7 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_approve'])) {
         $_SESSION['error_msg'] = 'ID / Number exceeds maximum length of 255 characters.';
     } else {
         // Fetch purchase details
-        $stmt = $db->prepare("SELECT * FROM purchases WHERE id = ? AND status = 'pending'");
+        $stmt = $db->prepare("SELECT p.*, u.username FROM purchases p LEFT JOIN users u ON p.user_id = u.id WHERE p.id = ? AND p.status = 'pending'");
         $stmt->execute([$purchase_id]);
         $purchase = $stmt->fetch();
         
@@ -323,13 +323,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_approve'])) {
                 $update = $db->prepare("UPDATE purchases SET status = 'approved', virtual_number_provided = ?, otp_provided = ?, screenshot_path = NULL WHERE id = ?");
                 $update->execute([$virtual_number, $otp_code, $purchase_id]);
                 
-                // Decrement stock in products table
-                $dec_products = $db->prepare("UPDATE products SET stock_quantity = GREATEST(0, stock_quantity - 1), availability_status = CASE WHEN stock_quantity - 1 <= 0 THEN 'out_of_stock' ELSE availability_status END WHERE id = ?");
-                $dec_products->execute([$purchase['catalog_id']]);
+                // Decrement stock in products table or catalog table
+                if (!empty($purchase['product_id'])) {
+                    $dec_products = $db->prepare("UPDATE products SET stock_quantity = GREATEST(0, stock_quantity - 1), availability_status = CASE WHEN stock_quantity - 1 <= 0 THEN 'out_of_stock' ELSE availability_status END WHERE id = ?");
+                    $dec_products->execute([$purchase['product_id']]);
+                } elseif (!empty($purchase['catalog_id'])) {
+                    $dec_products = $db->prepare("UPDATE products SET stock_quantity = GREATEST(0, stock_quantity - 1), availability_status = CASE WHEN stock_quantity - 1 <= 0 THEN 'out_of_stock' ELSE availability_status END WHERE id = ?");
+                    $dec_products->execute([$purchase['catalog_id']]);
 
-                // Decrement stock in legacy catalog table
-                $dec_catalog = $db->prepare("UPDATE catalog SET stock = GREATEST(0, stock - 1) WHERE id = ?");
-                $dec_catalog->execute([$purchase['catalog_id']]);
+                    $dec_catalog = $db->prepare("UPDATE catalog SET stock = GREATEST(0, stock - 1) WHERE id = ?");
+                    $dec_catalog->execute([$purchase['catalog_id']]);
+                }
                 
                 $db->commit();
                 $_SESSION['success_msg'] = 'Order approved successfully! Stock decremented and virtual verification OTP sent to user dashboard.';
@@ -366,7 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reject'])) {
     $purchase_id = (int)$_POST['purchase_id'];
     $active_tab = $_POST['active_tab'] ?? 'approvals';
     
-    $stmt = $db->prepare("SELECT id, username, utr_number, service_type, item_name, screenshot_path FROM purchases WHERE id = ? AND status = 'pending'");
+    $stmt = $db->prepare("SELECT p.id, p.user_id, p.utr_number, p.service_type, p.item_name, p.screenshot_path, u.username FROM purchases p LEFT JOIN users u ON p.user_id = u.id WHERE p.id = ? AND p.status = 'pending'");
     $stmt->execute([$purchase_id]);
     $purchase = $stmt->fetch();
     
@@ -481,14 +485,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_create_section
         $sec_icon = $uploaded_icon;
     }
 
-    $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $sec_name)));
-
     if (empty($sec_name)) {
         $_SESSION['error_msg'] = 'Section name is required.';
     } else {
-        $stmt = $db->prepare("INSERT INTO sections (name, slug, description, icon) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$sec_name, $slug, $sec_desc, $sec_icon]);
-        $_SESSION['success_msg'] = "New Section '{$sec_name}' created successfully!";
+        // Build sanitized unique slug
+        $base_slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $sec_name), '-'));
+        if (empty($base_slug)) {
+            $base_slug = 'section-' . time();
+        }
+
+        $slug = $base_slug;
+        try {
+            if ($db) {
+                // Ensure slug uniqueness before insert
+                $chk_slug = $db->prepare("SELECT id FROM sections WHERE slug = ?");
+                $chk_slug->execute([$slug]);
+                if ($chk_slug->fetch()) {
+                    $slug = $base_slug . '-' . time();
+                }
+
+                $stmt = $db->prepare("INSERT INTO sections (name, slug, description, icon) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$sec_name, $slug, $sec_desc, $sec_icon]);
+                $_SESSION['success_msg'] = "New Section '{$sec_name}' created successfully!";
+            } else {
+                $_SESSION['error_msg'] = 'Database connection error. Could not create section.';
+            }
+        } catch (PDOException $e) {
+            // ponytail: handle duplicate/schema errors gracefully without crashing page
+            $_SESSION['error_msg'] = "Failed to create section: " . $e->getMessage();
+        }
     }
     header("Location: admin.php?active_tab=catalog");
     exit;
@@ -497,9 +522,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_create_section
 // 3c. Handle Manage Offers: Delete Section
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_delete_section'])) {
     $sec_id = (int)$_POST['section_id'];
-    $stmt = $db->prepare("DELETE FROM sections WHERE id = ?");
-    $stmt->execute([$sec_id]);
-    $_SESSION['success_msg'] = 'Section deleted successfully!';
+    try {
+        if ($db) {
+            $stmt = $db->prepare("DELETE FROM sections WHERE id = ?");
+            $stmt->execute([$sec_id]);
+            $_SESSION['success_msg'] = 'Section deleted successfully!';
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error_msg'] = 'Failed to delete section: ' . $e->getMessage();
+    }
     header("Location: admin.php?active_tab=catalog");
     exit;
 }

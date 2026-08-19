@@ -100,9 +100,9 @@ if (empty($_SESSION['csrf_token'])) {
 
 // Database Credentials (configured for Hostinger mangonumbers.bond)
 define('DB_HOST', $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost');
-define('DB_USER', $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'u266502536_usernumber');
+define('DB_USER', $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'u266502536_mangouser');
 define('DB_PASS', $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '@Sidhu890');
-define('DB_NAME', $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'u266502536_number');
+define('DB_NAME', $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'u266502536_mango');
 
 // Business Configurations
 define('USDT_RATE', 89.0);               // 1 USDT = 89 INR
@@ -126,20 +126,76 @@ function get_db_connection() {
         return $pdo;
     }
     
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+
+    $host = DB_HOST;
+    $dbname = DB_NAME;
+    $user = DB_USER;
+    $pass = DB_PASS;
+
     try {
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-        $options = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ];
-        $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+        $pdo = new PDO("mysql:host={$host};dbname={$dbname};charset=utf8mb4", $user, $pass, $options);
+    } catch (PDOException $e) {
+        // Fallback for local XAMPP development environment
+        try {
+            $pdo = new PDO("mysql:host=127.0.0.1;dbname={$dbname};charset=utf8mb4", 'root', '', $options);
+        } catch (PDOException $e2) {
+            try {
+                $pdo = new PDO("mysql:host=127.0.0.1;dbname=mango_number;charset=utf8mb4", 'root', '', $options);
+            } catch (PDOException $e3) {
+                try {
+                    $pdo = new PDO("mysql:host=127.0.0.1;dbname=uclrhzsi_number;charset=utf8mb4", 'root', '', $options);
+                } catch (PDOException $e4) {
+                    return null;
+                }
+            }
+        }
+    }
         
         // Auto-migration & Schema verification (runs only once per process)
         static $migrated = false;
         if (!$migrated) {
             $migrated = true;
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS sections (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(150) NOT NULL,
+                    slug VARCHAR(150) NOT NULL UNIQUE,
+                    description TEXT DEFAULT NULL,
+                    icon VARCHAR(255) DEFAULT 'bx-layer',
+                    display_order INT DEFAULT 0,
+                    status ENUM('active', 'inactive') DEFAULT 'active',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB;");
+            } catch (PDOException $e) {}
+
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS products (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    section_id INT NOT NULL,
+                    name VARCHAR(150) NOT NULL,
+                    country VARCHAR(100) DEFAULT 'Global',
+                    price_cost_usd DECIMAL(10,2) DEFAULT 0.00,
+                    price_cost_inr DECIMAL(10,2) DEFAULT 0.00,
+                    price_usd DECIMAL(10,2) DEFAULT 0.00,
+                    price_inr DECIMAL(10,2) DEFAULT 0.00,
+                    stock_quantity INT DEFAULT 0,
+                    availability_status VARCHAR(50) DEFAULT 'available',
+                    icon VARCHAR(255) DEFAULT NULL,
+                    badge VARCHAR(100) DEFAULT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB;");
+            } catch (PDOException $e) {}
+
             try { $pdo->exec("ALTER TABLE users ADD COLUMN mobile VARCHAR(20) DEFAULT NULL AFTER username"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE users ADD COLUMN avatar_path VARCHAR(255) DEFAULT NULL AFTER mobile"); } catch (PDOException $e) {}
             try { $pdo->exec("ALTER TABLE users ADD COLUMN status VARCHAR(20) DEFAULT 'active' AFTER role"); } catch (PDOException $e) {}
             try { $pdo->exec("ALTER TABLE users ADD COLUMN deletion_reason TEXT DEFAULT NULL AFTER status"); } catch (PDOException $e) {}
             try { $pdo->exec("ALTER TABLE complaints ADD COLUMN admin_deleted_at TIMESTAMP NULL DEFAULT NULL AFTER admin_response"); } catch (PDOException $e) {}
@@ -152,8 +208,10 @@ function get_db_connection() {
 
             // Migrate service_type columns to VARCHAR(50) to support Canva Premium
             try { $pdo->exec("ALTER TABLE catalog MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
-            try { $pdo->exec("ALTER TABLE products MODIFY COLUMN availability_status ENUM('available', 'out_of_stock', 'disabled') DEFAULT 'available'"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE products MODIFY COLUMN availability_status VARCHAR(50) NOT NULL DEFAULT 'available'"); } catch (PDOException $e) {}
             try { $pdo->exec("ALTER TABLE purchases MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE purchases ADD COLUMN product_id INT DEFAULT NULL AFTER catalog_id"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE purchases MODIFY COLUMN catalog_id INT DEFAULT NULL"); } catch (PDOException $e) {}
 
             // Auto-seed Canva Premium Lifetime if missing
             try {
@@ -253,9 +311,6 @@ function get_db_connection() {
         }
         
         return $pdo;
-    } catch (PDOException $e) {
-        return null;
-    }
 }
 
 function is_logged_in() {
@@ -413,7 +468,7 @@ function send_telegram_notification($message) {
     curl_setopt($ch, CURLOPT_TIMEOUT, 4);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     @curl_exec($ch);
-    curl_close($ch);
+    @curl_close($ch);
     return true;
 }
 

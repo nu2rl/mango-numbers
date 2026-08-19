@@ -15,3 +15,8 @@ uploads/
 
 # Build output
 dist/
+
+# Database dumps & zip archives
+*.sql
+*.zip
+
