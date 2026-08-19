@@ -647,7 +647,53 @@ function get_flag($country) {
       gap: 12px;
     }
 
-    /* Responsive */
+    /* Mobile Navigation Drawer */
+    .mobile-menu-toggle {
+      display: none;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-size: 1.4rem;
+      padding: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+    }
+    .mobile-drawer {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(3, 7, 18, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 20px 24px;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 100;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+    .mobile-drawer.active {
+      display: flex;
+    }
+    .mobile-drawer a {
+      color: #e5e7eb;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Responsive & Mobile Enhancements */
     @media (max-width: 992px) {
       .hero-inner {
         grid-template-columns: 1fr;
@@ -656,21 +702,70 @@ function get_flag($country) {
       .features-grid, .steps-grid, .testimonial-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-    }
-    @media (max-width: 640px) {
-      .hero-title {
-        font-size: 2.1rem;
+      .metrics-strip {
+        border-radius: 24px;
+        padding: 20px 24px;
       }
+    }
+    @media (max-width: 768px) {
       .nav {
         display: none;
       }
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      .brand-tagline {
+        display: none;
+      }
+      .hero {
+        padding: 28px 0 40px;
+      }
+      .hero-title {
+        font-size: clamp(1.85rem, 6vw, 2.5rem);
+      }
+      .section-title {
+        font-size: clamp(1.45rem, 5vw, 2rem);
+      }
+      .btn {
+        min-height: 44px;
+      }
+      .field input {
+        min-height: 46px;
+      }
+    }
+    @media (max-width: 640px) {
+      .container {
+        padding: 0 16px;
+      }
+      .hero-card {
+        padding: 22px 18px;
+        border-radius: 20px;
+      }
       .features-grid, .steps-grid, .testimonial-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
       }
       .metrics-strip {
         border-radius: 20px;
         flex-direction: column;
         align-items: flex-start;
+        gap: 16px;
+        padding: 18px 20px;
+      }
+      .hero-bullets {
+        gap: 8px;
+      }
+      .hero-pill {
+        font-size: .8rem;
+        padding: 6px 12px;
+      }
+      .footer-top {
+        flex-direction: column;
+        gap: 28px;
+      }
+      .footer-links {
+        flex-direction: column;
+        gap: 24px;
       }
     }
     </style>
@@ -704,12 +799,51 @@ function get_flag($country) {
             </a>
           <?php else: ?>
             <a href="login.php" class="btn btn-ghost btn-sm">Sign in</a>
-            <a href="register.php" class="btn btn-primary btn-sm">Create Account</a>
+            <a href="register.php" class="btn btn-primary btn-sm d-none-xs">Create Account</a>
           <?php endif; ?>
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Navigation Menu">
+            <i class="bx bx-menu"></i>
+          </button>
         </div>
       </div>
     </div>
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+      <a href="#services" onclick="closeMobileDrawer()"><i class="bx bx-store-alt"></i> Catalog Services <i class="bx bx-chevron-right"></i></a>
+      <a href="#why-mango" onclick="closeMobileDrawer()"><i class="bx bx-shield-quarter"></i> Why Mango Number? <i class="bx bx-chevron-right"></i></a>
+      <a href="#how-it-works" onclick="closeMobileDrawer()"><i class="bx bx-cog"></i> How It Works <i class="bx bx-chevron-right"></i></a>
+      <a href="#testimonials" onclick="closeMobileDrawer()"><i class="bx bx-star"></i> Reviews <i class="bx bx-chevron-right"></i></a>
+      <?php if (is_logged_in()): ?>
+        <a href="dashboard.php" style="background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #fff;"><i class="bx bx-grid-alt"></i> Go to Dashboard <i class="bx bx-right-arrow-alt"></i></a>
+      <?php else: ?>
+        <a href="login.php"><i class="bx bx-log-in"></i> Sign In <i class="bx bx-chevron-right"></i></a>
+        <a href="register.php" style="background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #fff;"><i class="bx bx-user-plus"></i> Create Account <i class="bx bx-right-arrow-alt"></i></a>
+      <?php endif; ?>
+    </div>
   </header>
+
+  <script>
+    const toggleBtn = document.getElementById('mobileMenuToggle');
+    const drawer = document.getElementById('mobileDrawer');
+    if (toggleBtn && drawer) {
+      toggleBtn.addEventListener('click', () => {
+        drawer.classList.toggle('active');
+        const icon = toggleBtn.querySelector('i');
+        if (drawer.classList.contains('active')) {
+          icon.className = 'bx bx-x';
+        } else {
+          icon.className = 'bx bx-menu';
+        }
+      });
+    }
+    function closeMobileDrawer() {
+      if (drawer) {
+        drawer.classList.remove('active');
+        const icon = toggleBtn.querySelector('i');
+        if (icon) icon.className = 'bx bx-menu';
+      }
+    }
+  </script>
 
   <!-- Hero + Quick Account Signup -->
   <main>
