@@ -1138,7 +1138,7 @@ function get_flag($country) {
             <span class="metric-label">active users saving on virtual numbers</span>
           </div>
           <div class="metric">
-            <span class="metric-value" data-counter="95" data-suffix="k+ Delivered">0k+ Delivered</span>
+            <span class="metric-value" data-counter="1200" data-suffix="+ Delivered">1,200+ Delivered</span>
             <span class="metric-label">instant OTP verifications worldwide</span>
           </div>
         </div>
