@@ -1117,7 +1117,7 @@ function get_flag($country) {
           </div>
           <div>
             <div class="brand-text">MANGO <span>NUMBER</span></div>
-            <div class="brand-tagline">World-Class SMS Verification &amp; Digital Marketplace</div>
+            <div class="brand-tagline">Instant Virtual SMS &amp; Digital Marketplace</div>
           </div>
         </a>
         <nav class="nav">
