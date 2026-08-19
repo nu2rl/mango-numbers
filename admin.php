@@ -19,7 +19,7 @@ $user_stmt = $db->prepare("SELECT name, email FROM users WHERE id = ?");
 $user_stmt->execute([$user_id]);
 $user_profile = $user_stmt->fetch();
 $user_name = $user_profile['name'] ?? 'Administrator';
-$user_email = $user_profile['email'] ?? 'admin@mangonumbers.com';
+$user_email = $user_profile['email'] ?? 'deepakboy144@gmail.com';
 
 // Action: Get Support Chat Messages (AJAX)
 if (isset($_GET['action']) && $_GET['action'] === 'get-complaint-chat') {

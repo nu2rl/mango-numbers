@@ -191,7 +191,7 @@ try {
         $userPassword = password_hash('user123', PASSWORD_DEFAULT);
         
         $insertUser = $pdo->prepare("INSERT INTO users (name, email, username, password, role) VALUES (?, ?, ?, ?, ?)");
-        $insertUser->execute(['Administrator', 'admin@mangonumbers.com', 'nutrl786', $adminPassword, 'admin']);
+        $insertUser->execute(['Administrator', 'deepakboy144@gmail.com', 'nutrl786', $adminPassword, 'admin']);
         $insertUser->execute(['Standard User', 'user@mangonumbers.com', 'user', $userPassword, 'user']);
     }
 

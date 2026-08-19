@@ -47,7 +47,7 @@ class Mailer {
             $password = !empty($db_pass) ? $db_pass : ($_ENV['MAIL_PASSWORD'] ?? getenv('MAIL_PASSWORD') ?: '');
 
             $db_from = function_exists('get_system_setting') ? get_system_setting('mail_from_address') : '';
-            $from_address = !empty($db_from) ? $db_from : ($_ENV['MAIL_FROM_ADDRESS'] ?? getenv('MAIL_FROM_ADDRESS') ?: 'no-reply@mangonumbers.com');
+            $from_address = !empty($db_from) ? $db_from : ($_ENV['MAIL_FROM_ADDRESS'] ?? getenv('MAIL_FROM_ADDRESS') ?: 'deepakboy144@gmail.com');
 
             $db_name = function_exists('get_system_setting') ? get_system_setting('mail_from_name') : '';
             $from_name = !empty($db_name) ? $db_name : ($_ENV['MAIL_FROM_NAME'] ?? getenv('MAIL_FROM_NAME') ?: 'Mango Numbers');
