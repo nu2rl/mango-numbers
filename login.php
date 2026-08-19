@@ -171,12 +171,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .left-logo-icon {
             width: 44px; height: 44px;
-            background: linear-gradient(135deg, #f97316, #fb923c);
-            border-radius: 12px;
+            background: transparent;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 24px rgba(249,115,22,0.5);
+            box-shadow: none;
         }
-        .left-logo-icon img { width: 28px; height: 28px; object-fit: contain; }
+        .left-logo-icon img { width: 44px; height: 44px; object-fit: contain; border-radius: 50%; filter: drop-shadow(0 0 10px rgba(249,115,22,0.4)); }
         .left-logo-text {
             font-family: 'Sora', sans-serif;
             font-size: 22px; font-weight: 800;

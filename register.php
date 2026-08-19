@@ -55,8 +55,8 @@ if (is_logged_in()) {
         @keyframes meshMove { 0% { background-position: 0 0; } 100% { background-position: 48px 48px; } }
         .left-content { position: relative; z-index: 2; text-align: center; max-width: 400px; }
         .left-logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 48px; text-decoration: none; }
-        .left-logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg,#f97316,#fb923c); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(249,115,22,0.5); }
-        .left-logo-icon img { width: 28px; height: 28px; object-fit: contain; }
+        .left-logo-icon { width: 44px; height: 44px; background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: none; }
+        .left-logo-icon img { width: 44px; height: 44px; object-fit: contain; border-radius: 50%; filter: drop-shadow(0 0 10px rgba(249,115,22,0.4)); }
         .left-logo-text { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); }
         .left-logo-text span { color: var(--accent); }
         .left-headline { font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800; line-height: 1.2; letter-spacing: -1px; color: var(--text); margin-bottom: 18px; }

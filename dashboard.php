@@ -318,8 +318,8 @@ function get_flag_icon($country) {
             display: flex; align-items: center; justify-content: space-between;
         }
         .sidebar-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .sidebar-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg,#f97316,#fb923c); border-radius: 9px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px rgba(249,115,22,0.4); }
-        .sidebar-logo-icon img { width: 22px; height: 22px; object-fit: contain; }
+        .sidebar-logo-icon { width: 38px; height: 38px; background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: none; }
+        .sidebar-logo-icon img { width: 38px; height: 38px; object-fit: contain; border-radius: 50%; filter: drop-shadow(0 0 10px rgba(249,115,22,0.4)); }
         .sidebar-logo-text { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 800; color: var(--text); }
         .sidebar-logo-text span { color: var(--accent); }
 

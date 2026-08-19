@@ -228,23 +228,25 @@ function get_flag($country) {
       gap: 12px;
     }
     .brand-logo-icon {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, #ff5e36, #ff8a1f);
-      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 20px rgba(255, 94, 54, 0.4);
+      box-shadow: none;
       transition: transform 0.3s ease;
     }
     .brand:hover .brand-logo-icon {
-      transform: scale(1.06) rotate(-3deg);
+      transform: scale(1.08) rotate(-3deg);
     }
     .brand-logo-icon img {
-      width: 24px;
-      height: 24px;
+      width: 44px;
+      height: 44px;
       object-fit: contain;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 10px rgba(255, 94, 54, 0.4));
     }
     .brand-text {
       font-family: 'Outfit', sans-serif;
