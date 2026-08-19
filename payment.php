@@ -17,6 +17,7 @@ if ($catalog_id <= 0) {
     header("Location: dashboard.php"); exit;
 }
 
+$is_catalog_item = false;
 $stmt = $db->prepare("SELECT p.*, s.name as service_type FROM products p JOIN sections s ON p.section_id = s.id WHERE p.id = ? AND p.status = 'active'");
 $stmt->execute([$catalog_id]);
 $product = $stmt->fetch();
@@ -25,6 +26,9 @@ if (!$product) {
     $stmt = $db->prepare("SELECT * FROM catalog WHERE id = ? AND status = 'active'");
     $stmt->execute([$catalog_id]);
     $product = $stmt->fetch();
+    if ($product) {
+        $is_catalog_item = true;
+    }
 }
 
 if (!$product) {
@@ -67,7 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
         if (move_uploaded_file($tmp_name, $dest_path)) { $screenshot_path = 'uploads/' . $new_filename; }
         else { $_SESSION['error_msg'] = 'Failed to save screenshot.'; header("Location: payment.php?id=" . $catalog_id); exit; }
     } else {
-        $src_img = ($mime==='image/png'||$mime==='image/x-png') ? @imagecreatefrompng($tmp_name) : @imagecreatefromjpeg($tmp_name);
+        if ($mime === 'image/webp' && function_exists('imagecreatefromwebp')) {
+            $src_img = @imagecreatefromwebp($tmp_name);
+        } elseif ($mime === 'image/png' || $mime === 'image/x-png') {
+            $src_img = @imagecreatefrompng($tmp_name);
+        } else {
+            $src_img = @imagecreatefromjpeg($tmp_name);
+        }
         if (!$src_img) { $_SESSION['error_msg'] = 'Failed to process image.'; header("Location: payment.php?id=" . $catalog_id); exit; }
         $width=imagesx($src_img); $height=imagesy($src_img); $max_dim=1200;
         if ($width>$max_dim||$height>$max_dim) {
@@ -86,9 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
         @imagedestroy($src_img); $screenshot_path='uploads/'.$new_filename;
     }
 
-    $insert = $db->prepare("INSERT INTO purchases (user_id, catalog_id, service_type, item_name, price_cost_inr, price_paid_inr, utr_number, screenshot_path, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+    $cat_id_val = $is_catalog_item ? (int)$product['id'] : null;
+    $prod_id_val = !$is_catalog_item ? (int)$product['id'] : null;
+
+    $insert = $db->prepare("INSERT INTO purchases (user_id, catalog_id, product_id, service_type, item_name, price_cost_inr, price_paid_inr, utr_number, screenshot_path, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
     try {
-        $insert->execute([$user_id,$product['id'],$product['service_type'],$product['name'],$product['price_cost_inr'],$product['price_inr'],$utr_number,$screenshot_path]);
+        $insert->execute([$user_id, $cat_id_val, $prod_id_val, $product['service_type'], $product['name'], $product['price_cost_inr'], $product['price_inr'], $utr_number, $screenshot_path]);
         
         // Send instant Telegram Bot Notification
         $user_name_text = $_SESSION['username'] ?? 'User #'.$user_id;
