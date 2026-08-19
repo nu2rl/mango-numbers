@@ -559,7 +559,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_create_house']
     $price_usd = (float)($_POST['price_usd'] ?? 0);
     $price_cost_inr = (float)($_POST['price_cost_inr'] ?? 0);
     $price_cost_usd = (float)($_POST['price_cost_usd'] ?? 0);
-    $stock = (int)($_POST['stock_quantity'] ?? 0);
+    $stock = max(0, min(2147483647, (int)($_POST['stock_quantity'] ?? 0)));
     $icon = trim($_POST['house_icon'] ?? '');
     $badge = trim($_POST['badge'] ?? '');
 
@@ -594,7 +594,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_house']
     $sec_id = (int)$_POST['section_id'];
     $price_inr = (float)($_POST['price_inr'] ?? 0);
     $price_usd = (float)($_POST['price_usd'] ?? 0);
-    $stock = (int)($_POST['stock_quantity'] ?? 0);
+    $stock = max(0, min(2147483647, (int)($_POST['stock_quantity'] ?? 0)));
 
     $house_name = isset($_POST['house_name']) ? trim($_POST['house_name']) : '';
     $badge = isset($_POST['badge']) ? trim($_POST['badge']) : null;
