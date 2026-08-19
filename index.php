@@ -972,11 +972,11 @@ function get_flag($country) {
       justify-content: space-between;
     }
 
-    /* Responsive */
+    /* Responsive & Mobile Enhancements */
     @media (max-width: 992px) {
       .hero-inner {
         grid-template-columns: 1fr;
-        gap: 36px;
+        gap: 28px;
       }
       .features-grid, .steps-grid, .testimonial-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -997,40 +997,80 @@ function get_flag($country) {
         display: none;
       }
       .hero {
-        padding: 28px 0 40px;
+        padding: 20px 0 32px;
       }
       .btn {
-        min-height: 44px;
+        min-height: 40px;
+        white-space: nowrap;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: .78rem;
       }
       .field input {
-        min-height: 46px;
+        min-height: 44px;
       }
     }
     @media (max-width: 640px) {
       .container {
-        padding: 0 16px;
+        padding: 0 14px;
+      }
+      .hero-title {
+        font-size: clamp(1.4rem, 5.2vw, 1.85rem);
+        margin-bottom: 10px;
+        line-height: 1.22;
+      }
+      .hero-sub {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+      .hero-kicker {
+        font-size: .74rem;
+        padding: 4px 10px;
+        margin-bottom: 12px;
       }
       .hero-card {
-        padding: 22px 18px;
-        border-radius: 20px;
+        padding: 20px 16px;
+        border-radius: 18px;
       }
       .features-grid, .steps-grid, .testimonial-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 14px;
       }
       .metrics-strip {
-        border-radius: 20px;
+        border-radius: 18px;
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
-        padding: 18px 20px;
+        gap: 14px;
+        padding: 16px 18px;
       }
       .hero-bullets {
-        gap: 8px;
+        gap: 6px;
+        margin-bottom: 18px;
       }
       .hero-pill {
-        font-size: .8rem;
+        font-size: .75rem;
+        padding: 5px 10px;
+      }
+      .floating-support-pill {
+        bottom: 12px;
+        right: 12px;
+        padding: 7px 12px;
+        font-size: .76rem;
+        box-shadow: 0 6px 20px rgba(0, 136, 204, 0.5);
+      }
+      .floating-support-pill svg {
+        width: 16px;
+        height: 16px;
+      }
+      .header-actions .btn-ghost {
+        padding: 6px 10px;
+        font-size: .75rem;
+      }
+      .header-actions .btn-primary {
         padding: 6px 12px;
+        font-size: .75rem;
       }
       .footer-top {
         flex-direction: column;
