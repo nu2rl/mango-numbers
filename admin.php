@@ -571,10 +571,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_create_house']
     if (empty($house_name) || $sec_id <= 0) {
         $_SESSION['error_msg'] = 'House name and Section are required.';
     } else {
-        $status = ($stock > 0) ? 'available' : 'out_of_stock';
-        $stmt = $db->prepare("INSERT INTO products (section_id, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock_quantity, availability_status, icon, badge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$sec_id, $house_name, $country, $price_cost_usd, $price_cost_inr, $price_usd, $price_inr, $stock, $status, $icon, $badge]);
-        $_SESSION['success_msg'] = "New House '{$house_name}' added to Section!";
+        try {
+            if ($db) {
+                $status = ($stock > 0) ? 'available' : 'out_of_stock';
+                $stmt = $db->prepare("INSERT INTO products (section_id, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock_quantity, availability_status, icon, badge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$sec_id, $house_name, $country, $price_cost_usd, $price_cost_inr, $price_usd, $price_inr, $stock, $status, $icon, $badge]);
+                $_SESSION['success_msg'] = "New House '{$house_name}' added to Section!";
+            } else {
+                $_SESSION['error_msg'] = 'Database connection error.';
+            }
+        } catch (PDOException $e) {
+            $_SESSION['error_msg'] = 'Failed to add house: ' . $e->getMessage();
+        }
     }
     header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
     exit;
@@ -597,35 +605,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_house']
         $icon = $uploaded_icon;
     }
 
-    $stmt_old = $db->prepare("SELECT name, badge, icon, status, availability_status FROM products WHERE id = ?");
-    $stmt_old->execute([$prod_id]);
-    $old = $stmt_old->fetch();
+    try {
+        if ($db) {
+            $stmt_old = $db->prepare("SELECT name, badge, icon, status, availability_status FROM products WHERE id = ?");
+            $stmt_old->execute([$prod_id]);
+            $old = $stmt_old->fetch();
 
-    if (empty($house_name) && $old) {
-        $house_name = $old['name'];
-    }
-    if ($badge === null && $old) {
-        $badge = $old['badge'];
-    }
-    if ($icon === null && $old) {
-        $icon = $old['icon'];
-    }
+            if (empty($house_name) && $old) {
+                $house_name = $old['name'];
+            }
+            if ($badge === null && $old) {
+                $badge = $old['badge'];
+            }
+            if ($icon === null && $old) {
+                $icon = $old['icon'];
+            }
 
-    if (isset($_POST['status'])) {
-        $status_input = trim($_POST['status']);
-        $status = ($status_input === 'inactive' || $status_input === 'disabled') ? 'inactive' : 'active';
-        $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
-    } else if ($old) {
-        $status = $old['status'];
-        $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
-    } else {
-        $status = 'active';
-        $availability = ($stock > 0) ? 'available' : 'out_of_stock';
-    }
+            if (isset($_POST['status'])) {
+                $status_input = trim($_POST['status']);
+                $status = ($status_input === 'inactive' || $status_input === 'disabled') ? 'inactive' : 'active';
+                $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
+            } else if ($old) {
+                $status = $old['status'];
+                $availability = ($status === 'inactive') ? 'disabled' : (($stock > 0) ? 'available' : 'out_of_stock');
+            } else {
+                $status = 'active';
+                $availability = ($stock > 0) ? 'available' : 'out_of_stock';
+            }
 
-    $stmt = $db->prepare("UPDATE products SET name = ?, badge = ?, icon = ?, price_inr = ?, price_usd = ?, stock_quantity = ?, status = ?, availability_status = ? WHERE id = ?");
-    $stmt->execute([$house_name, $badge, $icon, $price_inr, $price_usd, $stock, $status, $availability, $prod_id]);
-    $_SESSION['success_msg'] = 'House details updated successfully!';
+            $stmt = $db->prepare("UPDATE products SET name = ?, badge = ?, icon = ?, price_inr = ?, price_usd = ?, stock_quantity = ?, status = ?, availability_status = ? WHERE id = ?");
+            $stmt->execute([$house_name, $badge, $icon, $price_inr, $price_usd, $stock, $status, $availability, $prod_id]);
+            $_SESSION['success_msg'] = 'House details updated successfully!';
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error_msg'] = 'Failed to update house: ' . $e->getMessage();
+    }
     header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
     exit;
 }
@@ -634,9 +648,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_house']
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_delete_house'])) {
     $prod_id = (int)$_POST['product_id'];
     $sec_id = (int)$_POST['section_id'];
-    $stmt = $db->prepare("DELETE FROM products WHERE id = ?");
-    $stmt->execute([$prod_id]);
-    $_SESSION['success_msg'] = 'House deleted successfully!';
+    try {
+        if ($db) {
+            $stmt = $db->prepare("DELETE FROM products WHERE id = ?");
+            $stmt->execute([$prod_id]);
+            $_SESSION['success_msg'] = 'House deleted successfully!';
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error_msg'] = 'Failed to delete house: ' . $e->getMessage();
+    }
     header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
     exit;
 }
@@ -648,11 +668,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_bulk_delete_ho
     if (!empty($ids) && is_array($ids)) {
         $valid_ids = array_map('intval', array_filter($ids, 'is_numeric'));
         if (!empty($valid_ids)) {
-            $in_clause = implode(',', array_fill(0, count($valid_ids), '?'));
-            $stmt = $db->prepare("DELETE FROM products WHERE id IN ($in_clause)");
-            $stmt->execute($valid_ids);
-            $deleted_count = count($valid_ids);
-            $_SESSION['success_msg'] = "Successfully deleted {$deleted_count} selected house(s)!";
+            try {
+                if ($db) {
+                    $in_clause = implode(',', array_fill(0, count($valid_ids), '?'));
+                    $stmt = $db->prepare("DELETE FROM products WHERE id IN ($in_clause)");
+                    $stmt->execute($valid_ids);
+                    $deleted_count = count($valid_ids);
+                    $_SESSION['success_msg'] = "Successfully deleted {$deleted_count} selected house(s)!";
+                }
+            } catch (PDOException $e) {
+                $_SESSION['error_msg'] = 'Failed to bulk delete houses: ' . $e->getMessage();
+            }
         }
     } else {
         $_SESSION['error_msg'] = 'No houses were selected for deletion.';
@@ -666,33 +692,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_toggle_house_s
     $prod_id = (int)$_POST['product_id'];
     $sec_id = (int)$_POST['section_id'];
 
-    if (isset($_POST['status'])) {
-        $status_val = trim($_POST['status']);
-        $new_status = ($status_val === 'disabled' || $status_val === 'inactive') ? 'inactive' : 'active';
-    } else {
-        $stmt_curr = $db->prepare("SELECT status, availability_status FROM products WHERE id = ?");
-        $stmt_curr->execute([$prod_id]);
-        $curr = $stmt_curr->fetch();
-        $is_currently_disabled = ($curr && ($curr['status'] === 'inactive' || $curr['availability_status'] === 'disabled'));
-        $new_status = $is_currently_disabled ? 'active' : 'inactive';
+    try {
+        if ($db) {
+            if (isset($_POST['status'])) {
+                $status_val = trim($_POST['status']);
+                $new_status = ($status_val === 'disabled' || $status_val === 'inactive') ? 'inactive' : 'active';
+            } else {
+                $stmt_curr = $db->prepare("SELECT status, availability_status FROM products WHERE id = ?");
+                $stmt_curr->execute([$prod_id]);
+                $curr = $stmt_curr->fetch();
+                $is_currently_disabled = ($curr && ($curr['status'] === 'inactive' || $curr['availability_status'] === 'disabled'));
+                $new_status = $is_currently_disabled ? 'active' : 'inactive';
+            }
+
+            if ($new_status === 'active') {
+                $stmt_st = $db->prepare("SELECT stock_quantity FROM products WHERE id = ?");
+                $stmt_st->execute([$prod_id]);
+                $st = $stmt_st->fetch();
+                $stock = (int)($st['stock_quantity'] ?? 0);
+                $new_availability = ($stock > 0) ? 'available' : 'out_of_stock';
+                $label = 'Enabled';
+            } else {
+                $new_availability = 'disabled';
+                $label = 'Disabled';
+            }
+
+            $stmt = $db->prepare("UPDATE products SET status = ?, availability_status = ? WHERE id = ?");
+            $stmt->execute([$new_status, $new_availability, $prod_id]);
+
+            $_SESSION['success_msg'] = "House status updated to {$label}!";
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error_msg'] = 'Failed to toggle house status: ' . $e->getMessage();
     }
-
-    if ($new_status === 'active') {
-        $stmt_st = $db->prepare("SELECT stock_quantity FROM products WHERE id = ?");
-        $stmt_st->execute([$prod_id]);
-        $st = $stmt_st->fetch();
-        $stock = (int)($st['stock_quantity'] ?? 0);
-        $new_availability = ($stock > 0) ? 'available' : 'out_of_stock';
-        $label = 'Enabled';
-    } else {
-        $new_availability = 'disabled';
-        $label = 'Disabled';
-    }
-
-    $stmt = $db->prepare("UPDATE products SET status = ?, availability_status = ? WHERE id = ?");
-    $stmt->execute([$new_status, $new_availability, $prod_id]);
-
-    $_SESSION['success_msg'] = "House status updated to {$label}!";
     header("Location: admin.php?active_tab=catalog&view_section=" . $sec_id);
     exit;
 }
