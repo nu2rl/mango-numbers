@@ -1134,7 +1134,7 @@ function get_flag($country) {
             <span class="metric-label">cheaper than original market prices</span>
           </div>
           <div class="metric">
-            <span class="metric-value" data-counter="1200" data-suffix="+">0+</span>
+            <span class="metric-value" data-counter="280" data-suffix="+">280+</span>
             <span class="metric-label">active users saving on virtual numbers</span>
           </div>
           <div class="metric">
