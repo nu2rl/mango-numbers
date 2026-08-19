@@ -453,6 +453,58 @@ function get_flag($country) {
       box-shadow: 0 6px 18px rgba(255, 94, 54, 0.15);
     }
 
+    /* 3D Visual Depth & Micro-Physics */
+    .hero-card, .feature-card, .step-card, .testimonial-card {
+      transform-style: preserve-3d;
+    }
+    .feature-card:hover .feature-icon, .feature-card:hover .card-badge {
+      transform: translateZ(28px) scale(1.08);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-card:hover .hero-card-title, .hero-card:hover .btn-primary {
+      transform: translateZ(20px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .step-card:hover .step-badge {
+      transform: translateZ(24px) scale(1.1);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-3d-badge {
+      position: absolute;
+      top: -18px;
+      right: 18px;
+      background: rgba(17, 24, 39, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 138, 31, 0.45);
+      border-radius: 14px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 94, 54, 0.25);
+      z-index: 20;
+      animation: float3DBadge 5s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .badge-icon {
+      font-size: 1.2rem;
+    }
+    .badge-title {
+      font-size: .78rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .badge-sub {
+      font-size: .68rem;
+      color: #9ca3af;
+    }
+    @keyframes float3DBadge {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-10px) rotate(2deg); }
+    }
+
     /* Hero Card (Registration Form) */
     .hero-card {
       background: rgba(17, 24, 39, 0.85);
@@ -1214,9 +1266,17 @@ function get_flag($country) {
           </div>
 
           <!-- Registration / Login CTA Card -->
-          <div class="hero-card reveal-on-scroll" id="register">
-            <div class="hero-card-title">Get Started &amp; Save Big Today</div>
-            <div class="hero-card-sub">Takes less than 60 seconds. Claim virtual numbers &amp; premium digital services at unbeatable low prices.</div>
+          <div style="position: relative;">
+            <div class="hero-3d-badge">
+              <span class="badge-icon">⚡</span>
+              <div>
+                <div class="badge-title">Instant Delivery</div>
+                <div class="badge-sub">OTP released &lt;45s</div>
+              </div>
+            </div>
+            <div class="hero-card reveal-on-scroll" id="register">
+              <div class="hero-card-title">Get Started &amp; Save Big Today</div>
+              <div class="hero-card-sub">Takes less than 60 seconds. Claim virtual numbers &amp; premium digital services at unbeatable low prices.</div>
 
             <?php if (is_logged_in()): ?>
               <div style="padding: 20px 0; text-align: center;">
@@ -1242,8 +1302,9 @@ function get_flag($country) {
             <?php endif; ?>
           </div>
         </div>
+      </div>
 
-        <!-- Metrics Strip -->
+      <!-- Metrics Strip -->
         <div class="metrics-strip reveal-on-scroll" id="metricsStrip">
           <div class="metric">
             <span class="metric-value" data-counter="70" data-suffix="% OFF">Up to 70% OFF</span>
