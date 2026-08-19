@@ -853,17 +853,17 @@ function get_flag($country) {
           <div class="hero-content">
             <div class="hero-kicker">
               <span class="hero-kicker-dot"></span>
-              <span>Active users in 20+ countries</span>
+              <span>🏷️ Up to 90% Cheaper Than Original Retail Prices</span>
             </div>
             <h1 class="hero-title">
-              Unlock <span class="highlight">100+ Premium</span> Virtual Numbers &amp; Digital Services.
+              Unlock <span class="highlight">100+ Premium</span> Virtual Numbers &amp; Services at Dirt-Cheap Rates.
             </h1>
             <p class="hero-sub">
-              Mango Number gives you instant access to dedicated Telegram &amp; WhatsApp virtual numbers, Canva Premium, productivity tools and AI subscriptions — securely without risking your private phone number.
+              Why pay full price? Mango Number gives you instant access to dedicated Telegram &amp; WhatsApp virtual numbers, Canva Pro, productivity tools and AI subscriptions at heavily discounted rates — far cheaper than original retail prices.
             </p>
             <div class="hero-bullets">
               <span class="hero-pill">
-                <span>✅</span> No credit card required
+                <span>🏷️</span> Up to 90% OFF Original Prices
               </span>
               <span class="hero-pill">
                 <span>⚡</span> Instant OTP activation in minutes
@@ -879,8 +879,8 @@ function get_flag($country) {
 
           <!-- Registration / Login CTA Card -->
           <div class="hero-card" id="register">
-            <div class="hero-card-title">Get Started with Mango Number</div>
-            <div class="hero-card-sub">Takes less than 60 seconds. Start claiming your virtual numbers &amp; premium digital services today.</div>
+            <div class="hero-card-title">Get Started &amp; Save Big Today</div>
+            <div class="hero-card-sub">Takes less than 60 seconds. Claim virtual numbers &amp; premium digital services at unbeatable low prices.</div>
 
             <?php if (is_logged_in()): ?>
               <div style="padding: 20px 0; text-align: center;">
@@ -910,12 +910,12 @@ function get_flag($country) {
         <!-- Metrics Strip -->
         <div class="metrics-strip">
           <div class="metric">
-            <span class="metric-value">1,200+ Active Users</span>
-            <span class="metric-label">saving on virtual numbers &amp; subscriptions</span>
+            <span class="metric-value">Up to 90% OFF</span>
+            <span class="metric-label">cheaper than original market prices</span>
           </div>
           <div class="metric">
-            <span class="metric-value">100+ Services</span>
-            <span class="metric-label">Telegram, WhatsApp, Canva &amp; AI tools</span>
+            <span class="metric-value">1,200+ Active Users</span>
+            <span class="metric-label">saving on virtual numbers &amp; subscriptions</span>
           </div>
           <div class="metric">
             <span class="metric-value">95k+ Delivered</span>
@@ -929,9 +929,9 @@ function get_flag($country) {
     <section class="section" id="services">
       <div class="container">
         <div class="section-header">
-          <div class="section-kicker">Available Catalog</div>
+          <div class="section-kicker">Cheaper Than Original Price</div>
           <h2 class="section-title">Popular Virtual Numbers &amp; Services</h2>
-          <p class="section-text">Explore active virtual country numbers and premium digital subscriptions available right now.</p>
+          <p class="section-text">Explore active virtual country numbers and premium digital subscriptions available at dirt-cheap prices.</p>
         </div>
 
         <div class="features-grid">
@@ -941,7 +941,7 @@ function get_flag($country) {
               <i class="bxl-telegram"></i>
             </div>
             <h3 class="feature-title">Telegram OTP Numbers</h3>
-            <p class="feature-text">Fresh, dedicated virtual numbers from India, USA, Canada, UK, and Russia for Telegram account &amp; channel creation.</p>
+            <p class="feature-text">Fresh, dedicated virtual numbers from India, USA, Canada, UK, and Russia for Telegram account &amp; channel creation at wholesale cheap rates.</p>
             <div style="margin-top: 16px;">
               <a href="dashboard.php?section=buy" class="btn btn-ghost btn-sm w-100" style="border-color: rgba(0, 136, 204, 0.5); color: #38bdf8;">
                 Buy Telegram Numbers <i class="bx bx-chevron-right"></i>
@@ -955,7 +955,7 @@ function get_flag($country) {
               <i class="bxl-whatsapp"></i>
             </div>
             <h3 class="feature-title">WhatsApp Verification</h3>
-            <p class="feature-text">Establish secondary WhatsApp accounts without exposing your personal phone number. 100% private &amp; secure.</p>
+            <p class="feature-text">Establish secondary WhatsApp accounts without exposing your personal phone number. 100% private &amp; up to 80% cheaper.</p>
             <div style="margin-top: 16px;">
               <a href="dashboard.php?section=buy" class="btn btn-ghost btn-sm w-100" style="border-color: rgba(37, 211, 102, 0.5); color: #4ade80;">
                 Buy WhatsApp Numbers <i class="bx bx-chevron-right"></i>
@@ -969,7 +969,7 @@ function get_flag($country) {
               <i class="bx bx-paint"></i>
             </div>
             <h3 class="feature-title">Canva Premium Lifetime</h3>
-            <p class="feature-text">Unlock full access to Canva Pro brand kits, premium stock templates, AI background remover, and cloud storage.</p>
+            <p class="feature-text">Unlock full access to Canva Pro templates, brand kits, and AI tools for just ₹150 instead of the original ₹3,999/yr price.</p>
             <div style="margin-top: 16px;">
               <a href="payment.php?id=1" class="btn btn-ghost btn-sm w-100" style="border-color: rgba(168, 85, 247, 0.5); color: #c084fc;">
                 Get Canva Pro <i class="bx bx-chevron-right"></i>
@@ -988,7 +988,7 @@ function get_flag($country) {
           <div class="feature-card">
             <div class="feature-icon">🤖</div>
             <h3 class="feature-title">AI Assistants &amp; Utilities</h3>
-            <p class="feature-text">Discover productivity suites, chatbots, and AI tools to write, code, and automate your online workflow.</p>
+            <p class="feature-text">Discover productivity suites, chatbots, and AI tools to write, code, and automate at heavily discounted rates.</p>
           </div>
 
           <!-- Total Anonymity & Security -->
@@ -1006,9 +1006,9 @@ function get_flag($country) {
       <div class="container">
         <div class="section-header">
           <div class="section-kicker">Why users choose Mango Number</div>
-          <h2 class="section-title">One Dashboard. 100+ Premium Virtual Services.</h2>
+          <h2 class="section-title">Massive Savings. Unbeatable Cheap Prices.</h2>
           <p class="section-text">
-            Instead of risking your private personal phone number or paying high monthly subscription rates, Mango Number aggregates instant SMS verification and digital perks into one easy-to-use client portal.
+            Instead of paying expensive full subscription costs or risking your private personal phone number, Mango Number provides authentic virtual numbers and digital perks at up to 90% cheaper than original costs.
           </p>
         </div>
 
