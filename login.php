@@ -68,9 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             } catch (PDOException $e) {}
                             session_regenerate_id(true);
                             $_SESSION['user_id'] = $user['id'];
-                            $_SESSION['username'] = $user['username'];
+                            $_SESSION['username'] = $user['name'] ?: $user['username'];
+                            $_SESSION['email'] = $user['email'];
                             $_SESSION['role'] = $user['role'];
                             $_SESSION['status'] = $user['status'];
+                            $_SESSION['avatar_path'] = $user['avatar_path'] ?? null;
+                            $_SESSION['user_agent_sig'] = md5($_SERVER['HTTP_USER_AGENT'] ?? 'unknown');
                             $_SESSION['show_welcome_crack_modal'] = true;
                             if ($user['role'] === 'admin') {
                                 header("Location: admin.php");

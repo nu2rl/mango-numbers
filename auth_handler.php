@@ -306,8 +306,11 @@ try {
             // Set login sessions
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $name;
+            $_SESSION['email'] = $email;
             $_SESSION['role'] = 'user';
+            $_SESSION['status'] = 'active';
             $_SESSION['avatar_path'] = $avatar_path;
+            $_SESSION['user_agent_sig'] = md5($_SERVER['HTTP_USER_AGENT'] ?? 'unknown');
             $_SESSION['show_welcome_crack_modal'] = true;
 
             echo json_encode(['success' => true, 'message' => 'Email verified successfully! Creating account...']);
