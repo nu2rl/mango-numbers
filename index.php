@@ -977,17 +977,17 @@ function get_flag($country) {
   <!-- Live Activity Ticker Bar -->
   <div class="ticker-bar">
     <div class="ticker-content">
+      <div class="ticker-item"><span class="ticker-dot"></span> 🔥 Hum saare premium subscriptions aur apps ko saste me unlocked &amp; crack karke dete hain!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇺🇸 USA Telegram OTP — Delivered 12s ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> ⚡ Har premium app aur tool 90% sasta milega Mango Number pe!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇨🇦 Canada WhatsApp Number — Activated 34s ago</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🎨 Canva Pro Lifetime — Approved 1m ago</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇮🇳 India WhatsApp OTP — Delivered 2m ago</div>
-      <div class="ticker-item"><span class="ticker-dot"></span> 🇬🇧 UK Telegram Number — Activated 3m ago</div>
-      <div class="ticker-item"><span class="ticker-dot"></span> 🇷🇺 Russia OTP Number — Delivered 4m ago</div>
       <!-- Loop set -->
+      <div class="ticker-item"><span class="ticker-dot"></span> 🔥 Hum saare premium subscriptions aur apps ko saste me unlocked &amp; crack karke dete hain!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇺🇸 USA Telegram OTP — Delivered 12s ago</div>
-      <div class="ticker-item"><span class="ticker-dot"></span> 🇨🇦 Canada WhatsApp Number — Activated 34s ago</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> ⚡ Har premium app aur tool 90% sasta milega Mango Number pe!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🎨 Canva Pro Lifetime — Approved 1m ago</div>
-      <div class="ticker-item"><span class="ticker-dot"></span> 🇮🇳 India WhatsApp OTP — Delivered 2m ago</div>
     </div>
   </div>
 
