@@ -12,8 +12,9 @@ require_once __DIR__ . '/Mailer.php';
 $action = $_GET['action'] ?? '';
 if (!in_array($action, ['check-status', 'get-user-purchases'])) {
     $headers = getallheaders();
-    $csrf_token = $headers['X-CSRF-Token'] ?? $_POST['csrf_token'] ?? '';
-    if (empty($_SESSION['csrf_token']) || $csrf_token !== $_SESSION['csrf_token']) {
+    $headers_lower = array_change_key_case($headers, CASE_LOWER);
+    $csrf_token = $headers_lower['x-csrf-token'] ?? $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
+    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_token)) {
         echo json_encode(['success' => false, 'error' => 'CSRF verification failed. Please refresh the page and try again.']);
         exit;
     }

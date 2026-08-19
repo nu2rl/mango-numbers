@@ -29,11 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
     }
     $catalog_id = (int)($_POST['catalog_id'] ?? 0);
     $utr_number = trim($_POST['utr_number'] ?? '');
+    $is_catalog_item = false;
     $stmt = $db->prepare("SELECT p.*, s.name as service_type FROM products p JOIN sections s ON p.section_id = s.id WHERE p.id = ? AND p.status = 'active'");
     $stmt->execute([$catalog_id]); $product = $stmt->fetch();
     if (!$product) {
         $stmt = $db->prepare("SELECT * FROM catalog WHERE id = ? AND status = 'active'");
         $stmt->execute([$catalog_id]); $product = $stmt->fetch();
+        if ($product) { $is_catalog_item = true; }
     }
     $stock = isset($product['stock_quantity']) ? (int)$product['stock_quantity'] : (int)($product['stock'] ?? 0);
     if (!$product) { $_SESSION['error_msg'] = 'Invalid product.'; header("Location: dashboard.php?section=buy"); exit; }
@@ -58,9 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
                 }
             }
         }
-        $insert = $db->prepare("INSERT INTO purchases (user_id, catalog_id, service_type, item_name, price_cost_inr, price_paid_inr, utr_number, screenshot_path, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+        $cat_id_val = $is_catalog_item ? (int)$product['id'] : null;
+        $prod_id_val = !$is_catalog_item ? (int)$product['id'] : null;
+        $insert = $db->prepare("INSERT INTO purchases (user_id, catalog_id, product_id, service_type, item_name, price_cost_inr, price_paid_inr, utr_number, screenshot_path, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
         try {
-            $insert->execute([$user_id,$product['id'],$product['service_type'],$product['name'],$product['price_cost_inr'],$product['price_inr'],$utr_number,$screenshot_path]);
+            $insert->execute([$user_id,$cat_id_val,$prod_id_val,$product['service_type'],$product['name'],$product['price_cost_inr'],$product['price_inr'],$utr_number,$screenshot_path]);
             $_SESSION['success_msg'] = 'Payment submitted! Our team is verifying your UTR.';
             $_SESSION['show_whatsapp_redirect_modal'] = true;
             $_SESSION['show_whatsapp_url'] = "https://t.me/nu9rl";
@@ -838,7 +842,7 @@ function get_flag_icon($country) {
         <div class="sidebar-profile" onclick="switchSection('profile')" style="cursor: pointer; transition: background 0.2s; position: relative;" title="Click to manage account profile & password">
             <div class="profile-row">
                 <?php if (!empty($user_avatar) && file_exists(__DIR__ . '/' . $user_avatar)): ?>
-                    <img src="<?= htmlspecialchars($user_avatar) ?>" class="avatar" style="object-fit: cover; border: 2px solid var(--accent); shadow: 0 0 10px rgba(249,115,22,0.3);">
+                    <img src="<?= htmlspecialchars($user_avatar) ?>" class="avatar" style="object-fit: cover; border: 2px solid var(--accent); box-shadow: 0 0 10px rgba(249,115,22,0.3);">
                 <?php else: ?>
                     <div class="avatar"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
                 <?php endif; ?>
@@ -1068,8 +1072,9 @@ function get_flag_icon($country) {
                                                 <a href="https://t.me/nu9rl" target="_blank" class="btn-tg-sm">✈️ Telegram</a>
                                             </td>
                                             <td>
-                                                <?php if (!empty($p['catalog_id'])): ?>
-                                                    <a href="payment.php?id=<?= (int)$p['catalog_id'] ?>" class="btn-again">🔄 Re-order</a>
+                                                <?php $reorder_id = !empty($p['product_id']) ? $p['product_id'] : ($p['catalog_id'] ?? null); ?>
+                                                <?php if (!empty($reorder_id)): ?>
+                                                    <a href="payment.php?id=<?= (int)$reorder_id ?>" class="btn-again">🔄 Re-order</a>
                                                 <?php else: ?>
                                                     <span style="color:#64748b; font-size:12px;">—</span>
                                                 <?php endif; ?>
