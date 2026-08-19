@@ -1120,17 +1120,22 @@ if ($view_section_id > 0) {
 
     <style>
         :root {
-            --primary-bg: #fffbf5;
+            --primary-bg: #0b0f19;
             --accent-orange: #ff5e36;
-            --accent-yellow: #fca834;
+            --accent-yellow: #ff8a1f;
             --gradient-accent: linear-gradient(135deg, var(--accent-orange), var(--accent-yellow));
-            --text-dark: #231b15;
-            --text-light: #6e5e54;
+            --text-dark: #f3f4f6;
+            --text-light: #9ca3af;
         }
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--primary-bg) !important;
+            background-color: #0b0f19 !important;
+            color: #f3f4f6 !important;
+        }
+
+        .content-wrapper {
+            background-color: #0b0f19 !important;
         }
 
         .brand-text {
@@ -1144,37 +1149,40 @@ if ($view_section_id > 0) {
 
         /* Sidebar custom coloring */
         .bg-menu-theme {
-            background-color: #1e1b19 !important;
+            background-color: #111827 !important;
             color: #d1c5bc !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
 
         .bg-menu-theme .menu-item.active > .menu-link {
             background: var(--gradient-accent) !important;
             color: #ffffff !important;
             font-weight: 600;
+            box-shadow: 0 4px 16px rgba(255, 94, 54, 0.35);
         }
 
         .bg-menu-theme .menu-link {
-            color: #9c8e85 !important;
+            color: #9ca3af !important;
         }
 
         .bg-menu-theme .menu-item:not(.active) .menu-link:hover {
             color: #ffffff !important;
-            background-color: rgba(255, 255, 255, 0.04) !important;
+            background-color: rgba(255, 255, 255, 0.06) !important;
         }
 
         .layout-navbar {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.8) !important;
-            border-bottom: 1px solid rgba(220, 200, 190, 0.4);
+            backdrop-filter: blur(16px);
+            background: rgba(17, 24, 39, 0.88) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
 
         /* Widgets stats */
         .stat-card {
-            border: 1px solid rgba(220, 200, 190, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: 16px;
-            background: #ffffff;
-            box-shadow: 0 4px 15px rgba(25, 10, 5, 0.01);
+            background: rgba(17, 24, 39, 0.85) !important;
+            color: #f3f4f6 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
         }
 
@@ -1203,28 +1211,30 @@ if ($view_section_id > 0) {
 
         /* Section Management & Cards Redesign */
         .mn-section-card {
-            background: #ffffff;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(16px);
             border-radius: 22px;
-            border: 1.5px solid rgba(15, 23, 42, 0.08);
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+            border: 1.5px solid rgba(255, 138, 31, 0.35);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
             position: relative;
             display: flex;
             flex-direction: column;
+            color: #ffffff;
         }
 
         .mn-section-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 20px 40px rgba(255, 94, 54, 0.14);
-            border-color: rgba(255, 94, 54, 0.3);
+            box-shadow: 0 20px 45px rgba(255, 94, 54, 0.25);
+            border-color: rgba(255, 94, 54, 0.6);
         }
 
         .mn-section-card .mn-card-header-bar {
             height: 4px;
             width: 100%;
-            background: linear-gradient(90deg, #ff5e36, #fca834);
-            opacity: 0;
+            background: linear-gradient(90deg, #ff5e36, #ff8a1f);
+            opacity: 0.8;
             transition: opacity 0.3s ease;
             position: absolute;
             top: 0;
@@ -1254,23 +1264,23 @@ if ($view_section_id > 0) {
         }
 
         .mn-btn-glow {
-            background: linear-gradient(135deg, #ff5e36, #fca834);
+            background: linear-gradient(135deg, #ff5e36, #ff8a1f);
             color: #ffffff !important;
             border: none;
             border-radius: 14px;
             font-weight: 700;
-            box-shadow: 0 6px 18px rgba(255, 94, 54, 0.3);
+            box-shadow: 0 6px 18px rgba(255, 94, 54, 0.4);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mn-btn-glow:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(255, 94, 54, 0.45);
+            box-shadow: 0 10px 24px rgba(255, 94, 54, 0.6);
             color: #ffffff !important;
         }
 
         .mn-btn-open-section {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            background: linear-gradient(135deg, #ff5e36, #ff8a1f);
             color: #ffffff !important;
             border: none;
             border-radius: 14px;
@@ -1280,13 +1290,13 @@ if ($view_section_id > 0) {
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 6px 20px rgba(255, 94, 54, 0.4);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mn-btn-open-section:hover {
-            background: linear-gradient(135deg, #ff5e36, #fca834);
-            box-shadow: 0 8px 22px rgba(255, 94, 54, 0.35);
+            background: linear-gradient(135deg, #ff5e36, #ff8a1f);
+            box-shadow: 0 10px 28px rgba(255, 94, 54, 0.6);
             color: #ffffff !important;
             transform: translateY(-2px);
         }
@@ -1294,30 +1304,30 @@ if ($view_section_id > 0) {
         .mn-btn-delete-section {
             width: 44px !important;
             height: 44px !important;
-            background: #fef2f2 !important;
-            color: #dc2626 !important;
-            border: 1.5px solid #fecaca !important;
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #f87171 !important;
+            border: 1.5px solid rgba(239, 68, 68, 0.35) !important;
             border-radius: 14px !important;
             padding: 0 !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12) !important;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2) !important;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
             cursor: pointer !important;
             flex-shrink: 0 !important;
         }
 
         .mn-btn-delete-section:hover {
-            background: #dc2626 !important;
+            background: #ef4444 !important;
             color: #ffffff !important;
-            border-color: #dc2626 !important;
+            border-color: #ef4444 !important;
             transform: translateY(-2px) scale(1.05) !important;
-            box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4) !important;
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.5) !important;
         }
 
         .mn-btn-delete-section i {
-            color: #dc2626 !important;
+            color: #ef4444 !important;
             font-size: 19px !important;
             line-height: 1 !important;
             transition: color 0.2s ease !important;
@@ -2284,27 +2294,24 @@ if ($view_section_id > 0) {
                                             row.style.display = 'none';
                                         }
                                     });
-                                }
-                                </script>
-
-                            <?php else: ?>
-                                <!-- OVERVIEW SECTIONS LIST VIEW -->
-                                <div class="card p-4 mb-4" style="border: 1px solid rgba(255, 94, 54, 0.15); border-radius: 20px; background: linear-gradient(135deg, #ffffff 0%, #fff7f2 100%); box-shadow: 0 10px 30px rgba(255, 94, 54, 0.05); position: relative; overflow: hidden;">
-                                    <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,94,54,0.12) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+                                                                <!-- OVERVIEW SECTIONS LIST VIEW -->
+                                <div class="card p-4 mb-4" style="border: 1.5px solid rgba(255, 138, 31, 0.35); border-radius: 20px; background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;">
+                                    <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,94,54,0.2) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="z-index: 1;">
                                         <div class="d-flex align-items-center gap-3">
-                                            <div style="width: 58px; height: 58px; border-radius: 18px; background: #ffffff; border: 1.5px solid rgba(255, 94, 54, 0.25); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(255, 94, 54, 0.15); flex-shrink: 0; overflow: hidden; padding: 4px;">
+                                            <div style="width: 58px; height: 58px; border-radius: 18px; background: rgba(255, 94, 54, 0.15); border: 1.5px solid rgba(255, 94, 54, 0.35); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(255, 94, 54, 0.25); flex-shrink: 0; overflow: hidden; padding: 4px;">
                                                 <img src="assets/img/offers_icon.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                                             </div>
                                             <div>
                                                 <div class="d-flex align-items-center gap-2 mb-1">
-                                                    <h3 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif; color: #0f172a; font-size: 22px; letter-spacing: -0.3px;">Manage Offers & Sections</h3>
-                                                    <span class="badge" style="background: rgba(255, 94, 54, 0.12); color: #ff5e36; font-size: 11px; font-weight: 800; border-radius: 20px; padding: 4px 10px; border: 1px solid rgba(255,94,54,0.2);">
+                                                    <h3 class="fw-bold mb-0" style="font-family:'Outfit', sans-serif; color: #ffffff; font-size: 22px; letter-spacing: -0.3px;">Manage Offers &amp; Sections</h3>
+                                                    <span class="badge" style="background: rgba(255, 94, 54, 0.2); color: #ff8a1f; font-size: 11px; font-weight: 800; border-radius: 20px; padding: 4px 10px; border: 1px solid rgba(255,94,54,0.35);">
                                                         <?= count($sections_list ?? []) ?> CATEGORIES
                                                     </span>
                                                 </div>
-                                                <p class="text-muted small mb-0" style="font-size: 13.5px; color: #64748b;">Create, organize, and customize multi-level service categories for your customers.</p>
+                                                <p class="text-muted small mb-0" style="font-size: 13.5px; color: #9ca3af;">Create, organize, and customize multi-level service categories for your customers.</p>
                                             </div>
+                                        </div>                                    </div>
                                         </div>
                                         <button class="btn px-3.5 py-2.5 mn-btn-glow" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;" data-bs-toggle="collapse" data-bs-target="#newSectionCollapse">
                                             <i class="bx bx-plus-circle fs-5"></i> New Section
@@ -2447,8 +2454,8 @@ if ($view_section_id > 0) {
                                                                 </div>
                                                             <?php endif; ?>
                                                             <div>
-                                                                <h5 class="fw-bold mb-1" style="font-size: 17.5px; font-family:'Outfit', sans-serif; color: #0f172a; line-height: 1.2;"><?= htmlspecialchars($sec['name']) ?></h5>
-                                                                <span class="badge" style="background: <?= $brand_badge_bg ?>; color: <?= $brand_badge_color ?>; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.3px;">
+                                                                <h5 class="fw-bold mb-1" style="font-size: 17.5px; font-family:'Outfit', sans-serif; color: #ffffff; line-height: 1.2;"><?= htmlspecialchars($sec['name']) ?></h5>
+                                                                <span class="badge" style="background: <?= $brand_badge_bg ?>; color: <?= $brand_badge_color ?>; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid rgba(255,255,255,0.1);">
                                                                     <i class="bx bx-package"></i> <?= (int)$sec['house_count'] ?> Houses / Services
                                                                 </span>
                                                             </div>
