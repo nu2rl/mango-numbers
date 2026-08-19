@@ -1521,6 +1521,24 @@ document.addEventListener('mousemove', e => {
   });
 });
 
+// 3D Parallax Tilt Physics Interaction on Cards
+document.querySelectorAll('.hero-card, .feature-card, .testimonial-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    const rotateX = (-y / rect.height) * 8;
+    const rotateY = (x / rect.width) * 8;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+    card.style.transition = 'transform 0.1s ease-out';
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+  });
+});
+
 // Scroll Reveal Observer
 const revealElements = document.querySelectorAll('.reveal-on-scroll');
 const revealObserver = new IntersectionObserver((entries) => {
