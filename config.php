@@ -339,7 +339,7 @@ function is_logged_in() {
             $stmt = $db->prepare("SELECT id, status FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             $user = $stmt->fetch();
-            if (!$user || $user['status'] === 'deleted') {
+            if (!$user || $user['status'] === 'deleted' || $user['status'] === 'disabled') {
                 // User has been deleted!
                 if (session_status() === PHP_SESSION_NONE) {
                     session_start();

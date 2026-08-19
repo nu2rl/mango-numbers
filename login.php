@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($failed_count >= 5) {
                 $error = 'Too many failed login attempts. Please try again after 15 minutes.';
             } else {
-                $stmt = $db->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+                $stmt = $db->prepare("SELECT * FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)");
                 $stmt->execute([$username, $username]);
                 $user = $stmt->fetch();
                 
@@ -57,6 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($user['status'] === 'deleted') {
                         $reason = htmlspecialchars($user['deletion_reason'] ?? 'No reason specified by administrator.');
                         $error = 'Your account has been deleted by the administrator.<br><strong style="color: #f97316;">Reason:</strong> ' . $reason;
+                    } elseif ($user['status'] === 'disabled') {
+                        $error = 'Your account has been disabled by the administrator. Please contact support.';
                     } elseif (password_verify($password, $user['password'])) {
                         if ($user['role'] !== 'admin' && get_system_setting('allow_website_usage', '1') === '0') {
                             $error = 'The website is currently under maintenance. Only administrators can log in at this time.';
