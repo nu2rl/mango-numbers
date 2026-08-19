@@ -979,14 +979,14 @@ function get_flag($country) {
     <div class="ticker-content">
       <div class="ticker-item"><span class="ticker-dot"></span> 🔥 Hum saare premium subscriptions aur apps ko saste me unlocked &amp; crack karke dete hain!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇺🇸 USA Telegram OTP — Delivered 12s ago</div>
-      <div class="ticker-item"><span class="ticker-dot"></span> ⚡ Har premium app aur tool 90% sasta milega Mango Number pe!</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> ⚡ Har premium app aur tool up to 70% sasta milega Mango Number pe!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇨🇦 Canada WhatsApp Number — Activated 34s ago</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🎨 Canva Pro Lifetime — Approved 1m ago</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇮🇳 India WhatsApp OTP — Delivered 2m ago</div>
       <!-- Loop set -->
       <div class="ticker-item"><span class="ticker-dot"></span> 🔥 Hum saare premium subscriptions aur apps ko saste me unlocked &amp; crack karke dete hain!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🇺🇸 USA Telegram OTP — Delivered 12s ago</div>
-      <div class="ticker-item"><span class="ticker-dot"></span> ⚡ Har premium app aur tool 90% sasta milega Mango Number pe!</div>
+      <div class="ticker-item"><span class="ticker-dot"></span> ⚡ Har premium app aur tool up to 70% sasta milega Mango Number pe!</div>
       <div class="ticker-item"><span class="ticker-dot"></span> 🎨 Canva Pro Lifetime — Approved 1m ago</div>
     </div>
   </div>
@@ -1073,7 +1073,7 @@ function get_flag($country) {
           <div class="hero-content">
             <div class="hero-kicker">
               <span class="hero-kicker-dot"></span>
-              <span>🏷️ Up to 90% Cheaper Than Original Retail Prices</span>
+              <span>🏷️ Up to 70% Cheaper Than Original Retail Prices</span>
             </div>
             <h1 class="hero-title">
               Unlock <span class="highlight">100+ Premium</span> Virtual Numbers &amp; Services at Dirt-Cheap Rates.
@@ -1083,7 +1083,7 @@ function get_flag($country) {
             </p>
             <div class="hero-bullets">
               <span class="hero-pill">
-                <span>🏷️</span> Up to 90% OFF Original Prices
+                <span>🏷️</span> Up to 70% OFF Original Prices
               </span>
               <span class="hero-pill">
                 <span>⚡</span> Instant OTP activation in minutes
@@ -1130,7 +1130,7 @@ function get_flag($country) {
         <!-- Metrics Strip -->
         <div class="metrics-strip" id="metricsStrip">
           <div class="metric">
-            <span class="metric-value" data-counter="90" data-suffix="% OFF">0% OFF</span>
+            <span class="metric-value" data-counter="70" data-suffix="% OFF">Up to 70% OFF</span>
             <span class="metric-label">cheaper than original market prices</span>
           </div>
           <div class="metric">
@@ -1236,7 +1236,7 @@ function get_flag($country) {
           <div class="section-kicker">Why users choose Mango Number</div>
           <h2 class="section-title">Massive Savings. Unbeatable Cheap Prices.</h2>
           <p class="section-text">
-            Instead of paying expensive full subscription costs or risking your private personal phone number, Mango Number provides authentic virtual numbers and digital perks at up to 90% cheaper than original costs.
+            Instead of paying expensive full subscription costs or risking your private personal phone number, Mango Number provides authentic virtual numbers and digital perks at up to 70% cheaper than original costs.
           </p>
         </div>
 
@@ -1310,7 +1310,7 @@ function get_flag($country) {
           </div>
           <div class="faq-item" onclick="toggleFaq(this)">
             <div class="faq-header">
-              <span>Why are your prices up to 90% cheaper than original costs?</span>
+              <span>Why are your prices up to 70% cheaper than original costs?</span>
               <i class="bx bx-chevron-down faq-chevron"></i>
             </div>
             <div class="faq-body">
@@ -1476,7 +1476,7 @@ function animateNumbers() {
         current = target;
         clearInterval(timer);
       }
-        if (target === 90) {
+        if (target === 70) {
           el.innerText = 'Up to ' + current + suffix;
         } else {
           el.innerText = current.toLocaleString() + suffix;
