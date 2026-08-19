@@ -1181,9 +1181,15 @@ function get_flag($country) {
         </nav>
         <div class="header-actions">
           <?php if (is_logged_in()): ?>
-            <a href="dashboard.php" class="btn btn-primary btn-sm">
-              <i class="bx bx-grid-alt"></i> Dashboard
-            </a>
+            <?php if (is_admin()): ?>
+              <a href="admin.php" class="btn btn-primary btn-sm">
+                <i class="bx bx-cog"></i> Admin Panel
+              </a>
+            <?php else: ?>
+              <a href="dashboard.php" class="btn btn-primary btn-sm">
+                <i class="bx bx-grid-alt"></i> Dashboard
+              </a>
+            <?php endif; ?>
           <?php else: ?>
             <a href="login.php" class="btn btn-ghost btn-sm">Sign in</a>
             <a href="register.php" class="btn btn-primary btn-sm d-none-xs">Create Account</a>
@@ -1202,7 +1208,11 @@ function get_flag($country) {
       <a href="#faq" onclick="closeMobileDrawer()"><i class="bx bx-help-circle"></i> FAQ <i class="bx bx-chevron-right"></i></a>
       <a href="#testimonials" onclick="closeMobileDrawer()"><i class="bx bx-star"></i> Reviews <i class="bx bx-chevron-right"></i></a>
       <?php if (is_logged_in()): ?>
-        <a href="dashboard.php" style="background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #fff;"><i class="bx bx-grid-alt"></i> Go to Dashboard <i class="bx bx-right-arrow-alt"></i></a>
+        <?php if (is_admin()): ?>
+          <a href="admin.php" style="background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #fff;"><i class="bx bx-cog"></i> Admin Panel <i class="bx bx-right-arrow-alt"></i></a>
+        <?php else: ?>
+          <a href="dashboard.php" style="background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #fff;"><i class="bx bx-grid-alt"></i> Go to Dashboard <i class="bx bx-right-arrow-alt"></i></a>
+        <?php endif; ?>
       <?php else: ?>
         <a href="login.php"><i class="bx bx-log-in"></i> Sign In <i class="bx bx-chevron-right"></i></a>
         <a href="register.php" style="background: linear-gradient(135deg, #ff5e36, #ff8a1f); color: #fff;"><i class="bx bx-user-plus"></i> Create Account <i class="bx bx-right-arrow-alt"></i></a>
@@ -1281,10 +1291,16 @@ function get_flag($country) {
             <?php if (is_logged_in()): ?>
               <div style="padding: 20px 0; text-align: center;">
                 <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #ffffff;">Welcome back, <?= htmlspecialchars($_SESSION['username'] ?? 'User') ?>!</div>
-                <p style="font-size: .88rem; color: #9ca3af; margin-bottom: 20px;">You are currently logged in to your account.</p>
-                <a href="dashboard.php" class="btn btn-primary btn-full py-3" style="font-size: 1rem;">
-                  Go to Dashboard <i class="bx bx-right-arrow-alt"></i>
-                </a>
+                <p style="font-size: .88rem; color: #9ca3af; margin-bottom: 20px;">You are currently logged in as <?= is_admin() ? 'an Administrator' : 'a Client' ?>.</p>
+                <?php if (is_admin()): ?>
+                  <a href="admin.php" class="btn btn-primary btn-full py-3" style="font-size: 1rem;">
+                    Go to Admin Panel <i class="bx bx-right-arrow-alt"></i>
+                  </a>
+                <?php else: ?>
+                  <a href="dashboard.php" class="btn btn-primary btn-full py-3" style="font-size: 1rem;">
+                    Go to Dashboard <i class="bx bx-right-arrow-alt"></i>
+                  </a>
+                <?php endif; ?>
               </div>
             <?php else: ?>
               <form method="get" action="register.php">

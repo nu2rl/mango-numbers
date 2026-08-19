@@ -6,6 +6,12 @@
 require_once __DIR__ . '/config.php';
 require_login();
 
+// Auto-redirect Administrator accounts to Admin Panel
+if (is_admin()) {
+    header("Location: admin.php");
+    exit;
+}
+
 $db = get_db_connection();
 if (!$db) die("Database connection failed.");
 
