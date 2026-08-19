@@ -39,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_purchase'])) {
     }
     $stock = isset($product['stock_quantity']) ? (int)$product['stock_quantity'] : (int)($product['stock'] ?? 0);
     if (!$product) { $_SESSION['error_msg'] = 'Invalid product.'; header("Location: dashboard.php?section=buy"); exit; }
-    elseif ($stock <= 0) { $_SESSION['error_msg'] = 'Out of stock.'; header("Location: dashboard.php?section=buy"); exit; }
     elseif (empty($utr_number)) { $_SESSION['error_msg'] = 'UTR number is required.'; header("Location: dashboard.php?section=buy"); exit; }
+    elseif (!preg_match('/^\d{12}$/', $utr_number)) { $_SESSION['error_msg'] = 'UTR number must be exactly 12 numeric digits.'; header("Location: dashboard.php?section=buy"); exit; }
     else {
         $chk_stmt = $db->prepare("SELECT id FROM purchases WHERE utr_number = ?"); $chk_stmt->execute([$utr_number]);
         if ($chk_stmt->fetch()) { $_SESSION['error_msg'] = 'This UTR has already been submitted.'; header("Location: dashboard.php?section=buy"); exit; }
