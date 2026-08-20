@@ -10,6 +10,22 @@ if (is_logged_in()) {
     header("Location: dashboard.php");
     exit;
 }
+
+// Redirect if email parameter in GET belongs to an existing user account
+if (!empty($_GET['email'])) {
+    $check_email = trim($_GET['email']);
+    $db = get_db_connection();
+    if ($db) {
+        try {
+            $chk_stmt = $db->prepare("SELECT id FROM users WHERE email = ? AND status = 'active'");
+            $chk_stmt->execute([$check_email]);
+            if ($chk_stmt->fetch()) {
+                header("Location: login.php?email=" . urlencode($check_email) . "&msg=already_exists");
+                exit;
+            }
+        } catch (PDOException $e) {}
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -175,9 +191,9 @@ if (is_logged_in()) {
             <form id="signup-form" onsubmit="handleSignupFormSubmit(event)" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" id="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
-                <!-- Compulsory Profile Picture Upload -->
+                <!-- Optional Profile Picture Upload -->
                 <div class="form-group" style="text-align: center; margin-bottom: 22px;">
-                    <label style="display: block; text-align: left; margin-bottom: 10px;">Profile Picture <span style="color: #ef4444;">* (Compulsory)</span></label>
+                    <label style="display: block; text-align: left; margin-bottom: 10px;">Profile Picture <span style="color: #64748b;">(Optional)</span></label>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 16px; padding: 14px; background: rgba(255,255,255,0.03); border: 1.5px dashed rgba(249,115,22,0.4); border-radius: 16px;">
                         <div id="pfp-preview-wrap" style="width: 58px; height: 58px; border-radius: 50%; background: var(--elevated); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; box-shadow: 0 0 16px rgba(249,115,22,0.3);">
                             <span id="pfp-placeholder" style="font-size: 26px;">👤</span>
@@ -187,7 +203,7 @@ if (is_logged_in()) {
                             <label for="avatar" style="display: inline-block; padding: 9px 16px; background: linear-gradient(135deg, #f97316, #fb923c); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 9px; cursor: pointer; transition: transform 0.2s; margin-bottom: 4px;">
                                 📷 Choose Photo
                             </label>
-                            <input type="file" name="avatar" id="avatar" accept="image/jpeg,image/png,image/webp" required style="display: none;" onchange="previewAvatar(this)">
+                            <input type="file" name="avatar" id="avatar" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="previewAvatar(this)">
                             <div style="font-size: 11px; color: var(--muted);" id="pfp-filename">JPEG, PNG or WebP (Max 10MB)</div>
                         </div>
                     </div>
@@ -279,6 +295,10 @@ if (is_logged_in()) {
                     startResendTimer();
                 } else {
                     showAlert('error', data.error);
+                    if (data.redirect) {
+                        setTimeout(() => { window.location.href = data.redirect; }, 1200);
+                        return;
+                    }
                     if (!isResend) { btnSend.disabled = false; btnOtpText.innerText = 'Send OTP'; }
                     else { btnResend.disabled = false; btnResend.innerText = 'Resend'; }
                 }
@@ -332,10 +352,6 @@ if (is_logged_in()) {
         function verifyAndSignup() {
             var btnSignup = document.getElementById('btn-signup');
             var avatarInput = document.getElementById('avatar');
-            if (!avatarInput || !avatarInput.files || !avatarInput.files[0]) {
-                showAlert('error', 'Profile picture is compulsory! Please choose a photo before completing registration.');
-                return;
-            }
             var name = document.getElementById('name').value.trim();
             var email = document.getElementById('email').value.trim();
             var mobile = document.getElementById('mobile').value.trim();
@@ -347,7 +363,9 @@ if (is_logged_in()) {
             btnSignup.innerHTML = '<span class="spinner"></span> Verifying...';
             showAlert('none', '');
             var fd = new FormData();
-            fd.append('avatar', avatarInput.files[0]);
+            if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                fd.append('avatar', avatarInput.files[0]);
+            }
             fd.append('name', name); fd.append('email', email); fd.append('mobile', mobile);
             fd.append('otp', otp); fd.append('password', password);
             fd.append('confirm_password', confirmPassword); fd.append('csrf_token', csrfToken);

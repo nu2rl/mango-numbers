@@ -116,7 +116,11 @@ try {
         $stmt->execute([$email]);
         $existing_user = $stmt->fetch();
         if ($existing_user && $existing_user['status'] === 'active') {
-            echo json_encode(['success' => false, 'error' => 'This email address is already registered. Please login.']);
+            echo json_encode([
+                'success' => false, 
+                'redirect' => 'login.php?email=' . urlencode($email) . '&msg=already_exists',
+                'error' => 'This email address is already registered! Redirecting to login page...'
+            ]);
             exit;
         }
 
@@ -248,44 +252,33 @@ try {
                 }
             }
 
-            // Compulsory Profile Picture Upload Validation
-            if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
-                echo json_encode(['success' => false, 'error' => 'Profile picture is compulsory! Please select a photo.']);
-                exit;
+            // Optional Profile Picture Upload
+            $avatar_path = null;
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                $avatar_tmp = $_FILES['avatar']['tmp_name'];
+                $avatar_size = $_FILES['avatar']['size'];
+                if ($avatar_size <= 10 * 1024 * 1024) {
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $mime = finfo_file($finfo, $avatar_tmp);
+                    finfo_close($finfo);
+
+                    if (in_array($mime, ['image/jpeg', 'image/jpg', 'image/png', 'image/x-png', 'image/webp'])) {
+                        $avatar_dir = __DIR__ . '/uploads/avatars/';
+                        if (!is_dir($avatar_dir)) {
+                            @mkdir($avatar_dir, 0755, true);
+                        }
+
+                        $ext = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+                        if (empty($ext)) $ext = 'jpg';
+                        $avatar_filename = 'pfp_' . bin2hex(random_bytes(16)) . '.' . strtolower($ext);
+                        $avatar_destination = $avatar_dir . $avatar_filename;
+
+                        if (move_uploaded_file($avatar_tmp, $avatar_destination)) {
+                            $avatar_path = 'uploads/avatars/' . $avatar_filename;
+                        }
+                    }
+                }
             }
-
-            $avatar_tmp = $_FILES['avatar']['tmp_name'];
-            $avatar_size = $_FILES['avatar']['size'];
-            if ($avatar_size > 10 * 1024 * 1024) {
-                echo json_encode(['success' => false, 'error' => 'Profile picture size must not exceed 10MB.']);
-                exit;
-            }
-
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime = finfo_file($finfo, $avatar_tmp);
-            finfo_close($finfo);
-
-            if (!in_array($mime, ['image/jpeg', 'image/jpg', 'image/png', 'image/x-png', 'image/webp'])) {
-                echo json_encode(['success' => false, 'error' => 'Invalid image format. Please upload JPG, PNG, or WebP photo.']);
-                exit;
-            }
-
-            $avatar_dir = __DIR__ . '/uploads/avatars/';
-            if (!is_dir($avatar_dir)) {
-                @mkdir($avatar_dir, 0755, true);
-            }
-
-            $ext = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
-            if (empty($ext)) $ext = 'jpg';
-            $avatar_filename = 'pfp_' . bin2hex(random_bytes(16)) . '.' . strtolower($ext);
-            $avatar_destination = $avatar_dir . $avatar_filename;
-
-            if (!move_uploaded_file($avatar_tmp, $avatar_destination)) {
-                echo json_encode(['success' => false, 'error' => 'Failed to save profile picture. Please try again.']);
-                exit;
-            }
-
-            $avatar_path = 'uploads/avatars/' . $avatar_filename;
 
             $mobile = trim($_POST['mobile'] ?? '');
             $stmt = $db->prepare("INSERT INTO users (name, email, username, mobile, password, avatar_path, role) VALUES (?, ?, ?, ?, ?, ?, 'user')");

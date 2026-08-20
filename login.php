@@ -351,6 +351,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
+            <?php if (!empty($_GET['msg']) && $_GET['msg'] === 'already_exists'): ?>
+                <div class="alert-box alert-static" style="display:block; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3); color: #fb923c; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; font-size: 13.5px; text-align: center;">
+                    ℹ️ This email address is already registered. Please enter your password to sign in.
+                </div>
+            <?php endif; ?>
+
             <?php if (!empty($error)): ?>
                 <div class="alert-box alert-error"><?= $error ?></div>
             <?php endif; ?>
@@ -359,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="form-group">
                     <label for="username">Username or Email</label>
-                    <input type="text" name="username" id="username" placeholder="Enter username or email" required value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
+                    <input type="text" name="username" id="username" placeholder="Enter username or email" required value="<?= htmlspecialchars($_POST['username'] ?? $_GET['email'] ?? '') ?>">
                 </div>
                 <div class="form-group">
                     <div class="form-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
