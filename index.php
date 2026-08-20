@@ -1322,16 +1322,17 @@ function get_flag($country) {
                 <?php endif; ?>
               </div>
             <?php else: ?>
-              <form method="get" action="register.php">
+              <form method="get" action="register.php" id="hero-signup-form">
                 <div class="field">
                   <label for="reg_email">Email Address</label>
-                  <input id="reg_email" type="email" name="email" placeholder="you@example.com" required>
+                  <input id="reg_email" type="email" name="email" placeholder="you@example.com" required onblur="checkHeroEmail(this.value)">
                 </div>
-                <button type="submit" class="btn btn-primary btn-full py-3" style="font-size: .95rem;">
+                <div id="hero-email-alert" style="display:none; margin-bottom:14px; padding:12px 14px; background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.3); border-radius:12px; font-size:13px; color:#fb923c; text-align:center; line-height:1.5;"></div>
+                <button type="submit" class="btn btn-primary btn-full py-3" id="hero-signup-btn" style="font-size: .95rem;">
                   Create Account with Email OTP <i class="bx bx-right-arrow-alt"></i>
                 </button>
-                <div class="hero-card-footer">
-                  Already have an account? <a href="login.php">Sign in here</a>
+                <div class="hero-card-footer" id="hero-card-footer">
+                  Already have an account? <a href="login.php" id="hero-signin-link">Sign in here</a>
                 </div>
               </form>
             <?php endif; ?>
@@ -1749,6 +1750,57 @@ function animateNumbers() {
     }, 30);
   });
 }
+
+let isHeroEmailExisting = false;
+let existingEmailRedirect = '';
+
+function checkHeroEmail(email) {
+  email = (email || '').trim();
+  const alertEl = document.getElementById('hero-email-alert');
+  const btnEl = document.getElementById('hero-signup-btn');
+  if (!email || !email.includes('@')) {
+    if (alertEl) alertEl.style.display = 'none';
+    isHeroEmailExisting = false;
+    return;
+  }
+  fetch('auth_handler.php?action=check-email&email=' + encodeURIComponent(email))
+  .then(r => r.json())
+  .then(data => {
+    if (data.success && data.exists) {
+      isHeroEmailExisting = true;
+      existingEmailRedirect = data.redirect || ('login.php?email=' + encodeURIComponent(email) + '&msg=already_exists');
+      if (alertEl) {
+        alertEl.innerHTML = '⚠️ <strong>This user already exists!</strong> Please click on the Sign In button below.';
+        alertEl.style.display = 'block';
+      }
+      if (btnEl) {
+        btnEl.innerHTML = 'Sign In Now <i class="bx bx-right-arrow-alt"></i>';
+        btnEl.style.background = 'linear-gradient(135deg, #16a34a, #22c55e)';
+      }
+    } else {
+      isHeroEmailExisting = false;
+      if (alertEl) alertEl.style.display = 'none';
+      if (btnEl) {
+        btnEl.innerHTML = 'Create Account with Email OTP <i class="bx bx-right-arrow-alt"></i>';
+        btnEl.style.background = '';
+      }
+    }
+  })
+  .catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const formEl = document.getElementById('hero-signup-form');
+  if (formEl) {
+    formEl.addEventListener('submit', function(e) {
+      const email = document.getElementById('reg_email')?.value.trim();
+      if (isHeroEmailExisting && existingEmailRedirect) {
+        e.preventDefault();
+        window.location.href = existingEmailRedirect;
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>

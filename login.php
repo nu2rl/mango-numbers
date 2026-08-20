@@ -353,7 +353,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
             <?php if (!empty($_GET['msg']) && $_GET['msg'] === 'already_exists'): ?>
                 <div class="alert-box alert-static" style="display:block; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.3); color: #fb923c; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; font-size: 13.5px; text-align: center;">
-                    ℹ️ This email address is already registered. Please enter your password to sign in.
+                    ℹ️ This user already exists! Please enter your password to sign in.
                 </div>
             <?php endif; ?>
 

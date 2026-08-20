@@ -10,7 +10,7 @@ require_once __DIR__ . '/Mailer.php';
 
 // Verify CSRF token for security
 $action = $_GET['action'] ?? '';
-if (!in_array($action, ['check-status', 'get-user-purchases'])) {
+if (!in_array($action, ['check-status', 'get-user-purchases', 'check-email'])) {
     $headers = getallheaders();
     $headers_lower = array_change_key_case($headers, CASE_LOWER);
     $csrf_token = $headers_lower['x-csrf-token'] ?? $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
@@ -83,6 +83,27 @@ if ($action === 'get-user-purchases') {
     exit;
 }
 
+// -------------------------------------------------------------
+// ACTION: Check if email exists in database
+// -------------------------------------------------------------
+if ($action === 'check-email') {
+    $email = trim($_REQUEST['email'] ?? '');
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => true, 'exists' => false]);
+        exit;
+    }
+    $stmt = $db->prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?) AND status = 'active'");
+    $stmt->execute([$email]);
+    $exists = (bool)$stmt->fetch();
+    echo json_encode([
+        'success' => true,
+        'exists' => $exists,
+        'redirect' => 'login.php?email=' . urlencode($email) . '&msg=already_exists',
+        'message' => $exists ? 'This user already exists! Please click on the Sign In button.' : ''
+    ]);
+    exit;
+}
+
 /**
  * Validate email format
  */
@@ -118,8 +139,9 @@ try {
         if ($existing_user && $existing_user['status'] === 'active') {
             echo json_encode([
                 'success' => false, 
+                'exists' => true,
                 'redirect' => 'login.php?email=' . urlencode($email) . '&msg=already_exists',
-                'error' => 'This email address is already registered! Redirecting to login page...'
+                'error' => 'This user already exists! Please click on the Sign In button to log in.'
             ]);
             exit;
         }

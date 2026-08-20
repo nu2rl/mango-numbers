@@ -262,13 +262,54 @@ if (!empty($_GET['email'])) {
         var timerInterval = null;
         var csrfToken = document.getElementById('csrf_token') ? document.getElementById('csrf_token').value : '';
 
-        function showAlert(type, msg) {
+        function showAlert(type, msg, htmlContent = null) {
             var errEl = document.getElementById('alert-error');
             var succEl = document.getElementById('alert-success');
             errEl.style.display = 'none'; succEl.style.display = 'none';
-            if (type === 'error') { errEl.innerText = msg; errEl.style.display = 'block'; }
-            else if (type === 'success') { succEl.innerText = msg; succEl.style.display = 'block'; }
+            if (type === 'error') {
+                if (htmlContent) {
+                    errEl.innerHTML = htmlContent;
+                } else {
+                    errEl.innerText = msg;
+                }
+                errEl.style.display = 'block';
+            }
+            else if (type === 'success') {
+                if (htmlContent) {
+                    succEl.innerHTML = htmlContent;
+                } else {
+                    succEl.innerText = msg;
+                }
+                succEl.style.display = 'block';
+            }
         }
+
+        function checkEmailExists() {
+            var emailInput = document.getElementById('email');
+            if (!emailInput) return;
+            var email = emailInput.value.trim();
+            if (!email || !email.includes('@')) return;
+
+            fetch('auth_handler.php?action=check-email&email=' + encodeURIComponent(email))
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.exists) {
+                    var redirectUrl = data.redirect || ('login.php?email=' + encodeURIComponent(email) + '&msg=already_exists');
+                    showAlert('error', '', 
+                        '<div>⚠️ This user already exists! Please click on the Sign In button to log in.</div>' +
+                        '<a href="' + redirectUrl + '" class="btn-primary" style="display:inline-flex; text-decoration:none; margin-top:10px; font-size:13.5px; padding:10px 18px; width:auto; text-align:center; justify-content:center;">Sign In Now &rarr;</a>'
+                    );
+                }
+            })
+            .catch(() => {});
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var emailInput = document.getElementById('email');
+            if (emailInput) {
+                emailInput.addEventListener('blur', checkEmailExists);
+            }
+        });
 
         function sendOtpCode(isResend = false) {
             var emailInput = document.getElementById('email');
@@ -294,9 +335,19 @@ if (!empty($_GET['email'])) {
                     emailInput.disabled = true; btnSend.style.display = 'none';
                     startResendTimer();
                 } else {
+                    if (data.exists || (data.error && data.error.includes('already exists'))) {
+                        var redirectUrl = data.redirect || ('login.php?email=' + encodeURIComponent(email) + '&msg=already_exists');
+                        showAlert('error', '', 
+                            '<div>⚠️ This user already exists! Please click on the Sign In button to log in.</div>' +
+                            '<a href="' + redirectUrl + '" class="btn-primary" style="display:inline-flex; text-decoration:none; margin-top:10px; font-size:13.5px; padding:10px 18px; width:auto; text-align:center; justify-content:center;">Sign In Now &rarr;</a>'
+                        );
+                        if (!isResend) { btnSend.disabled = false; btnOtpText.innerText = 'Send OTP'; }
+                        else { btnResend.disabled = false; btnResend.innerText = 'Resend'; }
+                        return;
+                    }
                     showAlert('error', data.error);
                     if (data.redirect) {
-                        setTimeout(() => { window.location.href = data.redirect; }, 1200);
+                        setTimeout(() => { window.location.href = data.redirect; }, 1500);
                         return;
                     }
                     if (!isResend) { btnSend.disabled = false; btnOtpText.innerText = 'Send OTP'; }
