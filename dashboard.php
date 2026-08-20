@@ -995,7 +995,7 @@ function get_flag_icon($country) {
                     $sec_products = $cat_stmt->fetchAll();
                 }
             ?>
-                <div id="section-section-<?= $sec['id'] ?>" class="dashboard-section">
+                <div id="section-<?= $sec['id'] ?>" class="dashboard-section">
                     <h1 class="section-title"><?= htmlspecialchars(ucwords($sec['name'])) ?></h1>
                     <p class="section-sub"><?= htmlspecialchars(!empty($sec['description']) ? $sec['description'] : 'Browse available offers and services below.') ?></p>
                     
@@ -1456,59 +1456,37 @@ function get_flag_icon($country) {
             document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('section-' + section).classList.add('active');
-            const si = document.getElementById('menu-' + section); if (si) si.classList.add('active');
-            const bi = document.getElementById('bnav-' + section); if (bi) bi.classList.add('active');
+
+            let target = document.getElementById(section) || document.getElementById('section-' + section);
+            if (!target && section.startsWith('section-')) {
+                target = document.getElementById(section.replace('section-', ''));
+            }
+
+            if (target) {
+                target.classList.add('active');
+                const cleanId = target.id.replace(/^section-/, '');
+                const si = document.getElementById('menu-' + cleanId) || document.getElementById('menu-section-' + cleanId);
+                if (si) si.classList.add('active');
+                const bi = document.getElementById('bnav-' + cleanId);
+                if (bi) bi.classList.add('active');
+            }
             if (window.innerWidth <= 768) { closeSidebar(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         }
 
-        // Filter by service
-        function filterService(service, el) {
-            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('search-input').value = ''; document.getElementById('search-clear').style.display = 'none';
-            document.querySelectorAll('.catalog-card').forEach(card => {
-                card.classList.remove('hidden-by-search');
-                card.getAttribute('data-service') === service ? card.classList.remove('hidden') : card.classList.add('hidden');
-            });
-        }
-
-        function searchCatalog() {
-            const q = document.getElementById('search-input').value.toLowerCase().trim();
-            document.getElementById('search-clear').style.display = q ? 'block' : 'none';
-            const activeTab = document.querySelector('.filter-tab.active');
-            let activeService = 'Telegram';
-            if (activeTab) {
-                if (activeTab.textContent.includes('WhatsApp')) activeService = 'WhatsApp';
-                else if (activeTab.textContent.includes('Canva')) activeService = 'Canva';
-            }
-            document.querySelectorAll('.catalog-card').forEach(card => {
-                if (card.getAttribute('data-service') === activeService) {
-                    const country = card.querySelector('.c-country').innerText.toLowerCase();
-                    country.includes(q) ? card.classList.remove('hidden-by-search') : card.classList.add('hidden-by-search');
-                }
-            });
-        }
-        function clearSearch() { document.getElementById('search-input').value = ''; searchCatalog(); }
-
-        // Complaint accordion
-        function toggleComplaint(header) {
-            const item = header.closest('.complaint-item');
-            const wasOpen = item.classList.contains('open-item');
-            document.querySelectorAll('.complaint-item').forEach(i => { i.classList.remove('open-item'); const ico = i.querySelector('.complaint-header .bx-chevron-down'); if (ico) ico.style.transform = ''; });
-            if (!wasOpen) {
-                item.classList.add('open-item');
-                const ico = header.querySelector('.bx-chevron-down'); if (ico) ico.style.transform = 'rotate(180deg)';
-                // Scroll chat to bottom
-                const thread = item.querySelector('.chat-thread'); if (thread) thread.scrollTop = thread.scrollHeight;
-            }
-        }
-
-        // Restore section from URL
+        // Restore section from URL or default to first available section
         document.addEventListener('DOMContentLoaded', () => {
             const p = new URLSearchParams(window.location.search).get('section');
-            if (p && ['buy','history','support'].includes(p)) switchSection(p);
-            else switchSection('buy');
+            if (p) {
+                switchSection(p);
+            } else {
+                const firstSection = document.querySelector('.dashboard-section');
+                if (firstSection) {
+                    const secId = firstSection.id.replace(/^section-/, '');
+                    switchSection(secId);
+                } else {
+                    switchSection('history');
+                }
+            }
         });
 
         // Copy text helper
