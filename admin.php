@@ -973,107 +973,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_update_system_
 }
 
 // Fetch stats for widgets
-// A. Total Sales Revenue (Rate Sold)
-$stmt = $db->query("SELECT SUM(price_paid_inr) FROM purchases WHERE status = 'approved'");
-$total_revenue = (float)$stmt->fetchColumn();
+$total_revenue = 0.0;
+$total_spend = 0.0;
+$pending_orders_count = 0;
+$users_count = 0;
+$unresolved_complaints_count = 0;
+$pending_purchases = [];
+$catalog_list = [];
+$complaints_list = [];
+$all_users = [];
 
-// B. Total Cost Spend (Rate Bought)
-$stmt = $db->query("SELECT SUM(price_cost_inr) FROM purchases WHERE status = 'approved'");
-$total_spend = (float)$stmt->fetchColumn();
+try {
+    $stmt = $db->query("SELECT SUM(price_paid_inr) FROM purchases WHERE status = 'approved'");
+    $total_revenue = (float)($stmt ? $stmt->fetchColumn() : 0);
+} catch (Exception $e) {}
 
-// C. Net Profit (Revenue - Spend)
+try {
+    $stmt = $db->query("SELECT SUM(price_cost_inr) FROM purchases WHERE status = 'approved'");
+    $total_spend = (float)($stmt ? $stmt->fetchColumn() : 0);
+} catch (Exception $e) {}
+
 $net_profit = $total_revenue - $total_spend;
 
-// D. Pending Transactions
-$stmt = $db->query("SELECT COUNT(*) FROM purchases WHERE status = 'pending'");
-$pending_orders_count = (int)$stmt->fetchColumn();
+try {
+    $stmt = $db->query("SELECT COUNT(*) FROM purchases WHERE status = 'pending'");
+    $pending_orders_count = (int)($stmt ? $stmt->fetchColumn() : 0);
+} catch (Exception $e) {}
 
-// E. Total Active Users
-$stmt = $db->query("SELECT COUNT(*) FROM users WHERE role = 'user' AND status = 'active'");
-$users_count = (int)$stmt->fetchColumn();
+try {
+    $stmt = $db->query("SELECT COUNT(*) FROM users WHERE role = 'user' AND status = 'active'");
+    $users_count = (int)($stmt ? $stmt->fetchColumn() : 0);
+} catch (Exception $e) {}
 
-// F. Unresolved Complaints
-$stmt = $db->query("SELECT COUNT(*) FROM complaints WHERE status = 'open' AND admin_deleted_at IS NULL");
-$unresolved_complaints_count = (int)$stmt->fetchColumn();
+try {
+    $stmt = $db->query("SELECT COUNT(*) FROM complaints WHERE status = 'open' AND (admin_deleted_at IS NULL OR admin_deleted_at = '')");
+    $unresolved_complaints_count = (int)($stmt ? $stmt->fetchColumn() : 0);
+} catch (Exception $e) {
+    try {
+        $stmt = $db->query("SELECT COUNT(*) FROM complaints WHERE status = 'open'");
+        $unresolved_complaints_count = (int)($stmt ? $stmt->fetchColumn() : 0);
+    } catch (Exception $e2) {}
+}
 
-// Fetch Pending Purchases with user details
-$stmt = $db->query("SELECT p.*, u.username FROM purchases p JOIN users u ON p.user_id = u.id WHERE p.status = 'pending' ORDER BY p.id ASC");
-$pending_purchases = $stmt->fetchAll();
+try {
+    $stmt = $db->query("SELECT p.*, u.username FROM purchases p JOIN users u ON p.user_id = u.id WHERE p.status = 'pending' ORDER BY p.id ASC");
+    $pending_purchases = $stmt ? $stmt->fetchAll() : [];
+} catch (Exception $e) {}
 
-// Fetch Catalog list
-$stmt = $db->query("SELECT * FROM catalog ORDER BY service_type DESC, country ASC, name ASC");
-$catalog_list = $stmt->fetchAll();
+try {
+    $stmt = $db->query("SELECT * FROM catalog ORDER BY service_type DESC, country ASC, name ASC");
+    $catalog_list = $stmt ? $stmt->fetchAll() : [];
+} catch (Exception $e) {}
 
-// Fetch Complaints with user details
-$stmt = $db->query("SELECT c.*, u.username FROM complaints c JOIN users u ON c.user_id = u.id WHERE c.admin_deleted_at IS NULL ORDER BY c.status ASC, c.id DESC");
-$complaints_list = $stmt->fetchAll();
+try {
+    $stmt = $db->query("SELECT c.*, u.username FROM complaints c JOIN users u ON c.user_id = u.id WHERE (c.admin_deleted_at IS NULL OR c.admin_deleted_at = '') ORDER BY c.status ASC, c.id DESC");
+    $complaints_list = $stmt ? $stmt->fetchAll() : [];
+} catch (Exception $e) {
+    try {
+        $stmt = $db->query("SELECT c.*, u.username FROM complaints c JOIN users u ON c.user_id = u.id ORDER BY c.status ASC, c.id DESC");
+        $complaints_list = $stmt ? $stmt->fetchAll() : [];
+    } catch (Exception $e2) {}
+}
 
-// Fetch all registered users with their total approved spending
-$stmt = $db->query("SELECT u.*, (SELECT COALESCE(SUM(p.price_paid_inr), 0) FROM purchases p WHERE p.user_id = u.id AND p.status = 'approved') AS total_spent FROM users u WHERE u.status = 'active' ORDER BY u.id DESC");
-$all_users = $stmt->fetchAll();
+try {
+    $stmt = $db->query("SELECT u.*, (SELECT COALESCE(SUM(p.price_paid_inr), 0) FROM purchases p WHERE p.user_id = u.id AND p.status = 'approved') AS total_spent FROM users u WHERE u.status = 'active' ORDER BY u.id DESC");
+    $all_users = $stmt ? $stmt->fetchAll() : [];
+} catch (Exception $e) {}
 
 // Preserve active tab state across form submissions
 $active_tab = $_GET['active_tab'] ?? 'approvals';
 
 // Revenue Chart Data
-// Daily: last 14 days
-$daily_stmt = $db->query("
-    SELECT DATE(created_at) as day, 
-           SUM(price_paid_inr) as revenue, 
-           SUM(price_cost_inr) as cost,
-           COUNT(*) as orders
-    FROM purchases 
-    WHERE status = 'approved' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 13 DAY)
-    GROUP BY DATE(created_at) ORDER BY day ASC
-");
-$daily_raw = $daily_stmt->fetchAll();
-// Build a full 14-day array with 0s for missing days
+$daily_raw = [];
+try {
+    $daily_stmt = $db->query("
+        SELECT DATE(created_at) as day, 
+               SUM(price_paid_inr) as revenue, 
+               SUM(price_cost_inr) as cost,
+               COUNT(*) as orders
+        FROM purchases 
+        WHERE status = 'approved' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 13 DAY)
+        GROUP BY DATE(created_at) ORDER BY day ASC
+    ");
+    $daily_raw = $daily_stmt ? $daily_stmt->fetchAll() : [];
+} catch (Exception $e) {}
+
 $daily_labels = $daily_revenue = $daily_profit = $daily_orders = [];
 for ($i = 13; $i >= 0; $i--) {
     $d = date('Y-m-d', strtotime("-$i days"));
     $daily_labels[] = date('d M', strtotime($d));
-    $found = array_filter($daily_raw, fn($r) => $r['day'] === $d);
+    $found = array_filter($daily_raw, fn($r) => isset($r['day']) && $r['day'] === $d);
     $row = $found ? array_values($found)[0] : null;
-    $daily_revenue[] = $row ? (float)$row['revenue'] : 0;
-    $daily_profit[]  = $row ? round((float)$row['revenue'] - (float)$row['cost'], 2) : 0;
-    $daily_orders[]  = $row ? (int)$row['orders'] : 0;
+    $daily_revenue[] = $row ? (float)($row['revenue'] ?? 0) : 0;
+    $daily_profit[]  = $row ? round((float)($row['revenue'] ?? 0) - (float)($row['cost'] ?? 0), 2) : 0;
+    $daily_orders[]  = $row ? (int)($row['orders'] ?? 0) : 0;
 }
-// Weekly: last 8 weeks
-$weekly_stmt = $db->query("
-    SELECT YEARWEEK(created_at, 1) as yw,
-           MIN(DATE(created_at)) as week_start,
-           SUM(price_paid_inr) as revenue,
-           SUM(price_cost_inr) as cost,
-           COUNT(*) as orders
-    FROM purchases
-    WHERE status = 'approved' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 8 WEEK)
-    GROUP BY yw ORDER BY yw ASC
-");
-$weekly_raw = $weekly_stmt->fetchAll();
+
+$weekly_raw = [];
+try {
+    $weekly_stmt = $db->query("
+        SELECT YEARWEEK(created_at, 1) as yw,
+               MIN(DATE(created_at)) as week_start,
+               SUM(price_paid_inr) as revenue,
+               SUM(price_cost_inr) as cost,
+               COUNT(*) as orders
+        FROM purchases
+        WHERE status = 'approved' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 8 WEEK)
+        GROUP BY yw ORDER BY yw ASC
+    ");
+    $weekly_raw = $weekly_stmt ? $weekly_stmt->fetchAll() : [];
+} catch (Exception $e) {}
+
 $weekly_labels = $weekly_revenue = $weekly_profit = $weekly_orders = [];
 foreach ($weekly_raw as $row) {
-    $weekly_labels[]  = 'Wk ' . date('d M', strtotime($row['week_start']));
-    $weekly_revenue[] = (float)$row['revenue'];
-    $weekly_profit[]  = round((float)$row['revenue'] - (float)$row['cost'], 2);
-    $weekly_orders[]  = (int)$row['orders'];
+    $weekly_labels[]  = 'Wk ' . date('d M', strtotime($row['week_start'] ?? 'now'));
+    $weekly_revenue[] = (float)($row['revenue'] ?? 0);
+    $weekly_profit[]  = round((float)($row['revenue'] ?? 0) - (float)($row['cost'] ?? 0), 2);
+    $weekly_orders[]  = (int)($row['orders'] ?? 0);
 }
-// Monthly: last 6 months
-$monthly_stmt = $db->query("
-    SELECT DATE_FORMAT(created_at, '%Y-%m') as mo,
-           SUM(price_paid_inr) as revenue,
-           SUM(price_cost_inr) as cost,
-           COUNT(*) as orders
-    FROM purchases
-    WHERE status = 'approved' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-    GROUP BY mo ORDER BY mo ASC
-");
-$monthly_raw = $monthly_stmt->fetchAll();
+
+$monthly_raw = [];
+try {
+    $monthly_stmt = $db->query("
+        SELECT DATE_FORMAT(created_at, '%Y-%m') as mo,
+               SUM(price_paid_inr) as revenue,
+               SUM(price_cost_inr) as cost,
+               COUNT(*) as orders
+        FROM purchases
+        WHERE status = 'approved' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+        GROUP BY mo ORDER BY mo ASC
+    ");
+    $monthly_raw = $monthly_stmt ? $monthly_stmt->fetchAll() : [];
+} catch (Exception $e) {}
+
 $monthly_labels = $monthly_revenue = $monthly_profit = $monthly_orders = [];
 foreach ($monthly_raw as $row) {
-    $monthly_labels[]  = date('M Y', strtotime($row['mo'] . '-01'));
-    $monthly_revenue[] = (float)$row['revenue'];
-    $monthly_profit[]  = round((float)$row['revenue'] - (float)$row['cost'], 2);
-    $monthly_orders[]  = (int)$row['orders'];
+    $monthly_labels[]  = date('M Y', strtotime(($row['mo'] ?? date('Y-m')) . '-01'));
+    $monthly_revenue[] = (float)($row['revenue'] ?? 0);
+    $monthly_profit[]  = round((float)($row['revenue'] ?? 0) - (float)($row['cost'] ?? 0), 2);
+    $monthly_orders[]  = (int)($row['orders'] ?? 0);
 }
 // Fetch Sections & Products for Manage Offers
 $sections_list = [];

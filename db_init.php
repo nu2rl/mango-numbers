@@ -147,9 +147,14 @@ try {
         message TEXT NOT NULL,
         status ENUM('open', 'resolved') DEFAULT 'open',
         admin_response TEXT DEFAULT NULL,
+        admin_deleted_at TIMESTAMP NULL DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;");
+
+    try {
+        $pdo->exec("ALTER TABLE complaints ADD COLUMN admin_deleted_at TIMESTAMP NULL DEFAULT NULL AFTER admin_response;");
+    } catch (PDOException $e) {}
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS complaint_messages (
         id INT AUTO_INCREMENT PRIMARY KEY,
