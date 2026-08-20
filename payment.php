@@ -2,7 +2,11 @@
 /**
  * Mango Number - Dedicated Checkout & Payment Page
  */
-include 'config.php';
+if (!file_exists(__DIR__ . '/config.php')) {
+    http_response_code(500);
+    die("Configuration file config.php missing.");
+}
+require_once __DIR__ . '/config.php';
 require_login();
 
 $db = get_db_connection();

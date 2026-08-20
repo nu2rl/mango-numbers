@@ -3,6 +3,11 @@
  * Mango Number - Premium SaaS Landing Page
  */
 
+if (!file_exists(__DIR__ . '/config.php')) {
+    http_response_code(500);
+    die("<!DOCTYPE html><html><head><title>Configuration Error</title><style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}.card{background:#161b22;border:1px solid #30363d;padding:2rem;border-radius:12px;max-width:500px;text-align:center;h1{color:#ff8a1f;font-size:1.5rem;margin-top:0;}}</style></head><body><div class='card'><h1>Configuration File Missing</h1><p>The core configuration file (<code>config.php</code>) was not found on the server.</p><p style='font-size:0.9rem;color:#8b949e;'>Please ensure <code>config.php</code> is uploaded to your server's root web directory (<code>public_html</code>).</p></div></body></html>");
+}
+
 require_once __DIR__ . '/config.php';
 
 $db = get_db_connection();
