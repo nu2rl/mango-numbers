@@ -984,15 +984,20 @@ function get_flag_icon($country) {
 
             <!-- DYNAMIC CATALOG SECTIONS -->
             <?php foreach ($active_sections as $sec): 
-                $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? ORDER BY display_order ASC, id DESC");
-                $prod_stmt->execute([$sec['id']]);
-                $sec_products = $prod_stmt->fetchAll();
+                $sec_products = [];
+                try {
+                    $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? ORDER BY display_order ASC, id DESC");
+                    $prod_stmt->execute([$sec['id']]);
+                    $sec_products = $prod_stmt->fetchAll();
+                } catch (Exception $e) {}
 
                 // Fallback: If no products linked to section_id, check legacy catalog table by section name
                 if (empty($sec_products)) {
-                    $cat_stmt = $db->prepare("SELECT id, name, country, price_inr, price_usd, price_cost_inr, stock as stock_quantity, status, 'active' as availability_status, '' as badge, '' as icon FROM catalog WHERE (service_type LIKE ? OR name LIKE ?) AND status = 'active' ORDER BY price_inr ASC");
-                    $cat_stmt->execute(['%' . $sec['name'] . '%', '%' . $sec['name'] . '%']);
-                    $sec_products = $cat_stmt->fetchAll();
+                    try {
+                        $cat_stmt = $db->prepare("SELECT id, name, country, price_inr, price_usd, price_cost_inr, stock as stock_quantity, status, 'active' as availability_status, '' as badge, '' as icon FROM catalog WHERE (service_type LIKE ? OR name LIKE ?) AND status = 'active' ORDER BY price_inr ASC");
+                        $cat_stmt->execute(['%' . $sec['name'] . '%', '%' . $sec['name'] . '%']);
+                        $sec_products = $cat_stmt->fetchAll();
+                    } catch (Exception $e) {}
                 }
             ?>
                 <div id="section-<?= $sec['id'] ?>" class="dashboard-section">
@@ -1205,8 +1210,12 @@ function get_flag_icon($country) {
                                                 </div>
                                             </div>
                                             <?php
-                                            $msg_stmt = $db->prepare("SELECT * FROM complaint_messages WHERE complaint_id = ? ORDER BY id ASC");
-                                            $msg_stmt->execute([$c['id']]); $msgs = $msg_stmt->fetchAll();
+                                            $msgs = [];
+                                            try {
+                                                $msg_stmt = $db->prepare("SELECT * FROM complaint_messages WHERE complaint_id = ? ORDER BY id ASC");
+                                                $msg_stmt->execute([$c['id']]); 
+                                                $msgs = $msg_stmt->fetchAll();
+                                            } catch (Exception $e) {}
                                             foreach ($msgs as $m):
                                             ?>
                                                 <div style="align-self:<?= $m['sender']==='admin'?'flex-end':'flex-start' ?>;">
