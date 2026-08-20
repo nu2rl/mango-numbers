@@ -1184,7 +1184,7 @@ function get_flag($country) {
       <div class="header-inner">
         <a href="index.php" class="brand">
           <div class="brand-logo-icon">
-            <img src="assets/img/logo.png" alt="Mango Number Logo">
+            <img src="assets/img/logo.png" alt="Mango Number Logo" width="42" height="42" decoding="async">
           </div>
           <div>
             <div class="brand-text">MANGO <span>NUMBER</span></div>
@@ -1596,7 +1596,7 @@ function get_flag($country) {
         <div class="footer-brand">
           <a href="index.php" class="brand" style="margin-bottom: 8px;">
             <div class="brand-logo-icon">
-              <img src="assets/img/logo.png" alt="Mango Number Logo">
+              <img src="assets/img/logo.png" alt="Mango Number Logo" width="36" height="36" decoding="async" loading="lazy">
             </div>
             <div class="brand-text">MANGO <span>NUMBER</span></div>
           </a>
