@@ -253,18 +253,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_user_password'
 }
 
 // Data fetch
-$user_stmt = $db->prepare("SELECT name, email, mobile, avatar_path FROM users WHERE id = ?"); $user_stmt->execute([$user_id]); $user_profile = $user_stmt->fetch();
-$user_name = $user_profile['name'] ?? 'User'; $user_email = $user_profile['email'] ?? $username; $user_mobile = $user_profile['mobile'] ?? ''; $user_avatar = $user_profile['avatar_path'] ?? '';
-$spend_stmt = $db->prepare("SELECT SUM(price_paid_inr) FROM purchases WHERE user_id = ? AND status = 'approved'"); $spend_stmt->execute([$user_id]); $total_spending = $spend_stmt->fetchColumn() ?: 0;
-$order_count = $db->prepare("SELECT COUNT(*) FROM purchases WHERE user_id = ? AND status = 'approved'"); $order_count->execute([$user_id]); $approved_count = $order_count->fetchColumn() ?: 0;
-$stmt = $db->prepare("SELECT * FROM catalog WHERE status = 'active' ORDER BY service_type DESC, price_inr ASC"); $stmt->execute(); $catalog_items = $stmt->fetchAll();
-$canva_stmt = $db->query("SELECT * FROM catalog WHERE name LIKE '%Canva Premium Lifetime%' AND status = 'active' LIMIT 1"); $canva_item = $canva_stmt ? $canva_stmt->fetch() : null;
-$stmt = $db->prepare("SELECT * FROM purchases WHERE user_id = ? ORDER BY id DESC"); $stmt->execute([$user_id]); $purchases = $stmt->fetchAll();
-$comp_stmt = $db->prepare("SELECT * FROM complaints WHERE user_id = ? ORDER BY id DESC"); $comp_stmt->execute([$user_id]); $complaints = $comp_stmt->fetchAll();
+$user_profile = [];
+$total_spending = 0;
+$approved_count = 0;
+$catalog_items = [];
+$canva_item = null;
+$purchases = [];
+$complaints = [];
+
+try {
+    $user_stmt = $db->prepare("SELECT name, email, mobile, avatar_path FROM users WHERE id = ?"); 
+    $user_stmt->execute([$user_id]); 
+    $user_profile = $user_stmt->fetch() ?: [];
+} catch (Exception $e) {}
+
+$user_name = $user_profile['name'] ?? 'User'; 
+$user_email = $user_profile['email'] ?? $username; 
+$user_mobile = $user_profile['mobile'] ?? ''; 
+$user_avatar = $user_profile['avatar_path'] ?? '';
+
+try {
+    $spend_stmt = $db->prepare("SELECT SUM(price_paid_inr) FROM purchases WHERE user_id = ? AND status = 'approved'"); 
+    $spend_stmt->execute([$user_id]); 
+    $total_spending = $spend_stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {}
+
+try {
+    $order_count = $db->prepare("SELECT COUNT(*) FROM purchases WHERE user_id = ? AND status = 'approved'"); 
+    $order_count->execute([$user_id]); 
+    $approved_count = $order_count->fetchColumn() ?: 0;
+} catch (Exception $e) {}
+
+try {
+    $stmt = $db->prepare("SELECT * FROM catalog WHERE status = 'active' ORDER BY service_type DESC, price_inr ASC"); 
+    $stmt->execute(); 
+    $catalog_items = $stmt->fetchAll() ?: [];
+} catch (Exception $e) {}
+
+try {
+    $canva_stmt = $db->query("SELECT * FROM catalog WHERE name LIKE '%Canva Premium Lifetime%' AND status = 'active' LIMIT 1"); 
+    $canva_item = $canva_stmt ? $canva_stmt->fetch() : null;
+} catch (Exception $e) {}
+
+try {
+    $stmt = $db->prepare("SELECT * FROM purchases WHERE user_id = ? ORDER BY id DESC"); 
+    $stmt->execute([$user_id]); 
+    $purchases = $stmt->fetchAll() ?: [];
+} catch (Exception $e) {}
+
+try {
+    $comp_stmt = $db->prepare("SELECT * FROM complaints WHERE user_id = ? ORDER BY id DESC"); 
+    $comp_stmt->execute([$user_id]); 
+    $complaints = $comp_stmt->fetchAll() ?: [];
+} catch (Exception $e) {}
+
 $active_sections = [];
 try {
     $sections_stmt = $db->query("SELECT * FROM sections WHERE status = 'active' ORDER BY display_order ASC, id ASC");
-    $active_sections = $sections_stmt->fetchAll();
+    $active_sections = $sections_stmt ? $sections_stmt->fetchAll() : [];
 } catch (Exception $e) {}
 
 function get_flag_icon($country) {
