@@ -156,10 +156,10 @@ function get_db_connection() {
         }
     }
         
-        // Auto-migration & Schema verification (runs only once per process)
-        static $migrated = false;
-        if (!$migrated) {
-            $migrated = true;
+        // ponytail: Auto-migration & Schema verification runs only once per deployment/init, not on every HTTP request
+        $migration_flag = UPLOAD_DIR . '.db_migrated_v2';
+        if (!file_exists($migration_flag)) {
+            @touch($migration_flag);
             try {
                 $pdo->exec("CREATE TABLE IF NOT EXISTS sections (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -467,7 +467,8 @@ function send_telegram_notification($message) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 2);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     @curl_exec($ch);
     @curl_close($ch);
