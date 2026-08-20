@@ -574,7 +574,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_create_house']
         try {
             if ($db) {
                 $status = ($stock > 0) ? 'available' : 'out_of_stock';
-                $stmt = $db->prepare("INSERT INTO products (section_id, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock_quantity, availability_status, icon, badge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("INSERT INTO products (section_id, name, country, price_cost_usd, price_cost_inr, price_usd, price_inr, stock_quantity, availability_status, icon, badge, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')");
                 $stmt->execute([$sec_id, $house_name, $country, $price_cost_usd, $price_cost_inr, $price_usd, $price_inr, $stock, $status, $icon, $badge]);
                 $_SESSION['success_msg'] = "New House '{$house_name}' added to Section!";
             } else {

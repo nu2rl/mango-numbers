@@ -986,7 +986,7 @@ function get_flag_icon($country) {
             <?php foreach ($active_sections as $sec): 
                 $sec_products = [];
                 try {
-                    $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? ORDER BY display_order ASC, id DESC");
+                    $prod_stmt = $db->prepare("SELECT * FROM products WHERE section_id = ? ORDER BY id DESC");
                     $prod_stmt->execute([$sec['id']]);
                     $sec_products = $prod_stmt->fetchAll();
                 } catch (Exception $e) {}

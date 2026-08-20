@@ -212,6 +212,8 @@ function get_db_connection() {
             try { $pdo->exec("ALTER TABLE purchases MODIFY COLUMN service_type VARCHAR(50) NOT NULL"); } catch (PDOException $e) {}
             try { $pdo->exec("ALTER TABLE purchases ADD COLUMN product_id INT DEFAULT NULL AFTER catalog_id"); } catch (PDOException $e) {}
             try { $pdo->exec("ALTER TABLE purchases MODIFY COLUMN catalog_id INT DEFAULT NULL"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE products ADD COLUMN display_order INT DEFAULT 0"); } catch (PDOException $e) {}
+            try { $pdo->exec("ALTER TABLE products ADD COLUMN status VARCHAR(20) DEFAULT 'active'"); } catch (PDOException $e) {}
 
             // Auto-seed Canva Premium Lifetime if missing
             try {
